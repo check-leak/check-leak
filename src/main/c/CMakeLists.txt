@@ -36,9 +36,9 @@ set(CMAKE_C_FLAGS_DEBUG "-Wall -std=gnu11 -z execstack -fdump-tree-all -Wall -pg
 set(CMAKE_C_FLAGS "-O3 -std=gnu11 -Wall ${CMAKE_USER_C_FLAGS}")
 
 
-set(CRAWL_LIB_NAME crawl-64)
+set(DSECT_LIB_NAME dsect-64)
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(CRAWL_LIB_NAME crawl-32)
+    set(DSECT_LIB_NAME dsect-32)
 endif()
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
     set(ARTEMIS_LIB_DIR lib/linux-amd64)
@@ -72,15 +72,13 @@ INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 
 ADD_CUSTOM_COMMAND(
     OUTPUT com_dsect_jvmti_JVMTIInterface.h
-    COMMAND javah -cp ../java/ ccom.dsect.jvmti.JVMTIInterface
+    COMMAND javah -cp ../java/ com.dsect.jvmti.JVMTIInterface
     DEPENDS ../java/com/dsect/jvmti/JVMTIInterface.java
 )
 
-ADD_LIBRARY(artemis-native SHARED agent.cc com_dsect_jvmti_JVMTIInterface.h)
-
-#target_link_libraries(crawl ${LIBAIO_LIB})
+ADD_LIBRARY(artemis-native SHARED agent.c com_dsect_jvmti_JVMTIInterface.h)
 
 set_target_properties(artemis-native PROPERTIES
-              LIBRARY_OUTPUT_DIRECTORY ../../../target/${CRAWL_LIB_DIR}
-              LIBRARY_OUTPUT_NAME ${CRAWL_LIB_NAME})
-message(STATUS "Setting up library as ${CRAWL_LIB_NAME} based on current architecture")
+              LIBRARY_OUTPUT_DIRECTORY ../../../target/${DSECT_LIB_DIR}
+              LIBRARY_OUTPUT_NAME ${DSECT_LIB_NAME})
+message(STATUS "Setting up library as ${DSECT_LIB_NAME} based on current architecture")

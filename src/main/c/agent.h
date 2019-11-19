@@ -22,23 +22,23 @@ typedef struct _iteraOverObjectsControl
 
 
 
-inline void verifyError(jvmtiError error) {
+inline void verifyError(jvmtiEnv *jvmti, jvmtiError error) {
    if ( error != JVMTI_ERROR_NONE ) {
       char * errorName;
-      jvmti->GetErrorName(error,&errorName);
+      (*jvmti)->GetErrorName(jvmti, error, &errorName);
       fprintf (stderr,"JVMTI Error %s\n",errorName);
       fflush(stderr);
-      jvmti->Deallocate((unsigned char *)errorName);
+      (*jvmti)->Deallocate(jvmti, (unsigned char *)errorName);
    }   
 }
 
-inline void addTag(IteraOverObjectsControl * control, jlong & taglong)
+void addTag(jvmtiEnv *jvmti, IteraOverObjectsControl * control, jlong taglong)
 {
    if (control->size>=control->maxsize)
    {
       unsigned char * buffer;
-      jvmtiError error = jvmti->Allocate(sizeof(jlong) * (control->maxsize+1000),&buffer);
-      verifyError(error);
+      jvmtiError error = (*jvmti)->Allocate(jvmti, sizeof(jlong) * (control->maxsize+1000),&buffer);
+      verifyError(jvmti, error);
       jlong * newbuffer = (jlong *) buffer;
       
       if (control->tags!=NULL)
@@ -47,7 +47,7 @@ inline void addTag(IteraOverObjectsControl * control, jlong & taglong)
 	      {
 	         newbuffer[i] = control->tags[i];
 	      }
-	      jvmti->Deallocate((unsigned char *)control->tags);
+	      (*jvmti)->Deallocate(jvmti, (unsigned char *)control->tags);
 	  }
       control->tags = newbuffer;      
       control->maxsize=control->size+1000;
@@ -60,30 +60,18 @@ void throwException(JNIEnv * env,char * clazz, char * message);
 
 jint initJVMTI(JavaVM *jvm);
 
-inline int checkJVMTI(JNIEnv * env)
-{
-   if (jvmti==NULL)
-   {
-      throwException(env,"java/lang/RuntimeException","Agent not initialized");
-      return 0;
-   }
-   
-   return 1;
-}
-
-
 inline void throwException(JNIEnv * env,char * clazz, char * message)
 {
-  jclass exceptionClass = env->FindClass(clazz);
+  jclass exceptionClass = (*env)->FindClass(env, clazz);
   if (exceptionClass==NULL) 
   {
-     exceptionClass = env->FindClass("java/lang/RuntimeException");
+     exceptionClass = (*env)->FindClass(env, "java/lang/RuntimeException");
      if (exceptionClass==NULL) 
      {
         fprintf (stderr,"Couldn't throw exception %s - %s\n",clazz,message);
      }
   }
   
-  env->ThrowNew(exceptionClass,message);
+  (*env)->ThrowNew(env, exceptionClass,message);
   
 }

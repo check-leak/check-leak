@@ -114,7 +114,7 @@ void memoryWriteClass(JNIEnv *env,  jlong tag, IterateControl* iterate, jclass i
     if (genericPointer!=NULL) (*jvmti)->Deallocate(jvmti, (unsigned char *)genericPointer);
 }
 
-JNIEXPORT jobjectArray JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getLoadedClasses
+JNIEXPORT jobjectArray JNICALL Java_com_dsect_jvmti_JVMTIInterface_getLoadedClasses
   (JNIEnv * env, jobject thisObject)
 {
   jclass loadedClass = (*env)->FindClass(env, "java/lang/Class");
@@ -247,7 +247,7 @@ void releaseTags()
 				  &cleanTag, NULL);
 }
 
-JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_heapSnapshot
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_heapSnapshot
   (JNIEnv * env, jclass clazz, jstring classesFileName, jstring referencesFileName, jstring objectsFileName)
 {
 
@@ -336,7 +336,7 @@ JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_heapSnapshot
   verifyError(jvmti, err);
 }
 
-JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_forceGC
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_forceGC
   (JNIEnv * env, jobject thisObject)
 {
 
@@ -361,11 +361,11 @@ jvmtiIterationControl JNICALL iterate_getAllObjects
 
 
 /*
- * Class:     org_jboss_profiler_jvmti_JVMTIInterface
+ * Class:     com_dsect_jvmti_JVMTIInterface
  * Method:    getAllObjects
  * Signature: (Ljava/lang/Class;)[Ljava/lang/Object;
  */
-JNIEXPORT jobjectArray JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getAllObjects
+JNIEXPORT jobjectArray JNICALL Java_com_dsect_jvmti_JVMTIInterface_getAllObjects
   (JNIEnv * env, jobject jvmtiInteface_this, jclass klass) {
 
 
@@ -492,7 +492,7 @@ jvmtiIterationControl JNICALL iterateObjectRelationshipLookupReference
 
 
 
-JNIEXPORT jobjectArray JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getReferenceHolders
+JNIEXPORT jobjectArray JNICALL Java_com_dsect_jvmti_JVMTIInterface_getReferenceHolders
   (JNIEnv * env, jobject thisObject, jobjectArray objectArray)
 {
 	jobject referencedObject;
@@ -549,7 +549,7 @@ JNIEXPORT jobjectArray JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getR
 	return arrayReturn;
 }
 
-JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_releaseTags
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_releaseTags
   (JNIEnv * env, jobject tag)
 {
 	releaseTags();
@@ -676,7 +676,7 @@ jvmtiIterationControl JNICALL iterateObjectRelationshipOnNotify
  }
 
 
-JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_notifyInventory
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_notifyInventory
   (JNIEnv *env, jobject thisObject, jboolean notifyClasses, jstring temporaryFileReferences, jstring temporaryFileObjects, jobject jvmtiCallBack)
 {
   IterateControl iterate;
@@ -826,7 +826,7 @@ JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_notifyInvent
   verifyError(jvmti,err);
 }
 
-JNIEXPORT jlong JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getTagOnObject
+JNIEXPORT jlong JNICALL Java_com_dsect_jvmti_JVMTIInterface_getTagOnObject
   (JNIEnv * env, jobject thisObject, jobject taggedObject)
 {
     jlong retTag;
@@ -836,7 +836,7 @@ JNIEXPORT jlong JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getTagOnObj
     return retTag;
 }
 
-JNIEXPORT jobject JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getObjectOnTag
+JNIEXPORT jobject JNICALL Java_com_dsect_jvmti_JVMTIInterface_getObjectOnTag
   (JNIEnv * env, jobject thisObject, jlong tag)
 {
     jint countObjts=0;
@@ -868,7 +868,7 @@ JNIEXPORT jobject JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getObject
 	return retObject;
 }
 
-JNIEXPORT jobject JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getObjectField
+JNIEXPORT jobject JNICALL Java_com_dsect_jvmti_JVMTIInterface_getObjectField
   (JNIEnv * env, jobject thisObject, jclass clazz, jboolean isStatic,jlong fieldIndex)
 {
 	jint fieldCount=0;
@@ -899,7 +899,7 @@ JNIEXPORT jobject JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getObject
 }
 
 
-JNIEXPORT jstring JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethodName
+JNIEXPORT jstring JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodName
   (JNIEnv * env, jobject thisObject, jlong lMethodId)
 {
 	if (lMethodId==0 || lMethodId==-1) return NULL;
@@ -914,7 +914,7 @@ JNIEXPORT jstring JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethod
 	return retString;
 }
 
-JNIEXPORT jstring JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethodSignature
+JNIEXPORT jstring JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodSignature
   (JNIEnv * env, jobject thisObject, jlong lMethodId)
 {
 	if (lMethodId==0 || lMethodId==-1) return NULL;
@@ -930,7 +930,7 @@ JNIEXPORT jstring JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethod
 }
 
 
-JNIEXPORT jclass JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethodClass
+JNIEXPORT jclass JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodClass
   (JNIEnv * env, jobject thisObject, jlong lMethodId)
 {
 	if (lMethodId==0 || lMethodId==-1) return NULL;
@@ -942,7 +942,7 @@ JNIEXPORT jclass JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_getMethodC
 }
 
 
-JNIEXPORT jboolean JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_internalIsConfiguredProperly
+JNIEXPORT jboolean JNICALL Java_com_dsect_jvmti_JVMTIInterface_internalIsConfiguredProperly
   (JNIEnv * env, jobject thisObject)
 {
 	return jvmti!=NULL;
@@ -976,7 +976,7 @@ JNICALL void eventMethodLeave2(jvmtiEnv *jvmti_env,
 }
 
 
-JNIEXPORT void JNICALL Java_org_jboss_profiler_jvmti_JVMTIInterface_startMeasure
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_startMeasure
   (JNIEnv * env, jobject thisObj, jstring jstrDirectory, jstring jstrPrefix, jstring jstrSuffix)
 {
   fprintf (stderr,"Start measure\n"); fflush(stderr);

@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.redhat.crawl.jvmti.memoryweb;
+package com.dsect.jvmti.memoryweb;
 
 import com.dsect.jvmti.JVMTIInterface;
-import com.redhat.crawl.jvmti.TestClass;
+import com.dsect.jvmti.TestClass;
 import org.junit.Test;
 
 

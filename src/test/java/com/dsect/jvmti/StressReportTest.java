@@ -20,26 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.redhat.crawl.jvmti;
+package com.dsect.jvmti;
 
-/**
- * A DumbClass
- *
- * @author <mailto:clebert.suconic@jboss.org">Clebert Suconic</a>
- */
-public class TestClass {
+import com.dsect.jvmti.JVMTIInterface;
+import org.junit.Test;
 
-   static long counter = 0;
+public class StressReportTest {
 
-   long a = counter++;
 
-   long a2 = counter++;
+   @Test
+   public void testReports() throws Exception {
+      long i = 0;
 
-   long a3 = counter++;
+      JVMTIInterface jvmti = new JVMTIInterface();
 
-   long a4 = counter++;
-   long a5 = counter++;
-
-   long a6 = counter++;
+      while (true) {
+         if (i++ % 100 == 0) {
+            System.out.println("i = " + i);
+         }
+         jvmti.inventoryReport();
+      }
+   }
 
 }

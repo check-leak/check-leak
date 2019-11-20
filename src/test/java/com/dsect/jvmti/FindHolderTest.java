@@ -25,6 +25,11 @@ import org.junit.Test;
 public class FindHolderTest {
 
    @Test
+   public void testLoaded() {
+      Assert.assertTrue(JVMTIInterface.isLoaded());
+   }
+
+   @Test
    public void testGetObjects() {
 
       TestClass testClass = new TestClass();
@@ -64,9 +69,31 @@ public class FindHolderTest {
 
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
 
-      Map<Class<?>, InventoryDataPoint> inventory =  jvmtiInterface.produceInventory();
       System.out.println(jvmtiInterface.exploreObjectReferences(10, true, testClass));
 
 
+   }
+   /** This method will show an object leaking, and a report to where is the reference on it */
+   @Test
+   public void testNoLeak() throws Exception {
+
+      TestClass testClass = new TestClass();
+      testClass.someString = "Hello Francis!!!";
+
+      boolean leaked = false;
+
+      try {
+         JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
+      } catch (UnexpectedLeak leak) {
+         leak.printStackTrace();
+         leaked = true;
+      }
+
+
+      Assert.assertTrue(leaked);
+
+      testClass = null;
+
+      JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
    }
 }

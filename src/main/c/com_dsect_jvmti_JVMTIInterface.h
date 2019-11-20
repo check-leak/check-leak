@@ -9,6 +9,14 @@ extern "C" {
 #endif
 /*
  * Class:     com_dsect_jvmti_JVMTIInterface
+ * Method:    blank
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_blank
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_dsect_jvmti_JVMTIInterface
  * Method:    forceGC
  * Signature: ()V
  */
@@ -86,14 +94,6 @@ JNIEXPORT jlong JNICALL Java_com_dsect_jvmti_JVMTIInterface_getTagOnObject
  */
 JNIEXPORT jobject JNICALL Java_com_dsect_jvmti_JVMTIInterface_getObjectOnTag
   (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     com_dsect_jvmti_JVMTIInterface
- * Method:    internalIsConfiguredProperly
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_dsect_jvmti_JVMTIInterface_internalIsConfiguredProperly
-  (JNIEnv *, jobject);
 
 /*
  * Class:     com_dsect_jvmti_JVMTIInterface

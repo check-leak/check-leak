@@ -47,33 +47,44 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-/**
- * @author Clebert Suconic
- */
-public class JVMTIInterface
-{
-   private static boolean isLoaded = true;
-   static
-   {
-      try
-      {
-         JVMTIInterface tst = new JVMTIInterface();
-         // if this works, the profiler is already loaded
-         tst.forceGC();
+public class JVMTIInterface {
+
+   public static void noLeaks(String clazzName, int expectedInstances, int reportDepth) throws UnexpectedLeak, Exception {
+      JVMTIInterface jvmtiInterface = new JVMTIInterface();
+      Object[] objects = jvmtiInterface.getAllObjects(clazzName);
+
+      if (objects.length > expectedInstances) {
+         String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
+         throw new UnexpectedLeak(clazzName + " has " + objects.length + " > " + expectedInstances + "\n" + report);
       }
-      catch (Throwable e)
-      {
-         try
-         {
-            System.loadLibrary("JBossProfiler");
-         }
-         catch (Throwable e2)
-         {
+   }
+
+   private static boolean isLoaded = true;
+
+   static {
+      try {
+         JVMTIInterface tst = new JVMTIInterface();
+         // Calling the blank method, just to make sure the library is loaded
+         tst.blank();
+      } catch (Throwable e) {
+         try {
+            System.loadLibrary("dsect");
+         } catch (Throwable e2) {
+            e2.printStackTrace();
             isLoaded = false;
-            System.out.println("The DLL/SO couldn't be loaded, you won't be able to use any JVMTIInterface feature");
          }
       }
    }
+
+   /**
+    * Returns true if -agentlib:JBossProfiler was configured properly
+    */
+   public static boolean isLoaded() {
+      return isLoaded;
+   }
+
+   /** This is a blank method, intended just to verify if the library is loaded correctly */
+   public native void blank();
 
    /**
     * Force a GC. This method doesn't use System.gc. If JVMTI is enabled this
@@ -85,17 +96,16 @@ public class JVMTIInterface
 
    public native void stopMeasure();
 
-   /** returns the first class found with a given name */
-   public Class<?>[] getAllClassMachingName(final String className)
-   {
+   /**
+    * returns the first class found with a given name
+    */
+   public Class<?>[] getAllClassMachingName(final String className) {
       Class<?> classes[] = getLoadedClasses();
 
       ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
 
-      for (Class<?> clazz : classes)
-      {
-         if (clazz.getName().equals(className))
-         {
+      for (Class<?> clazz : classes) {
+         if (clazz.getName().equals(className)) {
             foundClasses.add(clazz);
          }
       }
@@ -103,14 +113,11 @@ public class JVMTIInterface
       return foundClasses.toArray(new Class<?>[foundClasses.size()]);
    }
 
-   public Class<?> getClassByName(final String className)
-   {
+   public Class<?> getClassByName(final String className) {
       Class<?> classes[] = getLoadedClasses();
 
-      for (Class<?> classe : classes)
-      {
-         if (classe.getName().equals(className))
-         {
+      for (Class<?> classe : classes) {
+         if (classe.getName().equals(className)) {
             return classe;
          }
       }
@@ -129,11 +136,12 @@ public class JVMTIInterface
     * This method will keep every object tagged for later usage. This method is
     * going to tag objects.
     */
-   protected native void notifyInventory(boolean notifyOnClasses, String temporaryFileReferences,
-         String temporaryFileObjects, JVMTICallBack callback);
+   protected native void notifyInventory(boolean notifyOnClasses,
+                                         String temporaryFileReferences,
+                                         String temporaryFileObjects,
+                                         JVMTICallBack callback);
 
-   public void notifyOnReferences(final String temporaryFile, final JVMTICallBack callback)
-   {
+   public void notifyOnReferences(final String temporaryFile, final JVMTICallBack callback) {
       notifyInventory(true, temporaryFile, null, callback);
    }
 
@@ -152,45 +160,30 @@ public class JVMTIInterface
     */
    public native Object[] getAllObjects(Class<?> clazz);
 
-   /** Will return the tag of an object */
+   /**
+    * Will return the tag of an object
+    */
    public native long getTagOnObject(Object obj);
 
-   /** Will return the object on a tag */
+   /**
+    * Will return the object on a tag
+    */
    public native Object getObjectOnTag(long tag);
-
-   private native boolean internalIsConfiguredProperly();
-
-   /** Returns true if -agentlib:JBossProfiler was configured properly */
-   public boolean isActive()
-   {
-      if (!isLoaded)
-      {
-         return false;
-      }
-      else
-      {
-         return internalIsConfiguredProperly();
-      }
-   }
 
    /**
     * Returns the field represted by the FieldId. This is used on field
     * relationships according to the rule determined by JVMTI documentation.
     */
-   public Field getObjectField(Class<?> clazz, int fieldId)
-   {
+   public Field getObjectField(Class<?> clazz, int fieldId) {
       ArrayList<Class<?>> list = new ArrayList<Class<?>>();
       list.add(clazz);
-      while ((clazz = clazz.getSuperclass()) != null)
-      {
+      while ((clazz = clazz.getSuperclass()) != null) {
          list.add(clazz);
       }
 
-      for (int i = list.size() - 1; i >= 0; i--)
-      {
-         Field fields[] = ((Class)list.get(i)).getDeclaredFields();
-         if (fieldId < fields.length)
-         {
+      for (int i = list.size() - 1; i >= 0; i--) {
+         Field fields[] = ((Class) list.get(i)).getDeclaredFields();
+         if (fieldId < fields.length) {
             return fields[fieldId];
          }
          fieldId -= fields.length;
@@ -206,13 +199,9 @@ public class JVMTIInterface
 
    protected static native void heapSnapshot(String classesFileName, String referencesFileName, String objectsFileName);
 
-   public void heapSnapshot(final String basicFileName, final String suffix)
-   {
+   public void heapSnapshot(final String basicFileName, final String suffix) {
       forceGC();
-      heapSnapshot(basicFileName +
-            "_classes" + "." + suffix, basicFileName +
-            "_references" + "." + suffix, basicFileName +
-            "_objects" + "." + suffix);
+      heapSnapshot(basicFileName + "_classes" + "." + suffix, basicFileName + "_references" + "." + suffix, basicFileName + "_objects" + "." + suffix);
    }
 
    /**
@@ -223,18 +212,14 @@ public class JVMTIInterface
     * Structs Action Form, this will return every ActionForm defined on the
     * current JVM.
     */
-   public Object[] getAllObjects(final String clazz)
-   {
+   public Object[] getAllObjects(final String clazz) {
       ArrayList list = new ArrayList();
 
       Class[] classes = getLoadedClasses();
-      for (Class classe : classes)
-      {
-         if (classe.getName().equals(clazz))
-         {
+      for (Class classe : classes) {
+         if (classe.getName().equals(clazz)) {
             Object objs[] = this.getAllObjects(classe);
-            for (Object obj : objs)
-            {
+            for (Object obj : objs) {
                list.add(obj);
             }
          }
@@ -243,57 +228,42 @@ public class JVMTIInterface
       return list.toArray();
    }
 
-   static class ClassSorterByClassLoader implements Comparator
-   {
+   static class ClassSorterByClassLoader implements Comparator {
 
-      public int compare(final Object o1, final Object o2)
-      {
-         Class left = (Class)o1;
-         Class right = (Class)o2;
+      public int compare(final Object o1, final Object o2) {
+         Class left = (Class) o1;
+         Class right = (Class) o2;
 
          int compare = 0;
 
-         if ((compare = compareClassLoader(left.getClassLoader(), right.getClassLoader())) != 0)
-         {
+         if ((compare = compareClassLoader(left.getClassLoader(), right.getClassLoader())) != 0) {
             return compare;
          }
 
          return left.getName().compareTo(right.getName());
       }
 
-      public int compareClassLoader(final ClassLoader left, final ClassLoader right)
-      {
-         if (left == null ||
-               right == null)
-         {
-            if (left == right)
-            {
+      public int compareClassLoader(final ClassLoader left, final ClassLoader right) {
+         if (left == null || right == null) {
+            if (left == right) {
                return 0;
-            }
-            else if (left == null)
-            {
+            } else if (left == null) {
                return -1;
-            }
-            else
-            {
+            } else {
                return 1;
             }
-         }
-         else
-         {
+         } else {
             return left.toString().compareTo(right.toString());
          }
       }
 
    }
 
-   static class ClassSorterByClassName implements Comparator
-   {
+   static class ClassSorterByClassName implements Comparator {
 
-      public int compare(final Object o1, final Object o2)
-      {
-         Class left = (Class)o1;
-         Class right = (Class)o2;
+      public int compare(final Object o1, final Object o2) {
+         Class left = (Class) o1;
+         Class right = (Class) o2;
          int compare = left.getName().compareTo(right.getName());
          /*
           * if (compare==0) { if (o1==o2) { return 0; } else { return 1; } }
@@ -303,90 +273,65 @@ public class JVMTIInterface
       }
    }
 
-   public String convertToString(final Object obj, final boolean callToString)
-   {
+   public String convertToString(final Object obj, final boolean callToString) {
 
       String returnValue = null;
-      try
-      {
-         if (obj == null)
-         {
+      try {
+         if (obj == null) {
             returnValue = "null";
-         }
-         else
-         {
-            if (callToString)
-            {
-               returnValue = "TOSTRING(" +
-                     obj.toString() + "), class=" + obj.getClass().getName();
-            }
-            else
-            {
-               if (obj instanceof Class)
-               {
-                  returnValue = "CLASS(" +
-                        obj.toString() + "), identifyHashCode=" + System.identityHashCode(obj);
-               }
-               else
-               {
-                  returnValue = "OBJ(" +
-                        obj.getClass().getName() + "@" + System.identityHashCode(obj) + ")";
+         } else {
+            if (callToString) {
+               returnValue = "TOSTRING(" + obj.toString() + "), class=" + obj.getClass().getName();
+            } else {
+               if (obj instanceof Class) {
+                  returnValue = "CLASS(" + obj.toString() + "), identifyHashCode=" + System.identityHashCode(obj);
+               } else {
+                  returnValue = "OBJ(" + obj.getClass().getName() + "@" + System.identityHashCode(obj) + ")";
                }
             }
          }
-      }
-      catch (Throwable e)
-      {
-         return obj.getClass().getName() +
-               " toString had an Exception ";
+      } catch (Throwable e) {
+         return obj.getClass().getName() + " toString had an Exception ";
       }
 
-      if (returnValue.length() > 200)
-      {
-         return "OBJ(" +
-               obj.getClass().getName() + "@" + System.identityHashCode(obj) + ")";
-      }
-      else
-      {
+      if (returnValue.length() > 200) {
+         return "OBJ(" + obj.getClass().getName() + "@" + System.identityHashCode(obj) + ")";
+      } else {
          return returnValue;
       }
    }
 
-   /** Explore references recursevely */
-   private void exploreObject(final PrintWriter out, final Object source, final int currentLevel, final int maxLevel,
-         final boolean useToString, final boolean weakAndSoft, final Map mapDataPoints, final HashSet alreadyExplored)
-   {
+   /**
+    * Explore references recursevely
+    */
+   private void exploreObject(final PrintWriter out,
+                              final Object source,
+                              final int currentLevel,
+                              final int maxLevel,
+                              final boolean useToString,
+                              final boolean weakAndSoft,
+                              final Map mapDataPoints,
+                              final HashSet alreadyExplored) {
       String level = null;
       {
          StringBuffer levelStr = new StringBuffer();
-         for (int i = 0; i <= currentLevel; i++)
-         {
+         for (int i = 0; i <= currentLevel; i++) {
             levelStr.append("!--");
          }
          level = levelStr.toString();
       }
 
-      if (maxLevel >= 0 &&
-            currentLevel >= maxLevel)
-      {
-         out.println("<br>" +
-               level + "<b>MaxLevel</b>");
+      if (maxLevel >= 0 && currentLevel >= maxLevel) {
+         out.println(level + "MaxLevel");
          return;
       }
       Integer index = new Integer(System.identityHashCode(source));
 
-      if (alreadyExplored.contains(index))
-      {
-         if (source instanceof Class)
-         {
-            out.println("<br>" +
-                  level + " object instanceOf " + source + "@" + index + " was already described before on this report");
-         }
-         else
-         {
-            out.println("<br>" +
-                  level + " object instanceOf " + source.getClass() + "@" + index +
-                  " was already described before on this report");
+      if (alreadyExplored.contains(index)) {
+         if (source instanceof Class) {
+            out.println(level + " object instanceOf " + source + "@" + index + " was already described before on this report");
+         } else {
+            out.println(level + " object instanceOf " + source.getClass() + "@" + index + " was already described before on this report");
          }
          return;
       }
@@ -394,40 +339,26 @@ public class JVMTIInterface
       alreadyExplored.add(index);
 
       Long sourceTag = new Long(getTagOnObject(source));
-      ArrayList listPoints = (ArrayList)mapDataPoints.get(sourceTag);
-      if (listPoints == null)
-      {
+      ArrayList listPoints = (ArrayList) mapDataPoints.get(sourceTag);
+      if (listPoints == null) {
          return;
       }
 
       Iterator iter = listPoints.iterator();
 
-      while (iter.hasNext())
-      {
-         ReferenceDataPoint point = (ReferenceDataPoint)iter.next();
+      while (iter.hasNext()) {
+         ReferenceDataPoint point = (ReferenceDataPoint) iter.next();
 
          Object nextReference = treatReference(level, out, point, useToString);
 
-         if (nextReference != null &&
-               !weakAndSoft)
-         {
-            if (nextReference instanceof WeakReference ||
-                  nextReference instanceof SoftReference)
-            {
+         if (nextReference != null && !weakAndSoft) {
+            if (nextReference instanceof WeakReference || nextReference instanceof SoftReference) {
                nextReference = null;
             }
          }
 
-         if (nextReference != null)
-         {
-            exploreObject(out,
-                          nextReference,
-                          currentLevel + 1,
-                          maxLevel,
-                          useToString,
-                          weakAndSoft,
-                          mapDataPoints,
-                          alreadyExplored);
+         if (nextReference != null) {
+            exploreObject(out, nextReference, currentLevel + 1, maxLevel, useToString, weakAndSoft, mapDataPoints, alreadyExplored);
          }
       }
 
@@ -437,30 +368,25 @@ public class JVMTIInterface
     * This is used by JSPs to have access to internal features formating
     * results according to the navigations. That's the only reason this method
     * is public. This is not intended to be used as part of the public API.
-    * 
+    *
     * @urlBaseToFollow will be concatenated objId=3> obj </a> to the
-    *                  outputStream
+    * outputStream
     */
-   public Object treatReference(final String level, final PrintWriter out, final ReferenceDataPoint point,
-         final boolean useToString)
-   {
+   public Object treatReference(final String level,
+                                final PrintWriter out,
+                                final ReferenceDataPoint point,
+                                final boolean useToString) {
       Object referenceHolder = null;
-      if (point.getReferenceHolder() == 0 ||
-            point.getReferenceHolder() == -1)
-      {
+      if (point.getReferenceHolder() == 0 || point.getReferenceHolder() == -1) {
          referenceHolder = null;
-      }
-      else
-      {
+      } else {
          referenceHolder = getObjectOnTag(point.getReferenceHolder());
       }
       Object nextReference = null;
-      switch (point.getReferenceType())
-      {
+      switch (point.getReferenceType()) {
          case JVMTITypes.JVMTI_REFERENCE_INSTANCE:
             ;// Reference from an object to its class.
-            out.println("<br>" +
-                  level + "InstanceOfReference:ToString=" + convertToString(referenceHolder, useToString));
+            out.println(level + "InstanceOfReference:ToString=" + convertToString(referenceHolder, useToString));
 
             nextReference = referenceHolder;
             break;
@@ -484,26 +410,18 @@ public class JVMTIInterface
 
             String fieldName = null;
 
-            if (referenceHolder == null)
-            {
+            if (referenceHolder == null) {
                fieldName = "Reference GONE";
-            }
-            else
-            {
+            } else {
                Class clazz = referenceHolder.getClass();
-               Field field = getObjectField(clazz, (int)point.getIndex());
-               if (field == null)
-               {
-                  fieldName = "UndefinedField@" +
-                        referenceHolder;
-               }
-               else
-               {
+               Field field = getObjectField(clazz, (int) point.getIndex());
+               if (field == null) {
+                  fieldName = "UndefinedField@" + referenceHolder;
+               } else {
                   fieldName = field.toString();
                }
             }
-            out.println("<br>" +
-                  level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
+            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          }
@@ -512,43 +430,33 @@ public class JVMTIInterface
             // elements. For
             // references of this kind the referrer_index parameter to the
             // jvmtiObjectReferenceCallback is the array index.
-            if (referenceHolder == null)
-            {
-               out.println("<br>" +
-                     level + " arrayRef Position " + point.getIndex() + " is gone");
-            }
-            else
-            {
-               out.println("<br>" +
-                     level + " arrayRef " + referenceHolder.getClass().getName() + "[" + point.getIndex() + "] id=@" +
-                     System.identityHashCode(referenceHolder));
+            if (referenceHolder == null) {
+               out.println(level + " arrayRef Position " + point.getIndex() + " is gone");
+            } else {
+               out.println(level + " arrayRef " + referenceHolder.getClass().getName() + "[" + point.getIndex() + "] id=@" + System.identityHashCode(referenceHolder));
             }
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_CLASS_LOADER:// Reference from a class
             // to its class loader.
-            out.println("<br>" +
-                  level + "ClassLoaderReference @ " + convertToString(referenceHolder, useToString));
+            out.println(level + "ClassLoaderReference @ " + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_SIGNERS:// Reference from a class to its
             // signers array.
-            out.println("<br>" +
-                  level + "ReferenceSigner@" + convertToString(referenceHolder, useToString));
+            out.println(level + "ReferenceSigner@" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_PROTECTION_DOMAIN:// Reference from a
             // class to its
             // protection
             // domain.
-            out.println("<br>" +
-                  level + "ProtectionDomain@" + convertToString(referenceHolder, useToString));
+            out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_INTERFACE:// Reference from a class to
             // one of its interfaces.
-            out.println("<br>" +
-                  level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
+            out.println(level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_STATIC_FIELD:// Reference from a class
@@ -561,20 +469,15 @@ public class JVMTIInterface
             // (not inherited fields), starting at zero. See
             // GetClassFields.
          {
-            Class clazz = (Class)referenceHolder;
-            Field field = getObjectField(clazz, (int)point.getIndex());
+            Class clazz = (Class) referenceHolder;
+            Field field = getObjectField(clazz, (int) point.getIndex());
             String fieldName = null;
-            if (field == null)
-            {
-               fieldName = "UndefinedField@" +
-                     referenceHolder;
-            }
-            else
-            {
+            if (field == null) {
+               fieldName = "UndefinedField@" + referenceHolder;
+            } else {
                fieldName = field.toString();
             }
-            out.println("<br>" +
-                  level + " StaticFieldReference " + fieldName);
+            out.println(level + " StaticFieldReference " + fieldName);
             nextReference = null;
             break;
          }
@@ -586,35 +489,29 @@ public class JVMTIInterface
             // into constant pool table of the class, starting at 1. See
             // The Constant Pool in the Java Virtual Machine
             // Specification.
-            out.println("<br>" +
-                  level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
+            out.println(level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.ROOT_REFERENCE:
-            out.println("<br>" +
-                  level + "Root");
+            out.println(level + "Root");
             nextReference = null;
             break;
          case JVMTITypes.THREAD_REFERENCE:
 
             Class methodClass = getMethodClass(point.getMethod());
-            if (methodClass != null)
-            {
+            if (methodClass != null) {
                String className = null;
-               if (methodClass != null)
-               {
+               if (methodClass != null) {
                   className = methodClass.getName();
                }
 
                String methodName = getMethodName(point.getMethod());
-               out.println("<br>" +
-                     level + " Reference inside a method - " + className + "::" + methodName);
+               out.println(level + " Reference inside a method - " + className + "::" + methodName);
             }
             nextReference = null;
             break;
          default:
-            System.out.println("unexpected reference " +
-                  point);
+            System.out.println("unexpected reference " + point);
       }
       return nextReference;
    }
@@ -623,39 +520,36 @@ public class JVMTIInterface
     * This method tags the JVM and return an index. You can navigate through
     * references using this returned HashMap. This method can't be exposed
     * through JMX as it would serialize a huge amount of data.
-    * 
-    * @return HashMap<Long objectId,ArrayList<ReferenceDataPoint> referencees>
-    * */
-   public Map<Long, List<ReferenceDataPoint>> createIndexMatrix() throws IOException
-   {
+    *
+    * @return HashMap<Long objectId, ArrayList < ReferenceDataPoint> referencees>
+    */
+   public Map<Long, List<ReferenceDataPoint>> createIndexMatrix() throws IOException {
       releaseTags();
       final HashMap<Long, List<ReferenceDataPoint>> referencesMap = new HashMap<Long, List<ReferenceDataPoint>>();
       File tmpFile = File.createTempFile("tmpRefs", ".tmp");
-      notifyOnReferences(tmpFile.getAbsolutePath(), new JVMTICallBack()
-      {
+      notifyOnReferences(tmpFile.getAbsolutePath(), new JVMTICallBack() {
          int count = 0;
 
-         public void notifyReference(final long referenceHolder, final long referencedObject, final long classTag,
-               final long index, final long method, final byte referenceType)
-         {
-            ReferenceDataPoint dataPoint =
-                  new ReferenceDataPoint(referenceHolder, referencedObject, classTag, index, method, referenceType);
+         public void notifyReference(final long referenceHolder,
+                                     final long referencedObject,
+                                     final long classTag,
+                                     final long index,
+                                     final long method,
+                                     final byte referenceType) {
+            ReferenceDataPoint dataPoint = new ReferenceDataPoint(referenceHolder, referencedObject, classTag, index, method, referenceType);
             Long indexLong = new Long(referencedObject);
-            List<ReferenceDataPoint> arrayList = (ArrayList<ReferenceDataPoint>)referencesMap.get(indexLong);
-            if (arrayList == null)
-            {
+            List<ReferenceDataPoint> arrayList = (ArrayList<ReferenceDataPoint>) referencesMap.get(indexLong);
+            if (arrayList == null) {
                arrayList = new ArrayList<ReferenceDataPoint>();
                referencesMap.put(indexLong, arrayList);
             }
             arrayList.add(dataPoint);
          }
 
-         public void notifyClass(final long classTag, final Class clazz)
-         {
+         public void notifyClass(final long classTag, final Class clazz) {
          }
 
-         public void notifyObject(final long classTag, final long objectId, final long bytes)
-         {
+         public void notifyObject(final long classTag, final long objectId, final long bytes) {
          }
       });
 
@@ -664,62 +558,46 @@ public class JVMTIInterface
       return referencesMap;
    }
 
-   public String exploreClassReferences(final String className, final int maxLevel,
-         final boolean solveReferencesOnClasses, final boolean solveReferencesOnClassLoaders,
-         final boolean useToString, final boolean weakAndSoft, final boolean printObjects)
-   {
+   public String exploreClassReferences(final String className,
+                                        final int maxLevel,
+                                        final boolean solveReferencesOnClasses,
+                                        final boolean solveReferencesOnClassLoaders,
+                                        final boolean useToString,
+                                        final boolean weakAndSoft,
+                                        final boolean printObjects) {
       forceGC();
-      if (!solveReferencesOnClasses &&
-            !solveReferencesOnClassLoaders && !printObjects)
-      {
+      if (!solveReferencesOnClasses && !solveReferencesOnClassLoaders && !printObjects) {
          return "<b> you have to select at least solveReferences || solveClassLoaders || printObjects </b>";
       }
 
       Map referencesMap = null;
-      try
-      {
+      try {
          referencesMap = createIndexMatrix();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
          CharArrayWriter charArray = new CharArrayWriter();
          PrintWriter out = new PrintWriter(charArray);
          e.printStackTrace(out);
          return charArray.toString();
       }
 
-      try
-      {
+      try {
          CharArrayWriter charArray = new CharArrayWriter();
          PrintWriter out = new PrintWriter(charArray);
 
-         out.println(exploreClassReferences(className,
-                                            maxLevel,
-                                            solveReferencesOnClasses,
-                                            solveReferencesOnClassLoaders,
-                                            useToString,
-                                            weakAndSoft,
-                                            referencesMap));
+         out.println(exploreClassReferences(className, maxLevel, solveReferencesOnClasses, solveReferencesOnClassLoaders, useToString, weakAndSoft, referencesMap));
 
-         if (printObjects)
-         {
+         if (printObjects) {
             releaseTags();
             Class classes[] = getLoadedClasses();
 
-            for (Class clazz : classes)
-            {
-               if (clazz.getName().equals(className))
-               {
+            for (Class clazz : classes) {
+               if (clazz.getName().equals(className)) {
                   Object[] objs = this.getAllObjects(clazz);
 
-                  if (objs.length != 0)
-                  {
-                     out.println("<br> Instances of:" +
-                           clazz.getName() + " ClassLoader=" + clazz.getClassLoader());
-                     for (int countOBJ = 0; countOBJ < objs.length; countOBJ++)
-                     {
-                        out.println("<br>" +
-                              clazz.getName() + "[" + countOBJ + "]=" + objs[countOBJ]);
+                  if (objs.length != 0) {
+                     out.println("Instances of:" + clazz.getName() + " ClassLoader=" + clazz.getClassLoader());
+                     for (int countOBJ = 0; countOBJ < objs.length; countOBJ++) {
+                        out.println(clazz.getName() + "[" + countOBJ + "]=" + objs[countOBJ]);
                      }
                   }
                }
@@ -729,9 +607,7 @@ public class JVMTIInterface
          out.flush();
 
          return charArray.toString();
-      }
-      finally
-      {
+      } finally {
          referencesMap.clear();
          releaseTags();
       }
@@ -741,45 +617,33 @@ public class JVMTIInterface
     * This is an overload to reuse the matrix index in case you already have
     * indexed the JVM
     */
-   public String exploreClassReferences(final String className, final int maxLevel,
-         final boolean solveReferencesOnClasses, final boolean solveReferencesOnClassLoaders,
-         final boolean useToString, final boolean weakAndSoft, final Map referencesMap)
-   {
+   public String exploreClassReferences(final String className,
+                                        final int maxLevel,
+                                        final boolean solveReferencesOnClasses,
+                                        final boolean solveReferencesOnClassLoaders,
+                                        final boolean useToString,
+                                        final boolean weakAndSoft,
+                                        final Map referencesMap) {
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      try
-      {
+      try {
 
          Class[] loadClasses = getLoadedClasses();
 
-         for (Class loadClasse : loadClasses)
-         {
-            if (loadClasse.getName().equals(className))
-            {
-               out.println("<br><br><br><b>References to " +
-                     loadClasse + "</b>");
-               if (solveReferencesOnClasses)
-               {
+         for (Class loadClasse : loadClasses) {
+            if (loadClasse.getName().equals(className)) {
+               out.println("References to " + loadClasse);
+               if (solveReferencesOnClasses) {
                   exploreObject(out, loadClasse, 0, maxLevel, useToString, weakAndSoft, referencesMap, new HashSet());
                }
-               if (solveReferencesOnClassLoaders)
-               {
-                  if (loadClasse.getClassLoader() != null)
-                  {
-                     out.println("<br><b><i>references to its classloader " +
-                           loadClasse.getClassLoader() + "</i></b>");
-                     exploreObject(out,
-                                   loadClasse.getClassLoader(),
-                                   0,
-                                   maxLevel,
-                                   useToString,
-                                   weakAndSoft,
-                                   referencesMap,
-                                   new HashSet());
+               if (solveReferencesOnClassLoaders) {
+                  if (loadClasse.getClassLoader() != null) {
+                     out.println("references to its classloader " + loadClasse.getClassLoader());
+                     exploreObject(out, loadClasse.getClassLoader(), 0, maxLevel, useToString, weakAndSoft, referencesMap, new HashSet());
                   }
                }
-               out.println("<br>");
+               out.println();
 
             }
          }
@@ -787,9 +651,7 @@ public class JVMTIInterface
          loadClasses = null;
 
          return charArray.toString();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
          charArray = new CharArrayWriter();
          out = new PrintWriter(charArray);
          e.printStackTrace(out);
@@ -801,8 +663,9 @@ public class JVMTIInterface
     * Show the reference holders tree of an object. This method is also exposed
     * through MBean.
     */
-   public String exploreObjectReferences(final String className, final int maxLevel, final boolean useToString)
-   {
+   public String exploreObjectReferences(final String className,
+                                         final int maxLevel,
+                                         final boolean useToString) throws Exception {
       forceGC();
 
       Object obj[] = this.getAllObjects(className);
@@ -810,39 +673,22 @@ public class JVMTIInterface
       return exploreObjectReferences(maxLevel, useToString, obj);
    }
 
-   public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) {
-      System.out.println("Obj.length = " +
-            obj.length);
+   public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) throws Exception {
+      System.out.println("Obj.length = " + obj.length);
 
       Map referencesMap = null;
-      try
-      {
-         referencesMap = createIndexMatrix();
-      }
-      catch (Exception e)
-      {
-         CharArrayWriter charArray = new CharArrayWriter();
-         PrintWriter out = new PrintWriter(charArray);
-         e.printStackTrace(out);
-         return charArray.toString();
-      }
+      referencesMap = createIndexMatrix();
 
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      try
-      {
-         for (int i = 0; i < Math.min(50, obj.length); i++)
-         {
-            out.println("<br><b>References to obj[" +
-                  i + "]=" + (useToString
-                        ? obj[i].toString() : obj[i].getClass().getName()));
-            out.println(exploreObjectReferences(referencesMap, obj[i], maxLevel, useToString));
+      try {
+         for (int i = 0; i < Math.min(50, obj.length); i++) {
+            out.println("References to obj[" + i + "]=" + (useToString ? obj[i].toString() : obj[i].getClass().getName()));
+            out.print(exploreObjectReferences(referencesMap, obj[i], maxLevel, useToString));
          }
          return charArray.toString();
-      }
-      finally
-      {
+      } finally {
          referencesMap.clear();
          releaseTags();
       }
@@ -852,20 +698,17 @@ public class JVMTIInterface
     * Show the reference holders tree of an object. This returns a report you
     * can visualize through MBean.
     */
-   public String exploreObjectReferences(final Map referencesMap, final Object thatObject, final int maxLevel,
-         final boolean useToString)
-   {
+   public String exploreObjectReferences(final Map referencesMap,
+                                         final Object thatObject,
+                                         final int maxLevel,
+                                         final boolean useToString) {
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      try
-      {
+      try {
          exploreObject(out, thatObject, 0, maxLevel, useToString, false, referencesMap, new HashSet());
-         out.println("<br>");
          return charArray.toString();
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
          charArray = new CharArrayWriter();
          out = new PrintWriter(charArray);
          e.printStackTrace(out);
@@ -877,35 +720,27 @@ public class JVMTIInterface
     * Forces an OutOfMemoryError and releases the memory immediatly. This will
     * force SoftReferences to go away.
     */
-   public void forceReleaseOnSoftReferences()
-   {
+   public void forceReleaseOnSoftReferences() {
       SoftReference reference = new SoftReference(new Object());
 
       ArrayList list = new ArrayList();
       int i = 0;
-      try
-      {
-         while (true)
-         {
-            list.add("A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String " +
-                  i++);
+      try {
+         while (true) {
+            list.add("A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String " + i++);
             if (i % 1000 == 0) // doing the check on each 100 elements
             {
-               if (reference.get() == null)
-               {
+               if (reference.get() == null) {
                   System.out.println("Break as the soft reference was gone");
                   break;
                }
             }
          }
-      }
-      catch (Throwable e)
-      {
+      } catch (Throwable e) {
       }
 
       list.clear();
-      try
-      {
+      try {
          ByteArrayOutputStream byteout = new ByteArrayOutputStream();
          ObjectOutputStream out = new ObjectOutputStream(byteout);
 
@@ -915,9 +750,7 @@ public class JVMTIInterface
          ObjectInputStream input = new ObjectInputStream(byteInput);
          input.readObject();
 
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
          e.printStackTrace();
       }
 
@@ -928,8 +761,8 @@ public class JVMTIInterface
     * Used just to serialize anything and release SoftCache on java
     * Serialization
     */
-   static class Dummy implements Serializable
-   {
+   static class Dummy implements Serializable {
+
       private static final long serialVersionUID = 1L;
    }
 
@@ -938,10 +771,8 @@ public class JVMTIInterface
     * the report you will see duplicated classes (classes loaded in more than
     * one classLoader)
     */
-   public String listClassesHTMLReport() throws Exception
-   {
-      try
-      {
+   public String listClassesHTMLReport() throws Exception {
+      try {
          forceGC();
          CharArrayWriter charArray = new CharArrayWriter();
          PrintWriter out = new PrintWriter(charArray);
@@ -950,10 +781,8 @@ public class JVMTIInterface
 
          boolean printedHeader = false;
 
-         ClassLoader systemClassLoaderDummy = new ClassLoader()
-         {
-            public String toString()
-            {
+         ClassLoader systemClassLoaderDummy = new ClassLoader() {
+            public String toString() {
                return "SystemClassLoader";
             }
          };
@@ -961,27 +790,20 @@ public class JVMTIInterface
          Iterator iter = classSet.iterator();
          String currentName = null;
          Class currentClass = null;
-         while (iter.hasNext())
-         {
-            currentClass = (Class)iter.next();
-            if (currentName != currentClass.getName())
-            {
-               if (classLoaderDuplicates.size() > 1)
-               {
-                  if (!printedHeader)
-                  {
-                     out.println("<br><b>List of duplicated classes</b>");
+         while (iter.hasNext()) {
+            currentClass = (Class) iter.next();
+            if (currentName != currentClass.getName()) {
+               if (classLoaderDuplicates.size() > 1) {
+                  if (!printedHeader) {
+                     out.println("List of duplicated classes");
                      printedHeader = true;
                   }
 
-                  out.println("<br>" +
-                        "<b> Class " + currentName + " was loaded on these classLoaders:</b>");
+                  out.println("<b> Class " + currentName + " was loaded on these classLoaders:</b>");
                   Iterator iterClassLoader = classLoaderDuplicates.iterator();
-                  while (iterClassLoader.hasNext())
-                  {
-                     ClassLoader loader = (ClassLoader)iterClassLoader.next();
-                     out.println("<br>" +
-                           loader.toString());
+                  while (iterClassLoader.hasNext()) {
+                     ClassLoader loader = (ClassLoader) iterClassLoader.next();
+                     out.println(loader.toString());
                   }
 
                }
@@ -990,8 +812,7 @@ public class JVMTIInterface
             }
 
             ClassLoader loader = currentClass.getClassLoader();
-            if (loader == null)
-            {
+            if (loader == null) {
                loader = systemClassLoaderDummy;
             }
             classLoaderDuplicates.add(loader);
@@ -999,78 +820,66 @@ public class JVMTIInterface
             currentName = currentClass.getName();
          }
 
-         if (classLoaderDuplicates.size() > 1)
-         {
-            out.println("<br>" +
-                  "<b> Class " + currentName + " was loaded on these classLoaders:</b>");
+         if (classLoaderDuplicates.size() > 1) {
+            out.println("<b> Class " + currentName + " was loaded on these classLoaders:</b>");
             Iterator iterClassLoader = classLoaderDuplicates.iterator();
-            while (iterClassLoader.hasNext())
-            {
-               ClassLoader loader = (ClassLoader)iterClassLoader.next();
-               out.println("<br>" +
-                     loader.toString());
+            while (iterClassLoader.hasNext()) {
+               ClassLoader loader = (ClassLoader) iterClassLoader.next();
+               out.println(loader.toString());
             }
 
          }
 
-         out.println("<br><b>List of classes by ClassLoader</b>");
+         out.println("List of classes by ClassLoader");
          classSet = retrieveLoadedClassesByClassLoader();
 
          // I will need a dummy reference, as the first classLoader on the
          // iterator will be null
-         ClassLoader currentClassLoader = new ClassLoader()
-         {
+         ClassLoader currentClassLoader = new ClassLoader() {
          };
-         out.println("<br>");
+         out.println();
 
          iter = classSet.iterator();
-         while (iter.hasNext())
-         {
-            Class clazz = (Class)iter.next();
-            if (currentClassLoader != clazz.getClassLoader())
-            {
+         while (iter.hasNext()) {
+            Class clazz = (Class) iter.next();
+            if (currentClassLoader != clazz.getClassLoader()) {
                currentClassLoader = clazz.getClassLoader();
-               out.println("<br><b>ClassLoader = " +
-                     (currentClassLoader == null
-                           ? "System Class Loader" : currentClassLoader.toString()) + "</b>");
+               out.println("ClassLoader = " + (currentClassLoader == null ? "System Class Loader" : currentClassLoader.toString()));
             }
-            out.println("Class = " +
-                  clazz.getName());
+            out.println("Class = " + clazz.getName());
          }
 
          return new String(charArray.toCharArray());
-      }
-      catch (Exception e)
-      {
+      } catch (Exception e) {
          e.printStackTrace();
          throw e;
       }
    }
 
-   /** Used by JSPs and JMX to report */
-   public Collection retrieveLoadedClassesByClassName()
-   {
+   /**
+    * Used by JSPs and JMX to report
+    */
+   public Collection retrieveLoadedClassesByClassName() {
       Collection classSet;
       classSet = createTreeSet(new ClassSorterByClassName());
       return classSet;
    }
 
-   /** Used by JSPs and JMX to report */
-   public Collection retrieveLoadedClassesByClassLoader()
-   {
+   /**
+    * Used by JSPs and JMX to report
+    */
+   public Collection retrieveLoadedClassesByClassLoader() {
       Collection classSet;
       classSet = createTreeSet(new ClassSorterByClassLoader());
       return classSet;
    }
 
-   private Collection createTreeSet(final Comparator comparator)
-   {
+   private Collection createTreeSet(final Comparator comparator) {
       Class[] classes = getLoadedClasses();
 
       ArrayList classSet = new ArrayList();
 
-      for (Class classe : classes)
-      {
+      for (Class classe : classes) {
          classSet.add(classe);
       }
 
@@ -1078,28 +887,24 @@ public class JVMTIInterface
       return classSet;
    }
 
-   static class InnerCallBack implements JVMTICallBack
-   {
+   static class InnerCallBack implements JVMTICallBack {
 
       HashMap<Long, Class<?>> classesMap = new HashMap<Long, Class<?>>();
 
       WeakHashMap<Class<?>, InventoryDataPoint> maps = new WeakHashMap<Class<?>, InventoryDataPoint>();
 
-      public void notifyClass(final long classTag, final Class<?> clazz)
-      {
+      public void notifyClass(final long classTag, final Class<?> clazz) {
          classesMap.put(classTag, clazz);
       }
 
-      public void notifyObject(final long classTag, final long objectId, final long bytes)
-      {
-         Class<?> clazz = (Class<?>)classesMap.get(classTag);
+      public void notifyObject(final long classTag, final long objectId, final long bytes) {
+         Class<?> clazz = (Class<?>) classesMap.get(classTag);
 
          if (clazz != null) // this is not supposed to happen, but just in
          // case I keep this if here
          {
-            InventoryDataPoint point = (InventoryDataPoint)maps.get(clazz);
-            if (point == null)
-            {
+            InventoryDataPoint point = (InventoryDataPoint) maps.get(clazz);
+            if (point == null) {
                point = new InventoryDataPoint(clazz);
                maps.put(clazz, point);
             }
@@ -1110,9 +915,12 @@ public class JVMTIInterface
 
       }
 
-      public void notifyReference(final long referenceHolder, final long referencedObject, final long classTag,
-            final long index, final long method, final byte referenceType)
-      {
+      public void notifyReference(final long referenceHolder,
+                                  final long referencedObject,
+                                  final long classTag,
+                                  final long index,
+                                  final long method,
+                                  final byte referenceType) {
       }
 
    }
@@ -1121,43 +929,36 @@ public class JVMTIInterface
     * It will return true if the comparisson didn't represent any changes. This
     * can be used by JUnitTests to validate the consumption of the memory is on
     * the expected results.
-    * 
-    * @param reportOutput
-    *            You could set System.out here. The location where logging
-    *            information is going to be sent.
-    * @param map1
-    *            The first snapshot.
-    * @param map2
-    *            The second snapshot.
-    * @param ignoredClasses
-    *            Classes you want to ignore on the comparisson. Used to ignore
-    *            things you know are going to be produced and you don't have
-    *            control over the testcase.
-    * @param prefixesToIgnore
-    *            Same thing as classes, but every classes starting with these
-    *            prefixes are going to be ignored.
-    * @param expectedIncreases
-    *            An array of InventoryDataPoint with the maximum number of
-    *            instances each class could be generating.
+    *
+    * @param reportOutput      You could set System.out here. The location where logging
+    *                          information is going to be sent.
+    * @param map1              The first snapshot.
+    * @param map2              The second snapshot.
+    * @param ignoredClasses    Classes you want to ignore on the comparisson. Used to ignore
+    *                          things you know are going to be produced and you don't have
+    *                          control over the testcase.
+    * @param prefixesToIgnore  Same thing as classes, but every classes starting with these
+    *                          prefixes are going to be ignored.
+    * @param expectedIncreases An array of InventoryDataPoint with the maximum number of
+    *                          instances each class could be generating.
     * @return true if the assertion is okay
     */
-   public boolean compareInventories(final PrintStream reportOutput, final Map map1, final Map map2,
-         final Class[] ignoredClasses, final String[] prefixesToIgnore, final InventoryDataPoint[] expectedIncreases)
-   {
+   public boolean compareInventories(final PrintStream reportOutput,
+                                     final Map map1,
+                                     final Map map2,
+                                     final Class[] ignoredClasses,
+                                     final String[] prefixesToIgnore,
+                                     final InventoryDataPoint[] expectedIncreases) {
       HashSet ignoredItems = new HashSet();
-      if (ignoredClasses != null)
-      {
-         for (Class ignoredClasse : ignoredClasses)
-         {
+      if (ignoredClasses != null) {
+         for (Class ignoredClasse : ignoredClasses) {
             ignoredItems.add(ignoredClasse);
          }
       }
 
       HashMap expectedIncreasesHash = new HashMap();
-      if (expectedIncreases != null)
-      {
-         for (InventoryDataPoint expectedIncrease : expectedIncreases)
-         {
+      if (expectedIncreases != null) {
+         for (InventoryDataPoint expectedIncrease : expectedIncreases) {
             Class clazz = expectedIncrease.getClazz();
             expectedIncreasesHash.put(clazz, expectedIncrease);
          }
@@ -1174,59 +975,40 @@ public class JVMTIInterface
       boolean reportOK = true;
 
       Iterator iterMap1 = map1.entrySet().iterator();
-      while (iterMap1.hasNext())
-      {
-         Map.Entry entry = (Map.Entry)iterMap1.next();
-         Class clazz = (Class)entry.getKey();
+      while (iterMap1.hasNext()) {
+         Map.Entry entry = (Map.Entry) iterMap1.next();
+         Class clazz = (Class) entry.getKey();
 
          boolean isIgnoredPrefix = false;
-         if (prefixesToIgnore != null)
-         {
-            for (String element : prefixesToIgnore)
-            {
-               if (clazz.getName().startsWith(element))
-               {
+         if (prefixesToIgnore != null) {
+            for (String element : prefixesToIgnore) {
+               if (clazz.getName().startsWith(element)) {
                   isIgnoredPrefix = true;
                   break;
                }
             }
          }
-         if (!isIgnoredPrefix &&
-               !ignoredItems.contains(entry.getKey()))
-         {
-            InventoryDataPoint point1 = (InventoryDataPoint)entry.getValue();
-            InventoryDataPoint point2 = (InventoryDataPoint)map2.get(clazz);
-            if (point2 != null)
-            {
-               if (point2.getInstances() > point1.getInstances())
-               {
-                  InventoryDataPoint expectedIncrease = (InventoryDataPoint)expectedIncreasesHash.get(clazz);
+         if (!isIgnoredPrefix && !ignoredItems.contains(entry.getKey())) {
+            InventoryDataPoint point1 = (InventoryDataPoint) entry.getValue();
+            InventoryDataPoint point2 = (InventoryDataPoint) map2.get(clazz);
+            if (point2 != null) {
+               if (point2.getInstances() > point1.getInstances()) {
+                  InventoryDataPoint expectedIncrease = (InventoryDataPoint) expectedIncreasesHash.get(clazz);
                   boolean failed = true;
-                  if (expectedIncrease != null)
-                  {
-                     if (point2.getInstances() -
-                           point1.getInstances() <= expectedIncrease.getInstances())
-                     {
+                  if (expectedIncrease != null) {
+                     if (point2.getInstances() - point1.getInstances() <= expectedIncrease.getInstances()) {
                         failed = false;
                      }
                   }
-                  if (failed)
-                  {
+                  if (failed) {
                      int expected = 0;
-                     if (expectedIncrease != null)
-                     {
+                     if (expectedIncrease != null) {
                         expected = expectedIncrease.getInstances();
                      }
                      reportOK = false;
-                     reportOutput.println("<br> Class " +
-                           clazz.getName() + " had an increase of " + (point2.getInstances() -
-                                 point1.getInstances() - expected) + " instances represented by " +
-                           (point2.getBytes() - point1.getBytes()) + " bytes");
-                     if (expectedIncrease != null)
-                     {
-                        reportOutput.print("<br> " +
-                              (point2.getInstances() -
-                                    point1.getInstances() - expectedIncrease.getInstances()) + " higher than expected");
+                     reportOutput.println("Class " + clazz.getName() + " had an increase of " + (point2.getInstances() - point1.getInstances() - expected) + " instances represented by " + (point2.getBytes() - point1.getBytes()) + " bytes");
+                     if (expectedIncrease != null) {
+                        reportOutput.print((point2.getInstances() - point1.getInstances() - expectedIncrease.getInstances()) + " higher than expected");
                      }
 
                   }
@@ -1238,11 +1020,11 @@ public class JVMTIInterface
       return reportOK;
    }
 
-   private void addExpectedIncrease(final HashMap expectedIncreasesHash, final String name, final int numberOfInstances)
-   {
+   private void addExpectedIncrease(final HashMap expectedIncreasesHash,
+                                    final String name,
+                                    final int numberOfInstances) {
       Class tmpClass = getClassByName(name);
-      if (tmpClass != null)
-      {
+      if (tmpClass != null) {
          expectedIncreasesHash.put(tmpClass, new InventoryDataPoint(tmpClass, numberOfInstances));
       }
    }
@@ -1250,26 +1032,18 @@ public class JVMTIInterface
    /**
     * Returns a WeakHashMap<Class,InventoryDataPoint> summarizing the current
     * JVM's inventory.
-    * */
-   public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException
-   {
+    */
+   public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
       forceGC();
       InnerCallBack callBack = new InnerCallBack();
       File tmpFileObjects = File.createTempFile("delete-me", ".objects");
-      try
-      {
+      try {
          notifyInventory(true, null, tmpFileObjects.getAbsolutePath(), callBack);
-      }
-      finally
-      {
-         if (tmpFileObjects.exists())
-         {
-            try
-            {
+      } finally {
+         if (tmpFileObjects.exists()) {
+            try {
                tmpFileObjects.delete();
-            }
-            catch (Exception ignored)
-            {
+            } catch (Exception ignored) {
             }
          }
       }
@@ -1277,14 +1051,14 @@ public class JVMTIInterface
       return callBack.maps;
    }
 
-   public String inventoryReport() throws Exception
-   {
+   public String inventoryReport() throws Exception {
       return inventoryReport(true);
    }
 
-   /** Will list the current memory inventory. Exposed through JMX. */
-   public synchronized String inventoryReport(final boolean html) throws Exception
-   {
+   /**
+    * Will list the current memory inventory. Exposed through JMX.
+    */
+   public synchronized String inventoryReport(final boolean html) throws Exception {
       Map map = produceInventory();
 
       TreeSet valuesSet = new TreeSet(map.values());
@@ -1292,35 +1066,22 @@ public class JVMTIInterface
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      if (html)
-      {
+      if (html) {
          out.println("<table><tr><td>Class</td><td>#Instances</td><td>#Bytes</td></tr>");
-      }
-      else
-      {
+      } else {
          out.println(String.format("|%1$-100s|%2$10s|%3$10s|", "Class", "Instances", "Bytes"));
       }
 
-      while (iterDataPoints.hasNext())
-      {
-         InventoryDataPoint point = (InventoryDataPoint)iterDataPoints.next();
-         if (html)
-         {
-            out.println("<tr><td>" +
-                  point.getClazz().getName() + "</td><td>" + point.getInstances() + "</td><td>" + point.getBytes() +
-                  "</td></tr>");
-         }
-         else
-         {
-            out.println(String.format("|%1$-100s|%2$10d|%3$10d|",
-                                      point.getClazz().getName(),
-                                      point.getInstances(),
-                                      point.getBytes()));
+      while (iterDataPoints.hasNext()) {
+         InventoryDataPoint point = (InventoryDataPoint) iterDataPoints.next();
+         if (html) {
+            out.println("<tr><td>" + point.getClazz().getName() + "</td><td>" + point.getInstances() + "</td><td>" + point.getBytes() + "</td></tr>");
+         } else {
+            out.println(String.format("|%1$-100s|%2$10d|%3$10d|", point.getClazz().getName(), point.getInstances(), point.getBytes()));
          }
       }
 
-      if (html)
-      {
+      if (html) {
          out.println("</table>");
       }
 
@@ -1331,23 +1092,19 @@ public class JVMTIInterface
     * Will print a report of every instance of the class passed by parameter.
     * Exposed through JMX .
     */
-   public String printObjects(final String className) throws Exception
-   {
+   public String printObjects(final String className) throws Exception {
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
       Object objects[] = this.getAllObjects(className);
 
       out.println("<table>");
-      for (Object object : objects)
-      {
+      for (Object object : objects) {
          out.println("<tr><td>");
          out.println(object);
-         if (object instanceof Object[])
-         {
+         if (object instanceof Object[]) {
             out.println("</td><td>");
-            out.println("array of " +
-                  ((Object[])object).length);
+            out.println("array of " + ((Object[]) object).length);
             out.println("</td></tr>");
          }
       }

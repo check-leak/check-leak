@@ -940,10 +940,10 @@ JNIEXPORT jclass JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodClass
 }
 
 
-JNIEXPORT jboolean JNICALL Java_com_dsect_jvmti_JVMTIInterface_internalIsConfiguredProperly
+JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_blank
   (JNIEnv * env, jobject thisObject)
 {
-	return jvmti!=NULL;
+    // blank
 }
 
 JNICALL void eventMethodEntry(jvmtiEnv *jvmti_env,

@@ -16,6 +16,7 @@ You need to make sure a certain object is not leaking.
 You then do following assertion:
 
 ```java
+   @Test
    public void itWillLeak() throws Exception {
       doYourProcessing();
       noLeaks(TestClass.class.getName(), 0, 10);

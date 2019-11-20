@@ -20,9 +20,9 @@
             </os>
          </activation>
          <properties>
-            <activemq-surefire-argline>
+            <native-surefire-argline>
                -agentpath:${project.basedir}/target/lib/darwin/libdsect.dylib
-            </activemq-surefire-argline>
+            </native-surefire-argline>
          </properties>
       </profile>
       <profile>
@@ -33,9 +33,9 @@
             </os>
          </activation>
          <properties>
-            <activemq-surefire-argline>
+            <native-surefire-argline>
                -Djava.library.path="${project.basedir}/target/lib/linuxamd_64"
-            </activemq-surefire-argline>
+            </native-surefire-argline>
          </properties>
       </profile>
    </profiles>
@@ -54,8 +54,29 @@
    </dependencies>
 
    <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+               <execution>
+                  <phase>clean</phase>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+                  <configuration>
+                     <tasks>
+                        <echo>surefire-argline is : ${native-surefire-argline}</echo>
+                     </tasks>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
       <pluginManagement>
          <plugins>
+
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-surefire-plugin</artifactId>
@@ -65,7 +86,7 @@
                   <testFailureIgnore>false</testFailureIgnore>
                   <runOrder>alphabetical</runOrder>
                   <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                  <argLine>${activemq-surefire-argline}</argLine>
+                  <argLine>${native-surefire-argline}</argLine>
                </configuration>
             </plugin>
             <plugin>

@@ -16,7 +16,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-PROJECT(artemis-native)
+PROJECT(d-sect-native)
 SET(${PROJECT_NAME}_MAJOR_VERSION 1)
 SET(${PROJECT_NAME}_MINOR_VERSION 0)
 SET(${PROJECT_NAME}_PATCH_LEVEL 0)
@@ -55,41 +55,24 @@ else()
     endif()
 endif()
 
-set(ARTEMIS_CROSS_COMPILE OFF CACHE BOOL "Cross-compile the native library")
-
 message ("variable is ${CMAKE_SYSTEM_NAME}")
 
-if (ARTEMIS_CROSS_COMPILE)
-    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-        message(FATAL_ERROR "Cannot cross-compile to 32-bit architecture in a 32-bit architecture")
-    endif()
-
-    message(STATUS "Using cross-compilation")
-    set(ARTEMIS_CROSS_COMPILE_ROOT_PATH /usr/lib)
-    set(ARTEMIS_LIB_NAME artemis-native-32)
-    if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        set(ARTEMIS_LIB_DIR lib/linux-i686)
-    endif()
-
-    # The Cmake variable CMAKE_FIND_ROOT_PATH cannot be set via CLI, so we have to use a separate variable and then
-    # set it to that value. We use ARTEMIS_CROSS_COMPILE_ROOT_PATH for that.
-    set(CMAKE_FIND_ROOT_PATH ${ARTEMIS_CROSS_COMPILE_ROOT_PATH})
-endif()
-
 find_library(LIBAIO_LIB NAMES aio)
-message(STATUS "Using the following libaio library for linking: ${LIBAIO_LIB}")
+
+if(EXISTS javah)
+    ADD_CUSTOM_COMMAND(
+        OUTPUT com_dsect_jvmti_JVMTIInterface.h
+        COMMAND javah -cp ../java/ com.dsect.jvmti.JVMTIInterface
+        DEPENDS ../java/com/dsect/jvmti/JVMTIInterface.java
+    )
+endif()
 
 INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 
-ADD_CUSTOM_COMMAND(
-    OUTPUT com_dsect_jvmti_JVMTIInterface.h
-    COMMAND javah -cp ../java/ com.dsect.jvmti.JVMTIInterface
-    DEPENDS ../java/com/dsect/jvmti/JVMTIInterface.java
-)
 
-ADD_LIBRARY(artemis-native SHARED agent.c com_dsect_jvmti_JVMTIInterface.h)
+ADD_LIBRARY(d-sect-native SHARED agent.c com_dsect_jvmti_JVMTIInterface.h)
 
-set_target_properties(artemis-native PROPERTIES
+set_target_properties(d-sect-native PROPERTIES
               LIBRARY_OUTPUT_DIRECTORY ../../../target/${DSECT_LIB_DIR}
               LIBRARY_OUTPUT_NAME ${DSECT_LIB_NAME})
 message(STATUS "Setting up library as ${DSECT_LIB_NAME} based on current architecture")

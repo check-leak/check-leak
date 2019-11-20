@@ -206,10 +206,6 @@ public class JVMTIInterface
 
    protected static native void heapSnapshot(String classesFileName, String referencesFileName, String objectsFileName);
 
-   /**
-    * Will call {@link JVMTIInterface.heapSnapshot(String,String,String)}
-    * passing "_classes, _references, _objects in the name of the files
-    */
    public void heapSnapshot(final String basicFileName, final String suffix)
    {
       forceGC();
@@ -668,29 +664,6 @@ public class JVMTIInterface
       return referencesMap;
    }
 
-   /**
-    * Show the reference holders tree of an object
-    * 
-    * @param className
-    *            The name of the class to explore
-    * @param maxLevel
-    *            The number of levels to explode. Be careful as if you put this
-    *            number too high, you migh endup in a forever loop, specially
-    *            if your object is referencing something too generic
-    * @param solveReferencesOnClass
-    *            Will expose the tree on the class
-    * @param solveReferencesOnClassLoader
-    *            Will expode the tree on the classLoader (I mostly recommend to
-    *            only look for classLoader's references)
-    * @param useToString
-    *            If true, will use toString when an object is printed. If False
-    *            will use className@<System.identityHashCode(object)>
-    * @param weakAndSoft
-    *            If false, won't detail references on Weak and Soft References
-    * @param printObject
-    *            If true, Will print (with toString) every single instance of
-    *            the object passed as parameter
-    */
    public String exploreClassReferences(final String className, final int maxLevel,
          final boolean solveReferencesOnClasses, final boolean solveReferencesOnClassLoaders,
          final boolean useToString, final boolean weakAndSoft, final boolean printObjects)

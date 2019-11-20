@@ -14,8 +14,6 @@ jvmtiEventCallbacks callbacks;
 
 jint initJVMTI(JavaVM *jvm)
 {
-
-   fprintf (stderr, "I'm here\n");
    jint res;
 
    res = (*jvm)->GetEnv(jvm, (void **) &jvmti, JVMTI_VERSION_1_0);

@@ -36,17 +36,28 @@ set(CMAKE_C_FLAGS_DEBUG "-Wall -std=gnu11 -z execstack -fdump-tree-all -Wall -pg
 set(CMAKE_C_FLAGS "-O3 -std=gnu11 -Wall ${CMAKE_USER_C_FLAGS}")
 
 
+
 set(DSECT_LIB_NAME dsect-64)
-if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(DSECT_LIB_NAME dsect-32)
-endif()
-if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-    set(ARTEMIS_LIB_DIR lib/linux-amd64)
+
+message(${CMAKE_SYSTEM_NAME})
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(DSECT_LIB_DIR lib/darwin)
+    set(DSECT_LIB_NAME dsect)
 else()
-    set(ARTEMIS_LIB_DIR lib/linux-${CMAKE_SYSTEM_PROCESSOR})
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(DSECT_LIB_NAME dsect-32)
+    endif()
+    if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+        set(DSECT_LIB_DIR lib/linux-amd64)
+    else()
+        set(DSECT_LIB_DIR lib/linux-${CMAKE_SYSTEM_PROCESSOR})
+    endif()
 endif()
 
 set(ARTEMIS_CROSS_COMPILE OFF CACHE BOOL "Cross-compile the native library")
+
+message ("variable is ${CMAKE_SYSTEM_NAME}")
 
 if (ARTEMIS_CROSS_COMPILE)
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)

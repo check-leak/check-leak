@@ -29,16 +29,11 @@ public class StressReportTest {
 
 
    @Test
-   public void testReports() throws Exception {
-      long i = 0;
-
+   public void testInventoryReport() throws Exception {
       JVMTIInterface jvmti = new JVMTIInterface();
 
-      while (true) {
-         if (i++ % 100 == 0) {
-            System.out.println("i = " + i);
-         }
-         jvmti.inventoryReport();
+      for (int i = 0; i< 10; i++) {
+         System.out.println(jvmti.inventoryReport(false));
       }
    }
 

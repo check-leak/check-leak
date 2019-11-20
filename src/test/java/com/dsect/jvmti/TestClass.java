@@ -42,4 +42,6 @@ public class TestClass {
 
    long a6 = counter++;
 
+   public String someString;
+
 }

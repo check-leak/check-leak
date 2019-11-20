@@ -17,6 +17,8 @@
 
 package com.dsect.jvmti;
 
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,5 +39,34 @@ public class FindHolderTest {
       Assert.assertSame(testClass, objects[0]);
 
       Assert.assertEquals("Hello Francis!!!", ((TestClass)objects[0]).someString);
+
+      /*{
+         for (Object holder : jvmtiInterface.getReferenceHolders(new Object[]{testClass})) {
+            System.out.println("object is being held at " + holder);
+         }
+      } */
+
+      objects = null;
+      testClass = null;
+
+
+      objects = jvmtiInterface.getAllObjects(TestClass.class);
+      Assert.assertEquals(0, objects.length);
+   }
+
+
+   /** This method will show an object leaking, and a report to where is the reference on it */
+   @Test
+   public void testShowReferencing() throws Exception {
+
+      TestClass testClass = new TestClass();
+      testClass.someString = "Hello Francis!!!";
+
+      JVMTIInterface jvmtiInterface = new JVMTIInterface();
+
+      Map<Class<?>, InventoryDataPoint> inventory =  jvmtiInterface.produceInventory();
+      System.out.println(jvmtiInterface.exploreObjectReferences(10, true, testClass));
+
+
    }
 }

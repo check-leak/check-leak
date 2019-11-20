@@ -142,7 +142,7 @@ public class JVMTIInterface
     * parameter. This method is going to release tags, be careful if you are on
     * the middle of navigations.
     */
-   public native Object[] getReferenceHolders(Object[] objects);
+   public native Object[] getReferenceHolders(Object... objects);
 
    public native Class<?>[] getLoadedClasses();
 
@@ -807,6 +807,10 @@ public class JVMTIInterface
 
       Object obj[] = this.getAllObjects(className);
 
+      return exploreObjectReferences(maxLevel, useToString, obj);
+   }
+
+   public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) {
       System.out.println("Obj.length = " +
             obj.length);
 

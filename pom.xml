@@ -34,7 +34,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -Djava.library.path="${project.basedir}/target/lib/linuxamd_64"
+               -agentpath:${project.basedir}/target/lib/linux-amd64/libdsect.so
             </native-surefire-argline>
          </properties>
       </profile>

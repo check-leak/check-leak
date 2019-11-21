@@ -35,3 +35,6 @@ References to obj[0]=com.dsect.jvmti.TestClass@52d455b8
 !--!-- Reference inside a method - com.dsect.jvmti.JVMTIInterface::exploreObjectReferences
 !--!-- Reference inside a method - com.dsect.jvmti.JVMTIInterface::noLeaks
 ```
+
+
+You also have methods to inspect objects, such as getObjects(class), getReferencers(Object), etc..

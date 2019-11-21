@@ -38,3 +38,19 @@ References to obj[0]=com.dsect.jvmti.TestClass@52d455b8
 
 
 You also have methods to inspect objects, such as getObjects(class), getReferencers(Object), etc..
+
+
+#Compiling
+
+you need g++, gcc, cmake and make installed:
+
+```
+yum install cmake g++ gcc cmake make
+```
+
+then you type
+
+cmake .; make
+mvn install
+
+At this point this still need to be worked on packaging and a how to use section.

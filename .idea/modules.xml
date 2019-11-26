@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/core/jvmti.iml" filepath="$PROJECT_DIR$/core/jvmti.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/main-pom.iml" filepath="$PROJECT_DIR$/main-pom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/maven/maven-plugin.iml" filepath="$PROJECT_DIR$/maven/maven-plugin.iml" />
     </modules>
   </component>
 </project>

@@ -6,16 +6,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="jvmti" />
+        <module name="core" />
+        <module name="maven-plugin" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="jvmti" target="1.7" />
+      <module name="core" target="12" />
+      <module name="main-pom" target="1.5" />
+      <module name="maven-plugin" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="jvmti" options="-h $PROJECT_DIR$/core/src/main/c" />
+      <module name="core" options="-h $PROJECT_DIR$/core/src/main/c" />
+      <module name="maven-plugin" options="" />
     </option>
   </component>
 </project>

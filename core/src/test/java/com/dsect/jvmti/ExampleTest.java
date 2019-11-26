@@ -39,6 +39,14 @@ public class ExampleTest {
       noLeaks(TestClass.class.getName(), 0, 10);
    }
 
+
+   @Test
+   public void testProps() {
+      for (String key : System.getenv().keySet()) {
+         System.out.println(key + "=" + System.getenv(key));
+      }
+   }
+
    @Test
    public void testNoLeak() throws Exception {
       elements.clear();

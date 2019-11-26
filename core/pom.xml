@@ -27,7 +27,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/target/lib/darwin/libdsect.dylib
+               -agentpath:${project.basedir}/src/main/resources/lib/darwin/libdsect.dylib
             </native-surefire-argline>
          </properties>
       </profile>
@@ -40,7 +40,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/target/lib/linux-amd64/libdsect.so
+               -agentpath:${project.basedir}/src/main/resources/lib/linux-amd64/libdsect.so
             </native-surefire-argline>
          </properties>
       </profile>

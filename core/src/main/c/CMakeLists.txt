@@ -74,6 +74,6 @@ INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 ADD_LIBRARY(d-sect-native SHARED agent.c com_dsect_jvmti_JVMTIInterface.h)
 
 set_target_properties(d-sect-native PROPERTIES
-              LIBRARY_OUTPUT_DIRECTORY ../../../target/${DSECT_LIB_DIR}
+              LIBRARY_OUTPUT_DIRECTORY ../resources/${DSECT_LIB_DIR}
               LIBRARY_OUTPUT_NAME ${DSECT_LIB_NAME})
 message(STATUS "Setting up library as ${DSECT_LIB_NAME} based on current architecture")

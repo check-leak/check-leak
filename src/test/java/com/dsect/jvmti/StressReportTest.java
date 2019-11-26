@@ -22,6 +22,8 @@
 
 package com.dsect.jvmti;
 
+import java.util.ArrayList;
+
 import com.dsect.jvmti.JVMTIInterface;
 import org.junit.Test;
 
@@ -32,9 +34,23 @@ public class StressReportTest {
    public void testInventoryReport() throws Exception {
       JVMTIInterface jvmti = new JVMTIInterface();
 
-      for (int i = 0; i< 10; i++) {
-         System.out.println(jvmti.inventoryReport(false));
+      ArrayList list = new ArrayList();
+      for (int i = 0; i < 100000; i++) {
+         list.add(new TestClass());
       }
+
+      System.out.println(jvmti.inventoryReport(false));
+
+      for (Object el : list) {
+
+      }
+
+      list.clear();
+      list = null;
+      jvmti.forceGC();
+
+      System.out.println(jvmti.inventoryReport(false));
+
    }
 
 }

@@ -42,6 +42,7 @@ public class ExampleTest {
 
    @Test
    public void testProps() {
+      System.getProperties().list(System.out);
       for (String key : System.getenv().keySet()) {
          System.out.println(key + "=" + System.getenv(key));
       }

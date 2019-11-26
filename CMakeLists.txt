@@ -15,4 +15,4 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-SUBDIRS(src/main/c)
+SUBDIRS(core/src/main/c)

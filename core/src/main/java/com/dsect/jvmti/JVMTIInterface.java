@@ -51,6 +51,7 @@ public class JVMTIInterface {
 
    public static void noLeaks(String clazzName, int expectedInstances, int reportDepth) throws UnexpectedLeak, Exception {
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
+      jvmtiInterface.forceGC();
       Object[] objects = jvmtiInterface.getAllObjects(clazzName);
 
       if (objects.length > expectedInstances) {

@@ -55,8 +55,13 @@ public class JVMTIInterface {
       Object[] objects = jvmtiInterface.getAllObjects(clazzName);
 
       if (objects.length > expectedInstances) {
-         String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
-         throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
+
+         if (reportDepth > 0) {
+            String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
+            throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
+         } else {
+            throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
+         }
       }
    }
 

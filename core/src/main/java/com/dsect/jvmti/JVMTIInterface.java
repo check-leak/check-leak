@@ -848,7 +848,11 @@ public class JVMTIInterface {
                   fieldName = field.toString();
                }
                out.println(level + " StaticFieldReference " + fieldName);
+
                nextReference = null;
+               if (field != null && field.getDeclaringClass().getName().equals("lang.ref.Finalizer")) {
+                  break;
+               }
                return true;
             }
             case JVMTITypes.JVMTI_REFERENCE_CONSTANT_POOL:// Reference from a class
@@ -869,8 +873,9 @@ public class JVMTIInterface {
             case JVMTITypes.THREAD_REFERENCE:
 
                Class methodClass = getMethodClass(point.getMethod());
+               String className;
                if (methodClass != null) {
-                  String className = null;
+                  className = null;
                   if (methodClass != null) {
                      className = methodClass.getName();
                   }
@@ -879,7 +884,13 @@ public class JVMTIInterface {
                   out.println(level + " Reference inside a method - " + className + "::" + methodName);
                }
                nextReference = null;
-               return true;
+
+
+               if (methodClass != null && !methodClass.equals(JVMTIInterface.class)) {
+                  return true;
+               } else {
+                  break;
+               }
             default:
                System.out.println("unexpected reference " + point);
          }

@@ -57,7 +57,8 @@ public class JVMTIInterface {
       if (objects.length > expectedInstances) {
 
          if (reportDepth > 0) {
-            String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
+            //String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
+            String report = jvmtiInterface.findRoots(10, true, objects);
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
          } else {
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
@@ -678,6 +679,227 @@ public class JVMTIInterface {
 
       return exploreObjectReferences(maxLevel, useToString, obj);
    }
+
+  public String findRoots(int maxLevel, boolean useToString, Object... obj) throws Exception {
+      System.out.println("Obj.length = " + obj.length);
+
+      Map referencesMap = null;
+      referencesMap = createIndexMatrix();
+
+      CharArrayWriter charArray = new CharArrayWriter();
+      PrintWriter out = new PrintWriter(charArray);
+
+      try {
+         for (int i = 0; i < Math.min(50, obj.length); i++) {
+            CharArrayWriter charLeaf = new CharArrayWriter();
+            PrintWriter outLeaf = new PrintWriter(charArray);
+            if (findRootRecursevely(outLeaf, obj[i], 0, maxLevel, false, false, referencesMap, new HashSet())) {
+               out.print(outLeaf.toString());
+
+            }
+         }
+         return charArray.toString();
+      } finally {
+         referencesMap.clear();
+         releaseTags();
+      }
+   }
+  /**
+    * Explore references recursevely
+    */
+   private boolean findRootRecursevely(final PrintWriter out,
+                              final Object source,
+                              final int currentLevel,
+                              final int maxLevel,
+                              final boolean useToString,
+                              final boolean weakAndSoft,
+                              final Map mapDataPoints,
+                              final HashSet alreadyExplored) {
+      String level = null;
+      {
+         StringBuffer levelStr = new StringBuffer();
+         for (int i = 0; i <= currentLevel; i++) {
+            levelStr.append("!--");
+         }
+         level = levelStr.toString();
+      }
+
+      if (maxLevel >= 0 && currentLevel >= maxLevel) {
+         return false;
+      }
+      Integer index = new Integer(System.identityHashCode(source));
+
+      if (alreadyExplored.contains(index)) {
+         return false;
+      }
+
+      alreadyExplored.add(index);
+
+      Long sourceTag = new Long(getTagOnObject(source));
+      ArrayList listPoints = (ArrayList) mapDataPoints.get(sourceTag);
+      if (listPoints == null) {
+         return false;
+      }
+
+      Iterator iter = listPoints.iterator();
+
+      while (iter.hasNext()) {
+         ReferenceDataPoint point = (ReferenceDataPoint) iter.next();
+
+         Object referenceHolder = null;
+         if (point.getReferenceHolder() == 0 || point.getReferenceHolder() == -1) {
+            referenceHolder = null;
+         } else {
+            referenceHolder = getObjectOnTag(point.getReferenceHolder());
+         }
+         Object nextReference = null;
+         switch (point.getReferenceType()) {
+            case JVMTITypes.JVMTI_REFERENCE_INSTANCE:
+               ;// Reference from an object to its class.
+               out.println(level + "InstanceOfReference:ToString=" + convertToString(referenceHolder, useToString));
+
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_FIELD:// Reference from an object to the
+               // value of one of its instance
+               // fields. For references of this kind the referrer_index parameter
+               // to
+               // the jvmtiObjectReferenceCallback is the index of the the instance
+               // field. The index is based on the order of all the object's
+               // fields.
+               // This includes all fields of the directly declared static and
+               // instance fields in the class, and includes all fields (both
+               // public
+               // and private) fields declared in superclasses and superinterfaces.
+               // The index is thus calculated by summing the index of field in the
+               // directly declared class (see GetClassFields), with the total
+               // number
+               // of fields (both public and private) declared in all superclasses
+               // and superinterfaces. The index starts at zero.
+            {
+
+               String fieldName = null;
+
+               if (referenceHolder == null) {
+                  fieldName = "Reference GONE";
+               } else {
+                  Class clazz = referenceHolder.getClass();
+                  Field field = getObjectField(clazz, (int) point.getIndex());
+                  if (field == null) {
+                     fieldName = "UndefinedField@" + referenceHolder;
+                  } else {
+                     fieldName = field.toString();
+                  }
+               }
+               out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            }
+            case JVMTITypes.JVMTI_REFERENCE_ARRAY_ELEMENT:// Reference from an array
+               // to one of its
+               // elements. For
+               // references of this kind the referrer_index parameter to the
+               // jvmtiObjectReferenceCallback is the array index.
+               if (referenceHolder == null) {
+                  out.println(level + " arrayRef Position " + point.getIndex() + " is gone");
+               } else {
+                  out.println(level + " arrayRef " + referenceHolder.getClass().getName() + "[" + point.getIndex() + "] id=@" + System.identityHashCode(referenceHolder));
+               }
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_CLASS_LOADER:// Reference from a class
+               // to its class loader.
+               out.println(level + "ClassLoaderReference @ " + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_SIGNERS:// Reference from a class to its
+               // signers array.
+               out.println(level + "ReferenceSigner@" + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_PROTECTION_DOMAIN:// Reference from a
+               // class to its
+               // protection
+               // domain.
+               out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_INTERFACE:// Reference from a class to
+               // one of its interfaces.
+               out.println(level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.JVMTI_REFERENCE_STATIC_FIELD:// Reference from a class
+               // to the value of one
+               // of its static
+               // fields. For references of this kind the referrer_index
+               // parameter to the jvmtiObjectReferenceCallback is the index
+               // of the static field. The index is based on the order of the
+               // directly declared static and instance fields in the class
+               // (not inherited fields), starting at zero. See
+               // GetClassFields.
+            {
+               Class clazz = (Class) referenceHolder;
+               Field field = getObjectField(clazz, (int) point.getIndex());
+               String fieldName = null;
+               if (field == null) {
+                  fieldName = "UndefinedField@" + referenceHolder;
+               } else {
+                  fieldName = field.toString();
+               }
+               out.println(level + " StaticFieldReference " + fieldName);
+               nextReference = null;
+               return true;
+            }
+            case JVMTITypes.JVMTI_REFERENCE_CONSTANT_POOL:// Reference from a class
+               // to a resolved entry
+               // in the constant
+               // pool. For references of this kind the referrer_index
+               // parameter to the jvmtiObjectReferenceCallback is the index
+               // into constant pool table of the class, starting at 1. See
+               // The Constant Pool in the Java Virtual Machine
+               // Specification.
+               out.println(level + "ReferenceInterface@" + convertToString(referenceHolder, useToString));
+               nextReference = referenceHolder;
+               break;
+            case JVMTITypes.ROOT_REFERENCE:
+               out.println(level + "Root");
+               nextReference = null;
+               break;
+            case JVMTITypes.THREAD_REFERENCE:
+
+               Class methodClass = getMethodClass(point.getMethod());
+               if (methodClass != null) {
+                  String className = null;
+                  if (methodClass != null) {
+                     className = methodClass.getName();
+                  }
+
+                  String methodName = getMethodName(point.getMethod());
+                  out.println(level + " Reference inside a method - " + className + "::" + methodName);
+               }
+               nextReference = null;
+               return true;
+            default:
+               System.out.println("unexpected reference " + point);
+         }
+
+
+         if (!weakAndSoft && (nextReference instanceof WeakReference || nextReference instanceof SoftReference)) {
+             nextReference = null;
+         }
+
+         if (nextReference != null) {
+            return findRootRecursevely(out, nextReference, currentLevel + 1, maxLevel, useToString, weakAndSoft, mapDataPoints, alreadyExplored);
+         } else {
+            return false;
+         }
+      }
+
+      return false;
+
+   }
+
 
    public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) throws Exception {
       System.out.println("Obj.length = " + obj.length);

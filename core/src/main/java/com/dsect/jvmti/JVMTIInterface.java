@@ -694,7 +694,7 @@ public class JVMTIInterface {
             CharArrayWriter charLeaf = new CharArrayWriter();
             PrintWriter outLeaf = new PrintWriter(charArray);
             if (findRootRecursevely(outLeaf, obj[i], 0, maxLevel, false, false, referencesMap, new HashSet())) {
-               out.print(outLeaf.toString());
+               out.print(charLeaf.toString());
 
             }
          }
@@ -865,7 +865,7 @@ public class JVMTIInterface {
             case JVMTITypes.ROOT_REFERENCE:
                out.println(level + "Root");
                nextReference = null;
-               break;
+               return true;
             case JVMTITypes.THREAD_REFERENCE:
 
                Class methodClass = getMethodClass(point.getMethod());
@@ -892,11 +892,11 @@ public class JVMTIInterface {
          if (nextReference != null) {
             return findRootRecursevely(out, nextReference, currentLevel + 1, maxLevel, useToString, weakAndSoft, mapDataPoints, alreadyExplored);
          } else {
-            return false;
+            return true;
          }
       }
 
-      return false;
+      return true;
 
    }
 

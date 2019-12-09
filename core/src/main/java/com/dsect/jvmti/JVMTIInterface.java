@@ -57,9 +57,10 @@ public class JVMTIInterface {
       if (objects.length > expectedInstances) {
 
          if (reportDepth > 0) {
-            String report = jvmtiInterface.findRoots(10, true, objects);
-            System.out.println("Report of roots:" + report);
-            //report = jvmtiInterface.exploreObjectReferences(reportDepth, false, objects);
+            String report = jvmtiInterface.findRoots(reportDepth, true, objects);
+            System.err.println("Report of roots:" + report);
+
+            report = jvmtiInterface.exploreObjectReferences(reportDepth, false, objects);
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
          } else {
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
@@ -418,7 +419,7 @@ public class JVMTIInterface {
                   fieldName = field.toString();
                }
             }
-            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
+            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString) + " <<< possible leak");
             nextReference = referenceHolder;
             break;
          }
@@ -448,7 +449,7 @@ public class JVMTIInterface {
             // class to its
             // protection
             // domain.
-            out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString));
+            out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString) + " <<< possible leak");
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_INTERFACE:// Reference from a class to
@@ -474,7 +475,7 @@ public class JVMTIInterface {
             } else {
                fieldName = field.toString();
             }
-            out.println(level + " StaticFieldReference " + fieldName);
+            out.println(level + " StaticFieldReference " + fieldName + " <<< possible leak");
             nextReference = null;
             break;
          }

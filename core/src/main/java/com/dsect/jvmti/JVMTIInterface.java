@@ -57,8 +57,9 @@ public class JVMTIInterface {
       if (objects.length > expectedInstances) {
 
          if (reportDepth > 0) {
-            //String report = jvmtiInterface.exploreObjectReferences(reportDepth, true, objects);
             String report = jvmtiInterface.findRoots(10, true, objects);
+            System.out.println("Report of roots:" + report);
+            //report = jvmtiInterface.exploreObjectReferences(reportDepth, false, objects);
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
          } else {
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
@@ -177,26 +178,15 @@ public class JVMTIInterface {
     */
    public native Object getObjectOnTag(long tag);
 
+   JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
+
    /**
     * Returns the field represted by the FieldId. This is used on field
     * relationships according to the rule determined by JVMTI documentation.
     */
    public Field getObjectField(Class<?> clazz, int fieldId) {
-      ArrayList<Class<?>> list = new ArrayList<Class<?>>();
-      list.add(clazz);
-      while ((clazz = clazz.getSuperclass()) != null) {
-         list.add(clazz);
-      }
-
-      for (int i = list.size() - 1; i >= 0; i--) {
-         Field fields[] = ((Class) list.get(i)).getDeclaredFields();
-         if (fieldId < fields.length) {
-            return fields[fieldId];
-         }
-         fieldId -= fields.length;
-      }
-      return null;
-   }
+      return metadata.getFields(clazz)[fieldId];
+  }
 
    public native String getMethodName(long methodId);
 
@@ -617,6 +607,7 @@ public class JVMTIInterface {
       } finally {
          referencesMap.clear();
          releaseTags();
+         metadata.clear();
       }
    }
 
@@ -702,6 +693,7 @@ public class JVMTIInterface {
       } finally {
          referencesMap.clear();
          releaseTags();
+         metadata.clear();
       }
    }
   /**
@@ -930,6 +922,7 @@ public class JVMTIInterface {
       } finally {
          referencesMap.clear();
          releaseTags();
+         metadata.clear();
       }
    }
 

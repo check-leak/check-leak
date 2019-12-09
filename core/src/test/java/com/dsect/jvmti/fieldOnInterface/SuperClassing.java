@@ -15,35 +15,20 @@
  * limitations under the License.
  */
 
-package com.dsect.jvmti;
+package com.dsect.jvmti.fieldOnInterface;
 
-import org.junit.Assert;
-import org.junit.Test;
+import com.dsect.jvmti.TestClass;
 
-public class SubClassTest extends SuperClassTest {
+/**
+ * @author Clebert Suconic
+ */
 
-   //static TestClass myStatic;
+public class SuperClassing implements InterfaceOnSuperClass,SecondInterfaceOnSuperClass {
 
-   TestQueue testQueue;
+   int a;
+   int b;
+   int c;
+   int d;
+   TestClass onSuper = new TestClass();
 
-   @Test
-   public void testNoLeak() throws Exception {
-
-      testQueue = new TestQueue(new TestClass());
-      boolean leaked = false;
-
-      UnexpectedLeak leakEx = null;
-      try {
-         JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
-      } catch (UnexpectedLeak leak) {
-         leakEx = leak;
-         leak.printStackTrace();
-         leaked = true;
-      }
-
-
-      Assert.assertTrue(leaked);
-
-      Assert.assertTrue(leakEx.getMessage().contains("myTestField"));
-   }
 }

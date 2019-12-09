@@ -17,33 +17,19 @@
 
 package com.dsect.jvmti;
 
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * @author Clebert Suconic
+ */
 
-public class SubClassTest extends SuperClassTest {
+public interface SomeInterface {
 
-   //static TestClass myStatic;
+   /*int MAX_CONSUMERS_UNLIMITED = -1;
+   int MAX_2CONSUMERS_UNLIMITED = -1;
+   int MAX_333NSUMERS_UNLIMITED = -1;
+   int MAX_4CONSUMERS_UNLIMITED = -1; */
 
-   TestQueue testQueue;
-
-   @Test
-   public void testNoLeak() throws Exception {
-
-      testQueue = new TestQueue(new TestClass());
-      boolean leaked = false;
-
-      UnexpectedLeak leakEx = null;
-      try {
-         JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
-      } catch (UnexpectedLeak leak) {
-         leakEx = leak;
-         leak.printStackTrace();
-         leaked = true;
-      }
+   int MAX_2CONSUMERS_UNLIMITED = -1;
 
 
-      Assert.assertTrue(leaked);
-
-      Assert.assertTrue(leakEx.getMessage().contains("myTestField"));
-   }
+   public void doSomething();
 }

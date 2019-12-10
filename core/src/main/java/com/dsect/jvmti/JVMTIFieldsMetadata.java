@@ -69,6 +69,16 @@ public class JVMTIFieldsMetadata {
          getClassFields(fieldList, clazz.getSuperclass());
       }
 
+      if (clazz.isInterface()) {
+         for (Class superInterface : clazz.getInterfaces()) {
+            if (superInterface == clazz) {
+               continue;
+            }
+            getClassFields(fieldList, superInterface);
+         }
+
+      }
+
       for (Field field : clazz.getDeclaredFields()) {
          fieldList.add(field);
       }

@@ -34,6 +34,8 @@ public class TestMetaField {
    public void testMeta() {
       JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
       Field[] fields = metadata.getFields(C1.class);
-      Assert.assertTrue(fields[3].getName().equals("a"));
+      Assert.assertTrue(fields[2].getName().equals("a"));
+      fields = metadata.getFields(C2.class);
+      Assert.assertTrue(fields[4].getName().equals("a"));
    }
 }

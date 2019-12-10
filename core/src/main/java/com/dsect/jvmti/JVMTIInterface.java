@@ -51,11 +51,18 @@ public class JVMTIInterface {
 
    public static void noLeaks(String clazzName, int expectedInstances, int reportDepth) throws UnexpectedLeak, Exception {
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
-      jvmtiInterface.forceGC();
-      Object[] objects = jvmtiInterface.getAllObjects(clazzName);
+      Object[] objects = null;
+      for (int i = 0; i < 100; i++) {
+         objects = null;
+         jvmtiInterface.forceGC();
+         objects = jvmtiInterface.getAllObjects(clazzName);
+
+         if (objects.length <= expectedInstances) {
+            return;
+         }
+      }
 
       if (objects.length > expectedInstances) {
-
          if (reportDepth > 0) {
             String report = jvmtiInterface.findRoots(reportDepth, true, objects);
             System.err.println("Report of roots:" + report);
@@ -66,6 +73,7 @@ public class JVMTIInterface {
             throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
          }
       }
+
    }
 
    private static boolean isLoaded = true;

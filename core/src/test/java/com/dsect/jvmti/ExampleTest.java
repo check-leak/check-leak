@@ -33,7 +33,7 @@ public class ExampleTest {
    @Test
    public void itWillLeak() throws Exception {
       for (int i = 0; i < 10; i++) {
-         elements.add(new TestClass());
+         elements.add(new TestClass(null));
       }
 
       noLeaks(TestClass.class.getName(), 0, 10);

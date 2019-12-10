@@ -194,6 +194,12 @@ public class JVMTIInterface {
     * relationships according to the rule determined by JVMTI documentation.
     */
    public Field getObjectField(Class<?> clazz, int fieldId) {
+
+      Field[] fields= metadata.getFields(clazz);
+      // System.out.println("Looking for field " + fieldId + " on " + clazz);
+      // for (int i = 0; i < fields.length; i++) {
+         // System.out.println("[" + i + "]=" + fields[i]);
+      // }
       return metadata.getFields(clazz)[fieldId];
   }
 

@@ -25,7 +25,7 @@ import com.dsect.jvmti.TestClass;
 
 public interface Interfacing {
 
-   TestClass onInterface = new TestClass();
+   TestClass onInterface = new TestClass("onInterface");
    int i = 0;
 
 }

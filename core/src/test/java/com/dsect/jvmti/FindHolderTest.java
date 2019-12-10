@@ -32,7 +32,7 @@ public class FindHolderTest {
    @Test
    public void testGetObjects() {
 
-      TestClass testClass = new TestClass();
+      TestClass testClass = new TestClass(null);
       testClass.someString = "Hello Francis!!!";
 
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
@@ -64,7 +64,7 @@ public class FindHolderTest {
    @Test
    public void testShowReferencing() throws Exception {
 
-      TestClass testClass = new TestClass();
+      TestClass testClass = new TestClass(null);
       testClass.someString = "Hello Francis!!!";
 
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
@@ -77,7 +77,7 @@ public class FindHolderTest {
    @Test
    public void testNoLeak() throws Exception {
 
-      TestClass testClass = new TestClass();
+      TestClass testClass = new TestClass(null);
       testClass.someString = "Hello Francis!!!";
 
       boolean leaked = false;

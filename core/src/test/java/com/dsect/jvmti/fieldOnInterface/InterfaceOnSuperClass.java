@@ -25,6 +25,6 @@ import com.dsect.jvmti.TestClass;
 
 public interface InterfaceOnSuperClass {
 
-   public TestClass onSuperInterface = new TestClass();
+   public TestClass onSuperInterface = new TestClass("onInterface");
 
 }

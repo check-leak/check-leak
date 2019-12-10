@@ -29,7 +29,7 @@ public class SubClassTest extends SuperClassTest {
    @Test
    public void testNoLeak() throws Exception {
 
-      testQueue = new TestQueue(new TestClass());
+      testQueue = new TestQueue(new TestClass(null));
       boolean leaked = false;
 
       UnexpectedLeak leakEx = null;

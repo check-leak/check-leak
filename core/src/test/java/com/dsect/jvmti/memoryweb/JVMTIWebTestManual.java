@@ -50,7 +50,7 @@ public class JVMTIWebTestManual {
       TestClass str[] = new TestClass[1000];
 
       for (int i = 0; i < 1000; i++) {
-         str[i] = new TestClass();
+         str[i] = new TestClass(null);
       }
 
       str2 = str;

@@ -25,6 +25,6 @@ import com.dsect.jvmti.TestClass;
 
 public class DeclaringClass extends SuperClassing implements Interfacing{
 
-   TestClass declared = new TestClass();
+   TestClass declared = new TestClass("declared");
 
 }

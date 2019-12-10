@@ -29,6 +29,14 @@ package com.dsect.jvmti;
  */
 public class TestClass {
 
+   public TestClass(String m) {
+      this.someString = m;
+   }
+
+   public String toString() {
+      return "TestClass::" + someString;
+   }
+
    static long counter = 0;
 
    long a = counter++;

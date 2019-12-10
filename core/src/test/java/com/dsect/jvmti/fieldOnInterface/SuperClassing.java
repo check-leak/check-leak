@@ -29,6 +29,6 @@ public class SuperClassing implements InterfaceOnSuperClass,SecondInterfaceOnSup
    int b;
    int c;
    int d;
-   TestClass onSuper = new TestClass();
+   TestClass onSuper = new TestClass("onSuper");
 
 }

@@ -36,7 +36,7 @@ public class StressReportTest {
 
       ArrayList list = new ArrayList();
       for (int i = 0; i < 100000; i++) {
-         list.add(new TestClass());
+         list.add(new TestClass(null));
       }
 
       System.out.println(jvmti.inventoryReport(false));

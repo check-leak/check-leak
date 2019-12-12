@@ -49,7 +49,9 @@ import java.util.WeakHashMap;
 
 public class JVMTIInterface {
 
-   public static void noLeaks(String clazzName, int expectedInstances, int reportDepth) throws UnexpectedLeak, Exception {
+   public static void noLeaks(String clazzName,
+                              int expectedInstances,
+                              int reportDepth) throws UnexpectedLeak, Exception {
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
       Object[] objects = null;
       for (int i = 0; i < 100; i++) {
@@ -100,7 +102,9 @@ public class JVMTIInterface {
       return isLoaded;
    }
 
-   /** This is a blank method, intended just to verify if the library is loaded correctly */
+   /**
+    * This is a blank method, intended just to verify if the library is loaded correctly
+    */
    public native void blank();
 
    /**
@@ -195,13 +199,13 @@ public class JVMTIInterface {
     */
    public Field getObjectField(Class<?> clazz, int fieldId) {
 
-      Field[] fields= metadata.getFields(clazz);
+      Field[] fields = metadata.getFields(clazz);
       // System.out.println("Looking for field " + fieldId + " on " + clazz);
       // for (int i = 0; i < fields.length; i++) {
-         // System.out.println("[" + i + "]=" + fields[i]);
+      // System.out.println("[" + i + "]=" + fields[i]);
       // }
       return metadata.getFields(clazz)[fieldId];
-  }
+   }
 
    public native String getMethodName(long methodId);
 
@@ -620,7 +624,6 @@ public class JVMTIInterface {
 
          return charArray.toString();
       } finally {
-         referencesMap.clear();
          releaseTags();
          metadata.clear();
       }
@@ -686,7 +689,7 @@ public class JVMTIInterface {
       return exploreObjectReferences(maxLevel, useToString, obj);
    }
 
-  public String findRoots(int maxLevel, boolean useToString, Object... obj) throws Exception {
+   public String findRoots(int maxLevel, boolean useToString, Object... obj) throws Exception {
       System.out.println("Obj.length = " + obj.length);
 
       Map referencesMap = null;
@@ -711,17 +714,18 @@ public class JVMTIInterface {
          metadata.clear();
       }
    }
-  /**
+
+   /**
     * Explore references recursevely
     */
    private boolean findRootRecursevely(final PrintWriter out,
-                              final Object source,
-                              final int currentLevel,
-                              final int maxLevel,
-                              final boolean useToString,
-                              final boolean weakAndSoft,
-                              final Map mapDataPoints,
-                              final HashSet alreadyExplored) {
+                                       final Object source,
+                                       final int currentLevel,
+                                       final int maxLevel,
+                                       final boolean useToString,
+                                       final boolean weakAndSoft,
+                                       final Map mapDataPoints,
+                                       final HashSet alreadyExplored) {
       String level = null;
       {
          StringBuffer levelStr = new StringBuffer();
@@ -892,7 +896,6 @@ public class JVMTIInterface {
                }
                nextReference = null;
 
-
                if (methodClass != null && !methodClass.equals(JVMTIInterface.class)) {
                   return true;
                } else {
@@ -902,9 +905,8 @@ public class JVMTIInterface {
                System.out.println("unexpected reference " + point);
          }
 
-
          if (!weakAndSoft && (nextReference instanceof WeakReference || nextReference instanceof SoftReference)) {
-             nextReference = null;
+            nextReference = null;
          }
 
          if (nextReference != null) {
@@ -918,7 +920,6 @@ public class JVMTIInterface {
 
    }
 
-
    public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) throws Exception {
       System.out.println("Obj.length = " + obj.length);
 
@@ -928,17 +929,11 @@ public class JVMTIInterface {
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      try {
-         for (int i = 0; i < Math.min(50, obj.length); i++) {
-            out.println("References to obj[" + i + "]=" + (useToString ? obj[i].toString() : obj[i].getClass().getName()));
-            out.print(exploreObjectReferences(referencesMap, obj[i], maxLevel, useToString));
-         }
-         return charArray.toString();
-      } finally {
-         referencesMap.clear();
-         releaseTags();
-         metadata.clear();
+      for (int i = 0; i < Math.min(1, obj.length); i++) {
+         out.println("References to obj[" + i + "]=" + (useToString ? obj[i].toString() : obj[i].getClass().getName()));
+         out.print(exploreObjectReferences(referencesMap, obj[i], maxLevel, useToString));
       }
+      return charArray.toString();
    }
 
    /**

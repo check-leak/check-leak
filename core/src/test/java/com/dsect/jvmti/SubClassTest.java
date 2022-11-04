@@ -17,12 +17,11 @@
 
 package com.dsect.jvmti;
 
+import com.dsect.jvmti.util.JVMTIReport;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SubClassTest extends SuperClassTest {
-
-   //static TestClass myStatic;
 
    TestQueue testQueue;
 
@@ -30,20 +29,8 @@ public class SubClassTest extends SuperClassTest {
    public void testNoLeak() throws Exception {
 
       testQueue = new TestQueue(new TestClass(null));
-      boolean leaked = false;
-
-      UnexpectedLeak leakEx = null;
-      try {
-         JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
-      } catch (UnexpectedLeak leak) {
-         leakEx = leak;
-         leak.printStackTrace();
-         leaked = true;
-      }
-
+      boolean leaked = JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10);
 
       Assert.assertTrue(leaked);
-
-      Assert.assertTrue(leakEx.getMessage().contains("myTestField"));
    }
 }

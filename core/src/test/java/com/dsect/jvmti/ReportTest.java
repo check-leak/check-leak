@@ -20,51 +20,36 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.dsect.jvmti.memoryweb;
+package com.dsect.jvmti;
+
+import java.util.ArrayList;
 
 import com.dsect.jvmti.JVMTIInterface;
-import com.dsect.jvmti.TestClass;
+import com.dsect.jvmti.util.JVMTIReport;
 import org.junit.Test;
 
-
-public class JVMTIWebTestManual {
-
-   TestClass str2[] = null;
-
-   TestClass strroot;
-
-   static TestClass staticField;
-
-   public static void main(String arg[]) {
-      try {
-         JVMTIWebTestManual manual = new JVMTIWebTestManual();
-         manual.testWeb();
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
+public class ReportTest {
 
 
    @Test
-   public void testWeb() throws Exception {
-      TestClass str[] = new TestClass[1000];
+   public void testInventoryReport() throws Exception {
 
-      for (int i = 0; i < 1000; i++) {
-         str[i] = new TestClass(null);
+      ArrayList list = new ArrayList();
+      for (int i = 0; i < 100000; i++) {
+         list.add(new TestClass(null));
       }
 
-      str2 = str;
 
-      TestClass strroot2 = str[0];
-      strroot = str[0];
+      System.out.println(JVMTIReport.inventoryReport(false));
 
-      staticField = str[0];
+      for (Object el : list) { // this empty statement is here just to make sure JIT Compiler won't remove the list earlier.
+      }
 
-      JVMTIInterface jvmti = new JVMTIInterface();
+      list.clear();
+      list = null;
 
-      System.out.println(jvmti.inventoryReport(false));
+      System.out.println(JVMTIReport.inventoryReport(false));
 
-      System.out.println("strroot = " + strroot2);
    }
 
 }

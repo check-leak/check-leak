@@ -49,35 +49,6 @@ import java.util.WeakHashMap;
 
 public class JVMTIInterface {
 
-   public static void noLeaks(String clazzName,
-                              int expectedInstances,
-                              int reportDepth) throws UnexpectedLeak, Exception {
-      JVMTIInterface jvmtiInterface = new JVMTIInterface();
-      Object[] objects = null;
-      for (int i = 0; i < 100; i++) {
-         objects = null;
-         jvmtiInterface.forceGC();
-         objects = jvmtiInterface.getAllObjects(clazzName);
-
-         if (objects.length <= expectedInstances) {
-            return;
-         }
-      }
-
-      if (objects.length > expectedInstances) {
-         if (reportDepth > 0) {
-            String report = jvmtiInterface.findRoots(reportDepth, true, objects);
-            System.err.println("Report of roots:" + report);
-
-            report = jvmtiInterface.exploreObjectReferences(reportDepth, false, objects);
-            throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances + "\n" + report);
-         } else {
-            throw new UnexpectedLeak(clazzName + " has " + objects.length + " elements while we expected " + expectedInstances);
-         }
-      }
-
-   }
-
    private static boolean isLoaded = true;
 
    static {
@@ -117,10 +88,8 @@ public class JVMTIInterface {
 
    public native void stopMeasure();
 
-   /**
-    * returns the first class found with a given name
-    */
-   public Class<?>[] getAllClassMachingName(final String className) {
+   /** There might be more than one class with a matching name (example multiple class loaders) */
+   public Class<?>[] getAllClasses(final String className) {
       Class<?> classes[] = getLoadedClasses();
 
       ArrayList<Class<?>> foundClasses = new ArrayList<Class<?>>();
@@ -134,6 +103,9 @@ public class JVMTIInterface {
       return foundClasses.toArray(new Class<?>[foundClasses.size()]);
    }
 
+   /**
+    * returns the first class found with a given name
+    */
    public Class<?> getClassByName(final String className) {
       Class<?> classes[] = getLoadedClasses();
 
@@ -184,12 +156,12 @@ public class JVMTIInterface {
    /**
     * Will return the tag of an object
     */
-   public native long getTagOnObject(Object obj);
+   private native long getTagOnObject(Object obj);
 
    /**
     * Will return the object on a tag
     */
-   public native Object getObjectOnTag(long tag);
+   private native Object getObjectOnTag(long tag);
 
    JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
 
@@ -197,7 +169,7 @@ public class JVMTIInterface {
     * Returns the field represted by the FieldId. This is used on field
     * relationships according to the rule determined by JVMTI documentation.
     */
-   public Field getObjectField(Class<?> clazz, int fieldId) {
+   private Field getObjectField(Class<?> clazz, int fieldId) {
 
       Field[] fields = metadata.getFields(clazz);
       // System.out.println("Looking for field " + fieldId + " on " + clazz);
@@ -207,18 +179,11 @@ public class JVMTIInterface {
       return metadata.getFields(clazz)[fieldId];
    }
 
-   public native String getMethodName(long methodId);
+   private native String getMethodName(long methodId);
 
-   public native String getMethodSignature(long methodId);
+   private native String getMethodSignature(long methodId);
 
-   public native Class getMethodClass(long methodId);
-
-   protected static native void heapSnapshot(String classesFileName, String referencesFileName, String objectsFileName);
-
-   public void heapSnapshot(final String basicFileName, final String suffix) {
-      forceGC();
-      heapSnapshot(basicFileName + "_classes" + "." + suffix, basicFileName + "_references" + "." + suffix, basicFileName + "_objects" + "." + suffix);
-   }
+   private native Class getMethodClass(long methodId);
 
    /**
     * Return every single object on a give class by its name. This method will
@@ -244,52 +209,7 @@ public class JVMTIInterface {
       return list.toArray();
    }
 
-   static class ClassSorterByClassLoader implements Comparator {
-
-      public int compare(final Object o1, final Object o2) {
-         Class left = (Class) o1;
-         Class right = (Class) o2;
-
-         int compare = 0;
-
-         if ((compare = compareClassLoader(left.getClassLoader(), right.getClassLoader())) != 0) {
-            return compare;
-         }
-
-         return left.getName().compareTo(right.getName());
-      }
-
-      public int compareClassLoader(final ClassLoader left, final ClassLoader right) {
-         if (left == null || right == null) {
-            if (left == right) {
-               return 0;
-            } else if (left == null) {
-               return -1;
-            } else {
-               return 1;
-            }
-         } else {
-            return left.toString().compareTo(right.toString());
-         }
-      }
-
-   }
-
-   static class ClassSorterByClassName implements Comparator {
-
-      public int compare(final Object o1, final Object o2) {
-         Class left = (Class) o1;
-         Class right = (Class) o2;
-         int compare = left.getName().compareTo(right.getName());
-         /*
-          * if (compare==0) { if (o1==o2) { return 0; } else { return 1; } }
-          * else { return compare; }
-          */
-         return compare;
-      }
-   }
-
-   public String convertToString(final Object obj, final boolean callToString) {
+   private String convertToString(final Object obj, final boolean callToString) {
 
       String returnValue = null;
       try {
@@ -380,15 +300,8 @@ public class JVMTIInterface {
 
    }
 
-   /**
-    * This is used by JSPs to have access to internal features formating
-    * results according to the navigations. That's the only reason this method
-    * is public. This is not intended to be used as part of the public API.
-    *
-    * @urlBaseToFollow will be concatenated objId=3> obj </a> to the
-    * outputStream
-    */
-   public Object treatReference(final String level,
+   /** Treat a reference sending it tout the PrintWriter output */
+   private Object treatReference(final String level,
                                 final PrintWriter out,
                                 final ReferenceDataPoint point,
                                 final boolean useToString) {
@@ -437,7 +350,7 @@ public class JVMTIInterface {
                   fieldName = field.toString();
                }
             }
-            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString) + " <<< possible leak");
+            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          }
@@ -467,7 +380,7 @@ public class JVMTIInterface {
             // class to its
             // protection
             // domain.
-            out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString) + " <<< possible leak");
+            out.println(level + "ProtectionDomain@" + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          case JVMTITypes.JVMTI_REFERENCE_INTERFACE:// Reference from a class to
@@ -493,7 +406,7 @@ public class JVMTIInterface {
             } else {
                fieldName = field.toString();
             }
-            out.println(level + " StaticFieldReference " + fieldName + " <<< possible leak");
+            out.println(level + " StaticFieldReference " + fieldName);
             nextReference = null;
             break;
          }
@@ -533,10 +446,6 @@ public class JVMTIInterface {
    }
 
    /**
-    * This method tags the JVM and return an index. You can navigate through
-    * references using this returned HashMap. This method can't be exposed
-    * through JMX as it would serialize a huge amount of data.
-    *
     * @return HashMap<Long objectId, ArrayList < ReferenceDataPoint> referencees>
     */
    public Map<Long, List<ReferenceDataPoint>> createIndexMatrix() throws IOException {
@@ -681,17 +590,16 @@ public class JVMTIInterface {
     */
    public String exploreObjectReferences(final String className,
                                          final int maxLevel,
+                                         final int maxObjects,
                                          final boolean useToString) throws Exception {
       forceGC();
 
       Object obj[] = this.getAllObjects(className);
 
-      return exploreObjectReferences(maxLevel, useToString, obj);
+      return exploreObjectReferences(maxLevel, maxObjects, useToString, obj);
    }
 
    public String findRoots(int maxLevel, boolean useToString, Object... obj) throws Exception {
-      System.out.println("Obj.length = " + obj.length);
-
       Map referencesMap = null;
       referencesMap = createIndexMatrix();
 
@@ -702,7 +610,7 @@ public class JVMTIInterface {
          for (int i = 0; i < Math.min(50, obj.length); i++) {
             CharArrayWriter charLeaf = new CharArrayWriter();
             PrintWriter outLeaf = new PrintWriter(charArray);
-            if (findRootRecursevely(outLeaf, obj[i], 0, maxLevel, false, false, referencesMap, new HashSet())) {
+            if (findRootRecursevely(outLeaf, obj[i], 0, maxLevel, useToString, false, referencesMap, new HashSet())) {
                out.print(charLeaf.toString());
 
             }
@@ -920,7 +828,7 @@ public class JVMTIInterface {
 
    }
 
-   public String exploreObjectReferences(int maxLevel, boolean useToString, Object... obj) throws Exception {
+   public String exploreObjectReferences(int maxLevel, int maxObjects, boolean useToString, Object... obj) throws Exception {
       System.out.println("Obj.length = " + obj.length);
 
       Map referencesMap = null;
@@ -929,10 +837,23 @@ public class JVMTIInterface {
       CharArrayWriter charArray = new CharArrayWriter();
       PrintWriter out = new PrintWriter(charArray);
 
-      for (int i = 0; i < Math.min(1, obj.length); i++) {
-         out.println("References to obj[" + i + "]=" + (useToString ? obj[i].toString() : obj[i].getClass().getName()));
+      for (int i = 0; i < Math.min(maxObjects, obj.length); i++) {
+         out.println("*******************************************************************************************************************************");
+         out.println("References to obj[" + i + "]=" + convertToString(obj[i], useToString));
          out.print(exploreObjectReferences(referencesMap, obj[i], maxLevel, useToString));
       }
+
+      releaseTags();
+      referencesMap.clear();
+      referencesMap = null; // giving a hand to GC
+
+
+      out.println("Summary of all the refernce holders:");
+      Object[] holders = getReferenceHolders(obj);
+      for (Object ob : holders) {
+         out.println("-> "  + convertToString(ob, useToString));
+      }
+
       return charArray.toString();
    }
 
@@ -959,325 +880,12 @@ public class JVMTIInterface {
    }
 
    /**
-    * Forces an OutOfMemoryError and releases the memory immediatly. This will
-    * force SoftReferences to go away.
-    */
-   public void forceReleaseOnSoftReferences() {
-      SoftReference reference = new SoftReference(new Object());
-
-      ArrayList list = new ArrayList();
-      int i = 0;
-      try {
-         while (true) {
-            list.add("A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String A Big String " + i++);
-            if (i % 1000 == 0) // doing the check on each 100 elements
-            {
-               if (reference.get() == null) {
-                  System.out.println("Break as the soft reference was gone");
-                  break;
-               }
-            }
-         }
-      } catch (Throwable e) {
-      }
-
-      list.clear();
-      try {
-         ByteArrayOutputStream byteout = new ByteArrayOutputStream();
-         ObjectOutputStream out = new ObjectOutputStream(byteout);
-
-         out.writeObject(new Dummy());
-
-         ByteArrayInputStream byteInput = new ByteArrayInputStream(byteout.toByteArray());
-         ObjectInputStream input = new ObjectInputStream(byteInput);
-         input.readObject();
-
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-
-      forceGC();
-   }
-
-   /**
-    * Used just to serialize anything and release SoftCache on java
-    * Serialization
-    */
-   static class Dummy implements Serializable {
-
-      private static final long serialVersionUID = 1L;
-   }
-
-   /**
-    * Will show a report of every class loaded on this JVM. At the beggining of
-    * the report you will see duplicated classes (classes loaded in more than
-    * one classLoader)
-    */
-   public String listClassesHTMLReport() throws Exception {
-      try {
-         forceGC();
-         CharArrayWriter charArray = new CharArrayWriter();
-         PrintWriter out = new PrintWriter(charArray);
-
-         Collection classSet = createTreeSet(new ClassSorterByClassName());
-
-         boolean printedHeader = false;
-
-         ClassLoader systemClassLoaderDummy = new ClassLoader() {
-            public String toString() {
-               return "SystemClassLoader";
-            }
-         };
-         ArrayList classLoaderDuplicates = new ArrayList();
-         Iterator iter = classSet.iterator();
-         String currentName = null;
-         Class currentClass = null;
-         while (iter.hasNext()) {
-            currentClass = (Class) iter.next();
-            if (currentName != currentClass.getName()) {
-               if (classLoaderDuplicates.size() > 1) {
-                  if (!printedHeader) {
-                     out.println("List of duplicated classes");
-                     printedHeader = true;
-                  }
-
-                  out.println("<b> Class " + currentName + " was loaded on these classLoaders:</b>");
-                  Iterator iterClassLoader = classLoaderDuplicates.iterator();
-                  while (iterClassLoader.hasNext()) {
-                     ClassLoader loader = (ClassLoader) iterClassLoader.next();
-                     out.println(loader.toString());
-                  }
-
-               }
-               currentName = currentClass.getName();
-               classLoaderDuplicates.clear();
-            }
-
-            ClassLoader loader = currentClass.getClassLoader();
-            if (loader == null) {
-               loader = systemClassLoaderDummy;
-            }
-            classLoaderDuplicates.add(loader);
-
-            currentName = currentClass.getName();
-         }
-
-         if (classLoaderDuplicates.size() > 1) {
-            out.println("<b> Class " + currentName + " was loaded on these classLoaders:</b>");
-            Iterator iterClassLoader = classLoaderDuplicates.iterator();
-            while (iterClassLoader.hasNext()) {
-               ClassLoader loader = (ClassLoader) iterClassLoader.next();
-               out.println(loader.toString());
-            }
-
-         }
-
-         out.println("List of classes by ClassLoader");
-         classSet = retrieveLoadedClassesByClassLoader();
-
-         // I will need a dummy reference, as the first classLoader on the
-         // iterator will be null
-         ClassLoader currentClassLoader = new ClassLoader() {
-         };
-         out.println();
-
-         iter = classSet.iterator();
-         while (iter.hasNext()) {
-            Class clazz = (Class) iter.next();
-            if (currentClassLoader != clazz.getClassLoader()) {
-               currentClassLoader = clazz.getClassLoader();
-               out.println("ClassLoader = " + (currentClassLoader == null ? "System Class Loader" : currentClassLoader.toString()));
-            }
-            out.println("Class = " + clazz.getName());
-         }
-
-         return new String(charArray.toCharArray());
-      } catch (Exception e) {
-         e.printStackTrace();
-         throw e;
-      }
-   }
-
-   /**
-    * Used by JSPs and JMX to report
-    */
-   public Collection retrieveLoadedClassesByClassName() {
-      Collection classSet;
-      classSet = createTreeSet(new ClassSorterByClassName());
-      return classSet;
-   }
-
-   /**
-    * Used by JSPs and JMX to report
-    */
-   public Collection retrieveLoadedClassesByClassLoader() {
-      Collection classSet;
-      classSet = createTreeSet(new ClassSorterByClassLoader());
-      return classSet;
-   }
-
-   private Collection createTreeSet(final Comparator comparator) {
-      Class[] classes = getLoadedClasses();
-
-      ArrayList classSet = new ArrayList();
-
-      for (Class classe : classes) {
-         classSet.add(classe);
-      }
-
-      Collections.sort(classSet, comparator);
-      return classSet;
-   }
-
-   static class InnerCallBack implements JVMTICallBack {
-
-      HashMap<Long, Class<?>> classesMap = new HashMap<Long, Class<?>>();
-
-      WeakHashMap<Class<?>, InventoryDataPoint> maps = new WeakHashMap<Class<?>, InventoryDataPoint>();
-
-      public void notifyClass(final long classTag, final Class<?> clazz) {
-         classesMap.put(classTag, clazz);
-      }
-
-      public void notifyObject(final long classTag, final long objectId, final long bytes) {
-         Class<?> clazz = (Class<?>) classesMap.get(classTag);
-
-         if (clazz != null) // this is not supposed to happen, but just in
-         // case I keep this if here
-         {
-            InventoryDataPoint point = (InventoryDataPoint) maps.get(clazz);
-            if (point == null) {
-               point = new InventoryDataPoint(clazz);
-               maps.put(clazz, point);
-            }
-
-            point.bytes += bytes;
-            point.instances++;
-         }
-
-      }
-
-      public void notifyReference(final long referenceHolder,
-                                  final long referencedObject,
-                                  final long classTag,
-                                  final long index,
-                                  final long method,
-                                  final byte referenceType) {
-      }
-
-   }
-
-   /**
-    * It will return true if the comparisson didn't represent any changes. This
-    * can be used by JUnitTests to validate the consumption of the memory is on
-    * the expected results.
-    *
-    * @param reportOutput      You could set System.out here. The location where logging
-    *                          information is going to be sent.
-    * @param map1              The first snapshot.
-    * @param map2              The second snapshot.
-    * @param ignoredClasses    Classes you want to ignore on the comparisson. Used to ignore
-    *                          things you know are going to be produced and you don't have
-    *                          control over the testcase.
-    * @param prefixesToIgnore  Same thing as classes, but every classes starting with these
-    *                          prefixes are going to be ignored.
-    * @param expectedIncreases An array of InventoryDataPoint with the maximum number of
-    *                          instances each class could be generating.
-    * @return true if the assertion is okay
-    */
-   public boolean compareInventories(final PrintStream reportOutput,
-                                     final Map map1,
-                                     final Map map2,
-                                     final Class[] ignoredClasses,
-                                     final String[] prefixesToIgnore,
-                                     final InventoryDataPoint[] expectedIncreases) {
-      HashSet ignoredItems = new HashSet();
-      if (ignoredClasses != null) {
-         for (Class ignoredClasse : ignoredClasses) {
-            ignoredItems.add(ignoredClasse);
-         }
-      }
-
-      HashMap expectedIncreasesHash = new HashMap();
-      if (expectedIncreases != null) {
-         for (InventoryDataPoint expectedIncrease : expectedIncreases) {
-            Class clazz = expectedIncrease.getClazz();
-            expectedIncreasesHash.put(clazz, expectedIncrease);
-         }
-      }
-
-      // expected increase based on map1's size
-      addExpectedIncrease(expectedIncreasesHash, "java.lang.ref.ReferenceQueue$Lock", 1);
-      addExpectedIncrease(expectedIncreasesHash, "java.util.WeakHashMap", 1);
-      addExpectedIncrease(expectedIncreasesHash, "java.lang.ref.ReferenceQueue", 1);
-      addExpectedIncrease(expectedIncreasesHash, "[Ljava.util.WeakHashMap$Entry;", 1);
-      addExpectedIncrease(expectedIncreasesHash, "java.lang.ref.WeakReference", map1.size());
-      addExpectedIncrease(expectedIncreasesHash, "java.util.WeakHashMap$Entry", map1.size());
-
-      boolean reportOK = true;
-
-      Iterator iterMap1 = map1.entrySet().iterator();
-      while (iterMap1.hasNext()) {
-         Map.Entry entry = (Map.Entry) iterMap1.next();
-         Class clazz = (Class) entry.getKey();
-
-         boolean isIgnoredPrefix = false;
-         if (prefixesToIgnore != null) {
-            for (String element : prefixesToIgnore) {
-               if (clazz.getName().startsWith(element)) {
-                  isIgnoredPrefix = true;
-                  break;
-               }
-            }
-         }
-         if (!isIgnoredPrefix && !ignoredItems.contains(entry.getKey())) {
-            InventoryDataPoint point1 = (InventoryDataPoint) entry.getValue();
-            InventoryDataPoint point2 = (InventoryDataPoint) map2.get(clazz);
-            if (point2 != null) {
-               if (point2.getInstances() > point1.getInstances()) {
-                  InventoryDataPoint expectedIncrease = (InventoryDataPoint) expectedIncreasesHash.get(clazz);
-                  boolean failed = true;
-                  if (expectedIncrease != null) {
-                     if (point2.getInstances() - point1.getInstances() <= expectedIncrease.getInstances()) {
-                        failed = false;
-                     }
-                  }
-                  if (failed) {
-                     int expected = 0;
-                     if (expectedIncrease != null) {
-                        expected = expectedIncrease.getInstances();
-                     }
-                     reportOK = false;
-                     reportOutput.println("Class " + clazz.getName() + " had an increase of " + (point2.getInstances() - point1.getInstances() - expected) + " instances represented by " + (point2.getBytes() - point1.getBytes()) + " bytes");
-                     if (expectedIncrease != null) {
-                        reportOutput.print((point2.getInstances() - point1.getInstances() - expectedIncrease.getInstances()) + " higher than expected");
-                     }
-
-                  }
-               }
-            }
-         }
-      }
-
-      return reportOK;
-   }
-
-   private void addExpectedIncrease(final HashMap expectedIncreasesHash,
-                                    final String name,
-                                    final int numberOfInstances) {
-      Class tmpClass = getClassByName(name);
-      if (tmpClass != null) {
-         expectedIncreasesHash.put(tmpClass, new InventoryDataPoint(tmpClass, numberOfInstances));
-      }
-   }
-
-   /**
     * Returns a WeakHashMap<Class,InventoryDataPoint> summarizing the current
     * JVM's inventory.
     */
    public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
       forceGC();
-      InnerCallBack callBack = new InnerCallBack();
+      JVMTICapture callBack = new JVMTICapture();
       File tmpFileObjects = File.createTempFile("delete-me", ".objects");
       try {
          notifyInventory(true, null, tmpFileObjects.getAbsolutePath(), callBack);
@@ -1291,43 +899,6 @@ public class JVMTIInterface {
       }
 
       return callBack.maps;
-   }
-
-   public String inventoryReport() throws Exception {
-      return inventoryReport(true);
-   }
-
-   /**
-    * Will list the current memory inventory. Exposed through JMX.
-    */
-   public synchronized String inventoryReport(final boolean html) throws Exception {
-      Map map = produceInventory();
-
-      TreeSet valuesSet = new TreeSet(map.values());
-      Iterator iterDataPoints = valuesSet.iterator();
-      CharArrayWriter charArray = new CharArrayWriter();
-      PrintWriter out = new PrintWriter(charArray);
-
-      if (html) {
-         out.println("<table><tr><td>Class</td><td>#Instances</td><td>#Bytes</td></tr>");
-      } else {
-         out.println(String.format("|%1$-100s|%2$10s|%3$10s|", "Class", "Instances", "Bytes"));
-      }
-
-      while (iterDataPoints.hasNext()) {
-         InventoryDataPoint point = (InventoryDataPoint) iterDataPoints.next();
-         if (html) {
-            out.println("<tr><td>" + point.getClazz().getName() + "</td><td>" + point.getInstances() + "</td><td>" + point.getBytes() + "</td></tr>");
-         } else {
-            out.println(String.format("|%1$-100s|%2$10d|%3$10d|", point.getClazz().getName(), point.getInstances(), point.getBytes()));
-         }
-      }
-
-      if (html) {
-         out.println("</table>");
-      }
-
-      return charArray.toString();
    }
 
    /**

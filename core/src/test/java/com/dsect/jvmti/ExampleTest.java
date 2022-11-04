@@ -19,31 +19,30 @@ package com.dsect.jvmti;
 
 import java.util.ArrayList;
 
+import com.dsect.jvmti.util.JVMTIReport;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static com.dsect.jvmti.JVMTIInterface.noLeaks;
 
 public class ExampleTest {
 
    static ArrayList<TestClass> elements = new ArrayList<>();
 
-   /** This is just an example: this test will leak */
-   @Ignore
    @Test
    public void itWillLeak() throws Exception {
       for (int i = 0; i < 10; i++) {
          elements.add(new TestClass(null));
       }
 
-      noLeaks(TestClass.class.getName(), 0, 10);
+      Assert.assertTrue(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 
 
    @Test
    public void testNoLeak() throws Exception {
       elements.clear();
-      noLeaks(TestClass.class.getName(), 0, 10);
+      Assert.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 
 }

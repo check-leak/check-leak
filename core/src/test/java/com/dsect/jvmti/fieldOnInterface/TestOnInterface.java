@@ -38,17 +38,17 @@ public class TestOnInterface {
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
       jvmtiInterface.getAllObjects(TestClass.class);
 
-      final String reportOnSuper = jvmtiInterface.exploreObjectReferences(10, false, declaringClass.onSuper);
+      final String reportOnSuper = jvmtiInterface.exploreObjectReferences(10, 1, false, declaringClass.onSuper);
       System.out.println("Report = " + reportOnSuper);
       Assert.assertTrue(reportOnSuper.contains("onSuper"));
 
-      final String reportOnClass = jvmtiInterface.exploreObjectReferences(10, false, declaringClass.declared);
+      final String reportOnClass = jvmtiInterface.exploreObjectReferences(10, 1, false, declaringClass.declared);
       System.out.println("Report = " + reportOnClass);
-      final String reportOnInterface = jvmtiInterface.exploreObjectReferences(10, false, declaringClass.onInterface);
+      final String reportOnInterface = jvmtiInterface.exploreObjectReferences(10, 1, false, declaringClass.onInterface);
       System.out.println("Report = " + reportOnInterface);
-      final String reportOnSuperClassInterface = jvmtiInterface.exploreObjectReferences(10, false, declaringClass.onSuperInterface);
+      final String reportOnSuperClassInterface = jvmtiInterface.exploreObjectReferences(10, 1, false, declaringClass.onSuperInterface);
       System.out.println("Report = " + reportOnSuperClassInterface);
-      final String reportOnSecondSuperClassInterface = jvmtiInterface.exploreObjectReferences(10, false, declaringClass.secondInterfaceOnSuper);
+      final String reportOnSecondSuperClassInterface = jvmtiInterface.exploreObjectReferences(10, 1, false, declaringClass.secondInterfaceOnSuper);
       System.out.println("Report = " + reportOnSecondSuperClassInterface);
       Assert.assertTrue(reportOnInterface.contains("onInterface"));
       Assert.assertTrue(reportOnClass.contains("declared"));

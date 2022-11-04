@@ -19,6 +19,7 @@ package com.dsect.jvmti;
 
 import java.util.Map;
 
+import com.dsect.jvmti.util.JVMTIReport;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -69,7 +70,7 @@ public class FindHolderTest {
 
       JVMTIInterface jvmtiInterface = new JVMTIInterface();
 
-      System.out.println(jvmtiInterface.exploreObjectReferences(10, true, testClass));
+      System.out.println(jvmtiInterface.exploreObjectReferences(10, 10, true, testClass));
 
 
    }
@@ -80,20 +81,12 @@ public class FindHolderTest {
       TestClass testClass = new TestClass(null);
       testClass.someString = "Hello Francis!!!";
 
-      boolean leaked = false;
-
-      try {
-         JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
-      } catch (UnexpectedLeak leak) {
-         leak.printStackTrace();
-         leaked = true;
-      }
-
+      boolean leaked = JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10);
 
       Assert.assertTrue(leaked);
 
       testClass = null;
 
-      JVMTIInterface.noLeaks(TestClass.class.getName(), 0, 10);
+      Assert.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 }

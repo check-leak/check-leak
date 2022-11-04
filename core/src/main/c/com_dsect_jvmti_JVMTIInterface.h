@@ -119,14 +119,6 @@ JNIEXPORT jstring JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodSignature
 JNIEXPORT jclass JNICALL Java_com_dsect_jvmti_JVMTIInterface_getMethodClass
   (JNIEnv *, jobject, jlong);
 
-/*
- * Class:     com_dsect_jvmti_JVMTIInterface
- * Method:    heapSnapshot
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_com_dsect_jvmti_JVMTIInterface_heapSnapshot
-  (JNIEnv *, jclass, jstring, jstring, jstring);
-
 #ifdef __cplusplus
 }
 #endif

@@ -26,14 +26,14 @@ You then do following assertion:
 ultimately you should get the following result in case of a leak:
 
 ```
-com.dsect.jvmti.UnexpectedLeak: com.dsect.jvmti.TestClass has 10 elements while we expected 0
-References to obj[0]=com.dsect.jvmti.TestClass@52d455b8
+com.dsect.jvmti.UnexpectedLeak: TestClass has 10 elements while we expected 0
+References to obj[0]=TestClass@52d455b8
 !-- arrayRef [Ljava.lang.Object;[0] id=@1330278544
 !--!-- FieldReference transient java.lang.Object[] java.util.ArrayList.elementData=OBJ(java.util.ArrayList@519569038)
-!--!--!-- StaticFieldReference static java.util.ArrayList com.dsect.jvmti.ExampleTest.elements
+!--!--!-- StaticFieldReference static java.util.ArrayList ExampleTest.elements
 !-- arrayRef [Ljava.lang.Object;[0] id=@1870252780
-!--!-- Reference inside a method - com.dsect.jvmti.JVMTIInterface::exploreObjectReferences
-!--!-- Reference inside a method - com.dsect.jvmti.JVMTIInterface::noLeaks
+!--!-- Reference inside a method - JVMTIInterface::exploreObjectReferences
+!--!-- Reference inside a method - JVMTIInterface::noLeaks
 ```
 
 

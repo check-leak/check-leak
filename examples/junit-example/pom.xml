@@ -4,9 +4,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.dsect</groupId>
+  <groupId>org.dleak</groupId>
   <artifactId>junit-example</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1-SNAPSHOT</version>
 
   <name>junit-example</name>
 
@@ -18,7 +18,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.dsect</groupId>
+      <groupId>org.dleak</groupId>
       <artifactId>core</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -33,9 +33,9 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.dsect</groupId>
-        <artifactId>dsect-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.dleak</groupId>
+        <artifactId>dleak-maven-plugin</artifactId>
+        <version>${project.version}</version>
         <executions>
           <execution>
             <phase>generate-resources</phase>

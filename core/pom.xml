@@ -5,9 +5,9 @@
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.dsect</groupId>
-      <artifactId>dsect</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <groupId>org.dleak</groupId>
+      <artifactId>dleak</artifactId>
+      <version>0.1-SNAPSHOT</version>
    </parent>
 
    <artifactId>core</artifactId>
@@ -25,7 +25,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/lib/darwin/libdsect.dylib
+               -agentpath:${project.basedir}/src/main/resources/lib/darwin/libdleak.dylib
             </native-surefire-argline>
          </properties>
       </profile>
@@ -38,7 +38,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/lib/linux-amd64/libdsect.so
+               -agentpath:${project.basedir}/src/main/resources/lib/linux-amd64/libdleak.so
             </native-surefire-argline>
          </properties>
       </profile>
@@ -80,7 +80,27 @@
       </plugins>
       <pluginManagement>
          <plugins>
-
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <executions>
+                  <execution>
+                     <id>default-compile</id>
+                     <!-- Running compilation at generate-sources stage instead, to also generate the .h file
+                          ahead of running the cmake build at process-sources phase, in the profiles above -->
+                     <phase>generate-sources</phase>
+                     <goals>
+                        <goal>compile</goal>
+                     </goals>
+                     <configuration>
+                        <compilerArgs>
+                           <arg>-h</arg>
+                           <arg>./src/main/c</arg>
+                        </compilerArgs>
+                     </configuration>
+                  </execution>
+               </executions>
+            </plugin>
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-surefire-plugin</artifactId>

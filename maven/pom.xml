@@ -19,14 +19,14 @@
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.dsect</groupId>
-      <artifactId>dsect</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <groupId>org.dleak</groupId>
+      <artifactId>dleak</artifactId>
+      <version>0.1-SNAPSHOT</version>
    </parent>
 
-   <artifactId>dsect-maven-plugin</artifactId>
+   <artifactId>dleak-maven-plugin</artifactId>
    <packaging>maven-plugin</packaging>
-   <name>D-Sect Maven Plugin</name>
+   <name>D-Leak Maven Plugin</name>
 
    <properties>
       <activemq.basedir>${project.basedir}/..</activemq.basedir>
@@ -34,7 +34,7 @@
 
    <dependencies>
       <dependency>
-         <groupId>com.dsect</groupId>
+         <groupId>org.dleak</groupId>
          <artifactId>core</artifactId>
          <version>${project.version}</version>
       </dependency>

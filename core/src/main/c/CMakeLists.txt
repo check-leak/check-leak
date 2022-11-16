@@ -37,20 +37,20 @@ set(CMAKE_C_FLAGS "-O3 -std=gnu11 -Wall ${CMAKE_USER_C_FLAGS}")
 
 
 
-set(DSECT_LIB_NAME dsect-64)
+set(DSECT_LIB_NAME dleak-64)
 
 message(${CMAKE_SYSTEM_NAME})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(DSECT_LIB_DIR lib/darwin)
-    set(DSECT_LIB_NAME dsect)
+    set(DSECT_LIB_NAME dleak)
 else()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(DSECT_LIB_NAME dsect-32)
+        set(DSECT_LIB_NAME dleak-32)
     endif()
     if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         set(DSECT_LIB_DIR lib/linux-amd64)
-        set(DSECT_LIB_NAME dsect)
+        set(DSECT_LIB_NAME dleak)
     else()
         set(DSECT_LIB_DIR lib/linux-${CMAKE_SYSTEM_PROCESSOR})
     endif()
@@ -60,18 +60,9 @@ message ("variable is ${CMAKE_SYSTEM_NAME}")
 
 find_library(LIBAIO_LIB NAMES aio)
 
-if(EXISTS javah)
-    ADD_CUSTOM_COMMAND(
-        OUTPUT com_dsect_jvmti_JVMTIInterface.h
-        COMMAND javah -cp ../java/ com.dsect.jvmti.JVMTIInterface
-        DEPENDS ../java/com/dsect/jvmti/JVMTIInterface.java
-    )
-endif()
-
 INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 
-
-ADD_LIBRARY(d-sect-native SHARED agent.c com_dsect_jvmti_JVMTIInterface.h)
+ADD_LIBRARY(d-sect-native SHARED agent.c org_dleak_jvmti_JVMTIInterface.h)
 
 set_target_properties(d-sect-native PROPERTIES
               LIBRARY_OUTPUT_DIRECTORY ../resources/${DSECT_LIB_DIR}

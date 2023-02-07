@@ -27,9 +27,9 @@
 
    <distributionManagement>
       <repository>
-         <id>dsect</id>
+         <id>d-leak</id>
          <name>GitHub D-Sect Apache Maven Packages</name>
-         <url>https://maven.pkg.github.com/d-sect/d-sect</url>
+         <url>https://maven.pkg.github.com/d-leak/d-leak</url>
       </repository>
    </distributionManagement>
 

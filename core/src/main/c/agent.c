@@ -951,7 +951,7 @@ JNICALL void eventMethodEntry(jvmtiEnv *jvmti_env,
             jthread thread,
             jmethodID method)
 {
-   fprintf (stderr,"Event captured method=%ld\n", method); fflush(stderr);
+   fprintf (stderr,"Event captured method=%ld\n", (long)method); fflush(stderr);
 }
 
 
@@ -962,7 +962,7 @@ void JNICALL eventMethodLeave1(jvmtiEnv *jvmti_env,
             jboolean was_popped_by_exception,
             jvalue return_value)
 {
-	fprintf (stderr,"Leave method=%ld\n", method);
+	fprintf (stderr,"Leave method=%ld\n", (long)method);
 }
 
 JNICALL void eventMethodLeave2(jvmtiEnv *jvmti_env,
@@ -970,7 +970,7 @@ JNICALL void eventMethodLeave2(jvmtiEnv *jvmti_env,
             jthread thread,
             jmethodID method)
 {
-   fprintf (stderr,"Enter method=%ld\n", method); fflush(stderr);
+   fprintf (stderr,"Enter method=%ld\n", (long)method); fflush(stderr);
 }
 
 

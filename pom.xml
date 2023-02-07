@@ -15,4 +15,14 @@
      <module>maven</module>
    </modules>
 
+   <repositories>
+      <repository>
+         <id>d-leak</id>
+         <url>https://maven.pkg.github.com/d-leak/d-leak</url>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+      </repository>
+   </repositories>
+
 </project>

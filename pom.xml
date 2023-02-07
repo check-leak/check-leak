@@ -25,4 +25,12 @@
       </repository>
    </repositories>
 
+   <distributionManagement>
+      <repository>
+         <id>dsect</id>
+         <name>GitHub D-Sect Apache Maven Packages</name>
+         <url>https://maven.pkg.github.com/d-sect/d-sect</url>
+      </repository>
+   </distributionManagement>
+
 </project>

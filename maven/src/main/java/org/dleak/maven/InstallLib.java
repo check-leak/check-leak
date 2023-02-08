@@ -16,10 +16,10 @@
  */
 package org.dleak.maven;
 
-import java.net.URL;
+import java.io.File;
 import java.util.Properties;
 
-import org.dleak.jvmti.JVMTIInterface;
+import org.dleak.jvmti.Installer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -33,7 +33,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class InstallLib extends AbstractPlugin {
 
    @Parameter
-   String targetPlace;
+   String target;
+
+   @Parameter
+   String lib;
+
 
    @Parameter
    String[] args;
@@ -53,11 +57,19 @@ public class InstallLib extends AbstractPlugin {
 
    @Override
    protected void doExecute() throws MojoExecutionException, MojoFailureException {
-      for (int i = 0; i < 1000; i++) {
-         System.err.println("#####");
-         System.out.println("#####");
+      if (target == null) {
+         throw new RuntimeException("target not defined");
       }
-      URL url = JVMTIInterface.class.getResource("lib/darwing/libdsect.dylib");
-      System.out.println("url:: " + url);
+
+      File targetFile = new File(target);
+      targetFile.mkdirs();
+
+      File targetLib = new File(targetFile, lib);
+      try {
+         Installer.install(targetLib);
+      } catch (Exception e) {
+         throw new RuntimeException(e.getMessage(), e);
+      }
+
    }
 }

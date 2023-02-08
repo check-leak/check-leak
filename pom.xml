@@ -13,6 +13,7 @@
    <modules>
      <module>core</module>
      <module>maven</module>
+     <module>examples</module>
    </modules>
 
    <repositories>

@@ -4,6 +4,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.dleak</groupId>
+    <artifactId>examples</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.dleak</groupId>
   <artifactId>junit-example</artifactId>
   <version>0.1-SNAPSHOT</version>
@@ -22,6 +28,13 @@
       <artifactId>core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- this is to guarantee order of compilation -->
+    <dependency>
+      <groupId>org.dleak</groupId>
+      <artifactId>maven-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -38,11 +51,15 @@
         <version>${project.version}</version>
         <executions>
           <execution>
-            <phase>test-compile</phase>
+            <phase>generate-sources</phase>
             <id>find-native</id>
             <goals>
               <goal>install</goal>
             </goals>
+            <configuration>
+              <target>${project.basedir}/target/lib</target>
+              <lib>agent.dll</lib>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -87,6 +104,18 @@
         <plugin>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.18.1</version>
+          <configuration>
+            <forkMode>once</forkMode>
+            <testFailureIgnore>false</testFailureIgnore>
+            <runOrder>alphabetical</runOrder>
+            <redirectTestOutputToFile>false</redirectTestOutputToFile>
+            <argLine>-agentpath:${project.basedir}/target/lib/agent.dll</argLine>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

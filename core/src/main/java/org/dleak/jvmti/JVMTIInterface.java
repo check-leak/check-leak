@@ -22,9 +22,13 @@
 
 package org.dleak.jvmti;
 
+import java.io.BufferedOutputStream;
 import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

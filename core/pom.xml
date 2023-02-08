@@ -25,7 +25,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/lib/darwin/libdleak.dylib
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin/libdleak.dylib
             </native-surefire-argline>
          </properties>
       </profile>
@@ -38,7 +38,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/lib/linux-amd64/libdleak.so
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/linux-amd64/libdleak.so
             </native-surefire-argline>
          </properties>
       </profile>
@@ -58,6 +58,14 @@
    </dependencies>
 
    <build>
+      <resources>
+         <resource>
+            <directory>${project.basedir}/src/main/resources/</directory>
+            <includes>
+               <include>**/*</include>
+            </includes>
+         </resource>
+      </resources>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>

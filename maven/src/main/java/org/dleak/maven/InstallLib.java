@@ -29,7 +29,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * This will resolve the native agent library
  */
-@Mojo(name = "install-lib", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "install", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class InstallLib extends AbstractPlugin {
 
    @Parameter
@@ -55,6 +55,7 @@ public class InstallLib extends AbstractPlugin {
    protected void doExecute() throws MojoExecutionException, MojoFailureException {
       for (int i = 0; i < 1000; i++) {
          System.err.println("#####");
+         System.out.println("#####");
       }
       URL url = JVMTIInterface.class.getResource("lib/darwing/libdsect.dylib");
       System.out.println("url:: " + url);

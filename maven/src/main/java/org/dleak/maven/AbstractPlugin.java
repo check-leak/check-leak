@@ -65,7 +65,9 @@ public abstract class AbstractPlugin extends AbstractMojo {
 
    @Override
    public void execute() throws MojoExecutionException, MojoFailureException {
-
+      if (!isIgnore()) {
+         doExecute();
+      }
    }
    protected abstract boolean isIgnore();
 

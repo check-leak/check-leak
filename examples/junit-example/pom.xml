@@ -6,11 +6,11 @@
   <parent>
     <groupId>com.github.check-leak.check-leak</groupId>
     <artifactId>examples</artifactId>
-    <version>0.3</version>
+    <version>0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>junit-example</artifactId>
-  <version>0.3</version>
+  <version>0.4-SNAPSHOT</version>
 
   <name>junit-example</name>
 

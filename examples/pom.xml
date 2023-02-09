@@ -22,12 +22,12 @@ under the License.
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>org.dleak</groupId>
+      <groupId>com.github.d-leak</groupId>
       <artifactId>dleak</artifactId>
       <version>0.1-SNAPSHOT</version>
    </parent>
 
-   <groupId>org.dleak</groupId>
+   <groupId>com.github.d-leak</groupId>
    <artifactId>examples</artifactId>
    <version>0.1-SNAPSHOT</version>
    <packaging>pom</packaging>

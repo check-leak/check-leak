@@ -4,7 +4,7 @@
 
    <groupId>com.github.check-leak.check-leak</groupId>
    <artifactId>check-leak</artifactId>
-   <version>0.3-SNAPSHOT</version>
+   <version>0.3</version>
 
    <packaging>pom</packaging>
 
@@ -28,7 +28,7 @@
       <connection>scm:git:https://github.com/check-leak/check-leak.git</connection>
       <developerConnection>scm:git:git@github.com:check-leak/check-leak.git</developerConnection>
       <url>https://github.com/check-leak/check-leak/</url>
-      <tag>HEAD</tag>
+      <tag>0.3</tag>
    </scm>
 
    <build>

@@ -24,11 +24,11 @@ under the License.
    <parent>
       <groupId>com.github.check-leak.check-leak</groupId>
       <artifactId>check-leak</artifactId>
-      <version>0.3-SNAPSHOT</version>
+      <version>0.3</version>
    </parent>
 
    <artifactId>examples</artifactId>
-   <version>0.3-SNAPSHOT</version>
+   <version>0.3</version>
    <packaging>pom</packaging>
    <name>check-leak Examples</name>
 

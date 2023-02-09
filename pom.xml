@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
 
-   <groupId>com.github.d-leak.d-leak</groupId>
-   <artifactId>dleak</artifactId>
+   <groupId>com.github.check-leak.check-leak</groupId>
+   <artifactId>check-leak</artifactId>
    <version>0.3-SNAPSHOT</version>
 
    <packaging>pom</packaging>
@@ -25,9 +25,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:git:https://github.com/d-leak/d-leak.git</connection>
-      <developerConnection>scm:git:git@github.com:d-leak/d-leak.git</developerConnection>
-      <url>https://github.com/d-leak/d-leak/</url>
+      <connection>scm:git:https://github.com/check-leak/check-leak.git</connection>
+      <developerConnection>scm:git:git@github.com:check-leak/check-leak.git</developerConnection>
+      <url>https://github.com/check-leak/check-leak/</url>
       <tag>HEAD</tag>
    </scm>
 
@@ -46,18 +46,5 @@
          </plugins>
       </pluginManagement>
    </build>
-
-
-   <distributionManagement>
-      <repository>
-         <id>github</id>
-         <name>GitHub D-Sect Apache Maven Packages</name>
-         <url>https://maven.pkg.github.com/d-leak/d-leak</url>
-         <snapshots>
-             <enabled>true</enabled>
-         </snapshots>
-      </repository>
-   </distributionManagement>
-
 
 </project>

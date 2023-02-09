@@ -18,18 +18,18 @@
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.github.d-leak.d-leak</groupId>
-      <artifactId>dleak</artifactId>
+      <groupId>com.github.check-leak.check-leak</groupId>
+      <artifactId>check-leak</artifactId>
       <version>0.3-SNAPSHOT</version>
    </parent>
 
-   <artifactId>maven-plugin</artifactId>
+   <artifactId>checkleak-maven-plugin</artifactId>
    <packaging>maven-plugin</packaging>
-   <name>D-Leak Maven Plugin</name>
+   <name>check-leak Maven Plugin</name>
 
    <dependencies>
       <dependency>
-         <groupId>com.github.d-leak.d-leak</groupId>
+         <groupId>com.github.check-leak.check-leak</groupId>
          <artifactId>core</artifactId>
          <version>${project.version}</version>
       </dependency>

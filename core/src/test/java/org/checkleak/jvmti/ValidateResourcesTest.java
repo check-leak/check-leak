@@ -15,22 +15,25 @@
  * limitations under the License.
  */
 
-package org.checkleak.junitexample;
+package org.checkleak.jvmti;
 
-import org.checkleak.jvmti.JVMTIInterface;
-import org.checkleak.sample.SomeClass;
+import java.io.File;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-public class AvoidLeaksTest
-{
-    @Test
-    public void assertOneObject() throws Exception {
-        SomeClass someObject = new SomeClass();
-        JVMTIInterface jvmtiInterface = new JVMTIInterface();
-        Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
-        System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
-        someObject = null;
-        Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
-    }
+public class ValidateResourcesTest {
+
+   @Rule
+   public TemporaryFolder folder = new TemporaryFolder(new File("./target/"));
+
+   @Test
+   public void testInstall() throws Exception {
+      File target = new File(folder.getRoot(), "target-test.txt");
+
+      Installer.install(target);
+      Assert.assertTrue(target.exists());
+   }
+
 }

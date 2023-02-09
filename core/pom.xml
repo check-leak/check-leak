@@ -3,8 +3,8 @@
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.github.d-leak.d-leak</groupId>
-      <artifactId>dleak</artifactId>
+      <groupId>com.github.check-leak.check-leak</groupId>
+      <artifactId>check-leak</artifactId>
       <version>0.3-SNAPSHOT</version>
    </parent>
 
@@ -23,7 +23,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin/libdleak.dylib
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin/libcheckleak.dylib
             </native-surefire-argline>
          </properties>
       </profile>
@@ -36,7 +36,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/linux-amd64/libdleak.so
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/linux-amd64/libcheckleak.so
             </native-surefire-argline>
          </properties>
       </profile>

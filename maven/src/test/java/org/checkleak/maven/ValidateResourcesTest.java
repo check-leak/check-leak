@@ -15,22 +15,29 @@
  * limitations under the License.
  */
 
-package org.checkleak.junitexample;
+package org.checkleak.maven;
+
+import java.io.InputStream;
 
 import org.checkleak.jvmti.JVMTIInterface;
-import org.checkleak.sample.SomeClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AvoidLeaksTest
-{
-    @Test
-    public void assertOneObject() throws Exception {
-        SomeClass someObject = new SomeClass();
-        JVMTIInterface jvmtiInterface = new JVMTIInterface();
-        Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
-        System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
-        someObject = null;
-        Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
-    }
+public class ValidateResourcesTest {
+
+   @Test
+   public void testValidateResources() throws Exception {
+      System.getenv().forEach((a, b) -> {
+         System.out.println("env " + a + " = " + b);
+      });
+
+      System.getProperties().forEach((a, b) -> {
+         System.out.println("property " + a + " = " + b);
+      });
+
+
+      InputStream inputStream = JVMTIInterface.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
+      Assert.assertNotNull(inputStream);
+      inputStream.close();
+   }
 }

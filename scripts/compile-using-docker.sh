@@ -27,11 +27,11 @@ fi
 
 mvn generate-sources
 
-docker build -f src/main/docker/Dockerfile-centos -t dleak-native-builder .
+docker build -f src/main/docker/Dockerfile-centos -t checkleak-native-builder .
 
-docker run --rm -v $PWD/target/lib:/work/target/lib dleak-native-builder "$@"
+docker run --rm -v $PWD/target/lib:/work/target/lib checkleak-native-builder "$@"
 chown -Rv $USER:$GID ./target/lib
 ls -liat ./target/lib
 
 # Note: You may need to authorize docker to map folder at your folder structure
-#docker build -f src/main/docker/Dockerfile-centos -t dleak-native-builder . && docker run -it --rm -v $PWD/target/lib:/work/target/lib dleak-native-builder bash
+#docker build -f src/main/docker/Dockerfile-centos -t checkleak-native-builder . && docker run -it --rm -v $PWD/target/lib:/work/target/lib checkleak-native-builder bash

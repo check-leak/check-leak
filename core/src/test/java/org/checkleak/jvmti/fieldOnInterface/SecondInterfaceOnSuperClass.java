@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-package org.checkleak.junitexample;
+package org.checkleak.jvmti.fieldOnInterface;
 
-import org.checkleak.jvmti.JVMTIInterface;
-import org.checkleak.sample.SomeClass;
-import org.junit.Assert;
-import org.junit.Test;
+import org.checkleak.jvmti.TestClass;
 
-public class AvoidLeaksTest
-{
-    @Test
-    public void assertOneObject() throws Exception {
-        SomeClass someObject = new SomeClass();
-        JVMTIInterface jvmtiInterface = new JVMTIInterface();
-        Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
-        System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
-        someObject = null;
-        Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
-    }
+/**
+ * @author Clebert Suconic
+ */
+
+public interface SecondInterfaceOnSuperClass {
+
+   public TestClass secondInterfaceOnSuper = new TestClass("secondInterfaceOnSuper");
+
 }

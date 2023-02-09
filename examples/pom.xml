@@ -22,16 +22,15 @@ under the License.
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.github.d-leak.d-leak</groupId>
-      <artifactId>dleak</artifactId>
+      <groupId>com.github.check-leak.check-leak</groupId>
+      <artifactId>check-leak</artifactId>
       <version>0.3-SNAPSHOT</version>
    </parent>
 
-   <groupId>com.github.d-leak.d-leak</groupId>
    <artifactId>examples</artifactId>
    <version>0.3-SNAPSHOT</version>
    <packaging>pom</packaging>
-   <name>d-leak Examples</name>
+   <name>check-leak Examples</name>
 
    <modules>
       <module>junit-example</module>

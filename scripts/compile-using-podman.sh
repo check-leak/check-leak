@@ -27,17 +27,17 @@ fi
 
 mvn generate-sources
 
-podman build -f src/main/docker/Dockerfile-centos -t dleak-native-builder .
+podman build -f src/main/docker/Dockerfile-centos -t checkleak-native-builder .
 
 if [[ $OSTYPE == 'darwin'* ]]; then
   # for some reason the :Z is not working on mac
-  podman run --rm -v $PWD/target/lib:/work/target/lib dleak-native-builder "$@"
+  podman run --rm -v $PWD/target/lib:/work/target/lib checkleak-native-builder "$@"
 else
-  podman run --rm -v $PWD/target/lib:/work/target/lib:Z dleak-native-builder "$@"
+  podman run --rm -v $PWD/target/lib:/work/target/lib:Z checkleak-native-builder "$@"
 fi
 
 # to debug the image
-#podman run -it --rm -v $PWD/target/lib:/work/target/lib:Z dleak-native-builder "$@" bash
+#podman run -it --rm -v $PWD/target/lib:/work/target/lib:Z checkleak-native-builder "$@" bash
 chown -Rv $USER:$GID ./target/lib
 ls -liat ./target/lib
 

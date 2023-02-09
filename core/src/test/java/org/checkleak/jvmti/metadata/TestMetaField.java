@@ -15,22 +15,27 @@
  * limitations under the License.
  */
 
-package org.checkleak.junitexample;
+package org.checkleak.jvmti.metadata;
 
-import org.checkleak.jvmti.JVMTIInterface;
-import org.checkleak.sample.SomeClass;
+import java.lang.reflect.Field;
+
+import org.checkleak.jvmti.JVMTIFieldsMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AvoidLeaksTest
-{
-    @Test
-    public void assertOneObject() throws Exception {
-        SomeClass someObject = new SomeClass();
-        JVMTIInterface jvmtiInterface = new JVMTIInterface();
-        Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
-        System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
-        someObject = null;
-        Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
-    }
+/**
+ * This is accordingly to the specification from https://docs.oracle.com/en/java/javase/11/docs/specs/jvmti.html,
+ * look for jvmtiHeapReferenceInfoField on the doc ^^
+ */
+
+public class TestMetaField {
+
+   @Test
+   public void testMeta() {
+      JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
+      Field[] fields = metadata.getFields(C1.class);
+      Assert.assertTrue(fields[2].getName().equals("a"));
+      fields = metadata.getFields(C2.class);
+      Assert.assertTrue(fields[4].getName().equals("a"));
+   }
 }

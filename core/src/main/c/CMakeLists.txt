@@ -16,7 +16,7 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-PROJECT(d-sect-native)
+PROJECT(check-leak-native)
 SET(${PROJECT_NAME}_MAJOR_VERSION 1)
 SET(${PROJECT_NAME}_MINOR_VERSION 0)
 SET(${PROJECT_NAME}_PATCH_LEVEL 0)
@@ -37,22 +37,22 @@ set(CMAKE_C_FLAGS "-O3 -std=gnu11 -Wall ${CMAKE_USER_C_FLAGS}")
 
 
 
-set(DSECT_LIB_NAME dleak-64)
+set(CHECKLEAK_LIB_NAME checkleak-64)
 
 message(${CMAKE_SYSTEM_NAME})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(DSECT_LIB_DIR platforms-lib/darwin)
-    set(DSECT_LIB_NAME dleak)
+    set(CHECKLEAK_LIB_DIR platforms-lib/darwin)
+    set(CHECKLEAK_LIB_NAME checkleak)
 else()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(DSECT_LIB_NAME dleak-32)
+        set(CHECKLEAK_LIB_NAME checkleak-32)
     endif()
     if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-        set(DSECT_LIB_DIR platforms-lib/linux-amd64)
-        set(DSECT_LIB_NAME dleak)
+        set(CHECKLEAK_LIB_DIR platforms-lib/linux-amd64)
+        set(CHECKLEAK_LIB_NAME checkleak)
     else()
-        set(DSECT_LIB_DIR platforms-lib/linux-${CMAKE_SYSTEM_PROCESSOR})
+        set(CHECKLEAK_LIB_DIR platforms-lib/linux-${CMAKE_SYSTEM_PROCESSOR})
     endif()
 endif()
 
@@ -62,9 +62,9 @@ find_library(LIBAIO_LIB NAMES aio)
 
 INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 
-ADD_LIBRARY(d-sect-native SHARED agent.c org_dleak_jvmti_JVMTIInterface.h)
+ADD_LIBRARY(check-leak-native SHARED agent.c org_checkleak_jvmti_JVMTIInterface.h)
 
-set_target_properties(d-sect-native PROPERTIES
-              LIBRARY_OUTPUT_DIRECTORY ../resources/${DSECT_LIB_DIR}
-              LIBRARY_OUTPUT_NAME ${DSECT_LIB_NAME})
-message(STATUS "Setting up library as ${DSECT_LIB_NAME} based on current architecture")
+set_target_properties(check-leak-native PROPERTIES
+              LIBRARY_OUTPUT_DIRECTORY ../resources/${CHECKLEAK_LIB_DIR}
+              LIBRARY_OUTPUT_NAME ${CHECKLEAK_LIB_NAME})
+message(STATUS "Setting up library as ${CHECKLEAK_LIB_NAME} based on current architecture")

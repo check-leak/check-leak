@@ -4,12 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.github.d-leak.d-leak</groupId>
+    <groupId>com.github.check-leak.check-leak</groupId>
     <artifactId>examples</artifactId>
     <version>0.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.github.d-leak.d-leak</groupId>
   <artifactId>junit-example</artifactId>
   <version>0.3-SNAPSHOT</version>
 
@@ -23,14 +22,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.d-leak.d-leak</groupId>
+      <groupId>com.github.check-leak.check-leak</groupId>
       <artifactId>core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- this is to guarantee order of compilation -->
     <dependency>
-      <groupId>com.github.d-leak.d-leak</groupId>
-      <artifactId>maven-plugin</artifactId>
+      <groupId>com.github.check-leak.check-leak</groupId>
+      <artifactId>checkleak-maven-plugin</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
@@ -45,7 +44,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.github.d-leak.d-leak</groupId>
+        <groupId>com.github.check-leak.check-leak</groupId>
         <artifactId>maven-plugin</artifactId>
         <version>${project.version}</version>
         <executions>

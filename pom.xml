@@ -4,7 +4,7 @@
 
    <groupId>com.github.d-leak.d-leak</groupId>
    <artifactId>dleak</artifactId>
-   <version>0.2-SNAPSHOT</version>
+   <version>0.2</version>
 
    <packaging>pom</packaging>
 
@@ -28,7 +28,7 @@
       <connection>scm:git:https://github.com/d-leak/d-leak.git</connection>
       <developerConnection>scm:git:git@github.com:d-leak/d-leak.git</developerConnection>
       <url>https://github.com/d-leak/d-leak/</url>
-      <tag>HEAD</tag>
+      <tag>0.2</tag>
    </scm>
 
    <build>

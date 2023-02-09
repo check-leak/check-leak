@@ -6,12 +6,12 @@
   <parent>
     <groupId>com.github.d-leak.d-leak</groupId>
     <artifactId>examples</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
   </parent>
 
   <groupId>com.github.d-leak.d-leak</groupId>
   <artifactId>junit-example</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
 
   <name>junit-example</name>
 

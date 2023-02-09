@@ -26,11 +26,22 @@ public class AvoidLeaksTest
 {
     @Test
     public void assertOneObject() throws Exception {
+        // I am keeping a reference live
         SomeClass someObject = new SomeClass();
+
+        // I am starting the JVMTIInterface API
         JVMTIInterface jvmtiInterface = new JVMTIInterface();
+
+        // I'm checking if there are references. On this case I know I should have one object live, so I'm checking for 1
         Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
+
+        // You can use the exploreObjectReferences to find where the references are (in case they are not expected)
         System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
+
+        // Now I am clearing the reference
         someObject = null;
+
+        // I'm checking again from JVMTIInterface, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
         Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
     }
 }

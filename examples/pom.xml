@@ -24,12 +24,12 @@ under the License.
    <parent>
       <groupId>com.github.d-leak</groupId>
       <artifactId>dleak</artifactId>
-      <version>0.1</version>
+      <version>0.2-SNAPSHOT</version>
    </parent>
 
    <groupId>com.github.d-leak</groupId>
    <artifactId>examples</artifactId>
-   <version>0.1</version>
+   <version>0.2-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>d-leak Examples</name>
 

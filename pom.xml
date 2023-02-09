@@ -31,6 +31,23 @@
       <tag>HEAD</tag>
    </scm>
 
+   <build>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-release-plugin</artifactId>
+               <configuration>
+                  <autoVersionSubmodules>true</autoVersionSubmodules>
+                  <tagNameFormat>@{project.version}</tagNameFormat>
+                  <arguments>-DskipTests</arguments>
+               </configuration>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+   </build>
+
+
    <distributionManagement>
       <repository>
          <id>github</id>
@@ -41,5 +58,6 @@
          </snapshots>
       </repository>
    </distributionManagement>
+
 
 </project>

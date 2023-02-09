@@ -2,27 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
 
-   <groupId>com.github.check-leak.check-leak</groupId>
-   <artifactId>check-leak</artifactId>
+   <groupId>org.check-leak</groupId>
+   <artifactId>check-leak-parent</artifactId>
    <version>0.4-SNAPSHOT</version>
-
    <packaging>pom</packaging>
+   <inceptionYear>2023</inceptionYear>
 
-   <modules>
-     <module>core</module>
-     <module>maven</module>
-     <module>examples</module>
-   </modules>
+   <name>CheckLeak</name>
+   <description>Library to introspect the JVM to avoid and find memory leaks.</description>
+   <url>https://github.com/check-leak/check-leak</url>
 
-   <repositories>
-      <repository>
-         <id>github</id>
-         <url>https://maven.pkg.github.com/d-sect/d-sect</url>
-         <snapshots>
-            <enabled>true</enabled>
-         </snapshots>
-      </repository>
-   </repositories>
+   <licenses>
+      <license>
+         <name>The Apache License, Version 2.0</name>
+         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+   </licenses>
 
    <scm>
       <connection>scm:git:https://github.com/check-leak/check-leak.git</connection>
@@ -30,6 +25,36 @@
       <url>https://github.com/check-leak/check-leak/</url>
       <tag>HEAD</tag>
    </scm>
+
+   <developers>
+      <developer>
+         <name>Clebert Suconic</name>
+         <email>clebert.suconic@gmail.com</email>
+      </developer>
+   </developers>
+
+   <properties>
+      <maven-gpg-plugin-version>1.6</maven-gpg-plugin-version>
+   </properties>
+
+
+   <modules>
+     <module>core</module>
+     <module>maven</module>
+     <module>examples</module>
+   </modules>
+
+   <distributionManagement>
+      <snapshotRepository>
+         <id>ossrh</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      </snapshotRepository>
+      <repository>
+         <id>ossrh</id>
+         <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      </repository>
+   </distributionManagement>
+
 
    <build>
       <pluginManagement>
@@ -47,5 +72,35 @@
          </plugins>
       </pluginManagement>
    </build>
+
+   <profiles>
+      <profile>
+         <id>release</id>
+         <activation>
+            <property>
+               <name>release</name>
+               <value>true</value>
+            </property>
+         </activation>
+         <build>
+            <plugins>
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-gpg-plugin</artifactId>
+                  <version>${maven-gpg-plugin-version}</version>
+                  <executions>
+                     <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                           <goal>sign</goal>
+                        </goals>
+                     </execution>
+                  </executions>
+               </plugin>
+            </plugins>
+         </build>
+      </profile>
+   </profiles>
 
 </project>

@@ -26,6 +26,13 @@
       </repository>
    </repositories>
 
+   <scm>
+      <connection>scm:git:https://github.com/d-leak/d-leak.git</connection>
+      <developerConnection>scm:git:git@github.com:d-leak/d-leak.git</developerConnection>
+      <url>https://github.com/d-leak/d-leak/</url>
+      <tag>HEAD</tag>
+   </scm>
+
    <distributionManagement>
       <repository>
          <id>github</id>

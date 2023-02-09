@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>com.github.d-leak</groupId>
+      <groupId>com.github.d-leak.d-leak</groupId>
       <artifactId>dleak</artifactId>
       <version>0.2-SNAPSHOT</version>
    </parent>

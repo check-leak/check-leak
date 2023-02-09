@@ -45,7 +45,7 @@
     <plugins>
       <plugin>
         <groupId>com.github.check-leak.check-leak</groupId>
-        <artifactId>maven-plugin</artifactId>
+        <artifactId>checkleak-maven-plugin</artifactId>
         <version>${project.version}</version>
         <executions>
           <execution>

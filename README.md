@@ -5,7 +5,7 @@ Check-Leak is a powerful and efficient library for detecting memory leaks in Jav
 
 The Basic API is defined as part of JVMTIInterface. You simply instantiate org.checkleak.jvmti.JVMTIInterface and work with it.
 
-The most common used method is jvmti.getAllObjects() where you can use JUNIT Assertions to validate if they are still around as expected or not.
+The most commonly used method is jvmti.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
 
 The following example is also available as part of the [source code](https://github.com/check-leak/check-leak/tree/main/examples/junit-example).
 
@@ -49,7 +49,7 @@ Before using JVMTIInterface you need to have access to the native agent. We have
 
 You have to also configure the surefire-plugin to allow the --agentpath to work accordingly.
 
-Notice the maven instal plugin will copy the appropriate file for your environment. Currently we support MAC and Linux. It is possible to compile the library on any environent where a gcc compiler is available.
+Notice the maven install plugin will copy the appropriate file for your environment. Currently we support MAC and Linux. The library can be compiled on any environment where a GCC compiler is available.
 
 ````xml
 

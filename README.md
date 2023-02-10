@@ -3,9 +3,9 @@ Check-Leak is a powerful and efficient library for detecting memory leaks in Jav
 
 # Basic API
 
-The Basic API is defined as part of JVMTIInterface. You simply instantiate org.checkleak.core.CheckLeak and work with it.
+Everything will need is part of org.checkleak.core.CheckLeak.
 
-The most commonly used method is jvmti.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
+The most commonly used method is checkLeak.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
 
 The following example is also available as part of the [source code](https://github.com/check-leak/check-leak/tree/main/examples/junit-example).
 
@@ -23,8 +23,8 @@ public class AvoidLeaksTest
       // I am keeping a reference live
       SomeClass someObject = new SomeClass();
       
-      // I am starting the JVMTIInterface API
-      JVMTIInterface checkLeak = new JVMTIInterface();
+      // Instantiate CheckLeak
+      CheckLeak checkLeak = new CheckLeak();
       
       // I'm checking if there are references. On this case I know I should have one object live, so I'm checking for 1
       Assert.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
@@ -35,7 +35,7 @@ public class AvoidLeaksTest
       // Now I am clearing the reference
       someObject = null;
       
-      // I'm checking again from JVMTIInterface, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
+      // I'm checking again from CheckLeak, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
       Assert.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
    }
 }
@@ -44,7 +44,7 @@ public class AvoidLeaksTest
 
 
 # Installing the native agent
-Before using JVMTIInterface you need to have access to the native agent. We have provided a maven-plugin that will copy the required library at your location.
+Before using CheckLeak you need to have access to the native agent. We have provided a maven-plugin that will copy the required library at your location.
 
 You have to also configure the surefire-plugin to allow the --agentpath to work accordingly.
 

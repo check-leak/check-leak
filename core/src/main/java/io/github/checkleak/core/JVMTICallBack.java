@@ -33,13 +33,12 @@ public interface JVMTICallBack
     *JNISignature for this method = (JJJJJB)V
     * @param referenceHolder A tag id of an object  (if -1 means the root)
     * @param referencedObject A tag id of an object
-    * @param fieldId A tag id for a Field referencing the object. If -1 that means a static reference in a method
     * @param classTag A tag for the class holding the reference
     * @param index The index about the operation (like the field ID, array number.. etc)
     * @param method The method id (look at JVMTI docs)
     * @param referenceType Look at {@link JVMTITypes}
     */
-   public void notifyReference(long referenceHolder,
+   void notifyReference(long referenceHolder,
                                long referencedObject,
                                long classTag,
                                long index,
@@ -51,7 +50,7 @@ public interface JVMTICallBack
     * @param classTag the class tag id
     * @param clazz the class name
     */
-   public void notifyClass(long classTag, Class<?> clazz);
+   void notifyClass(long classTag, Class<?> clazz);
 
    /** 
     * Notification about an object
@@ -59,6 +58,6 @@ public interface JVMTICallBack
     * @param objectId the object id
     * @param bytes the number of bytes
     */
-   public void notifyObject(long classTag, long objectId, long bytes);
+   void notifyObject(long classTag, long objectId, long bytes);
 
 }

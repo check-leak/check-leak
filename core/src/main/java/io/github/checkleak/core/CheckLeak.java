@@ -57,6 +57,7 @@ public class CheckLeak {
 
    /**
     * Returns true if -agentlib:JBossProfiler was configured properly
+    * @return true if loaded
     */
    public static boolean isLoaded() {
       return isLoaded;
@@ -77,7 +78,10 @@ public class CheckLeak {
 
    public native void stopMeasure();
 
-   /** There might be more than one class with a matching name (example multiple class loaders) */
+   /** There might be more than one class with a matching name (example multiple class loaders)
+    * @param className The Classname.
+    * @return All The classes matching the classname on every classLoader.
+    * */
    public Class<?>[] getAllClasses(final String className) {
       Class<?> classes[] = getLoadedClasses();
 
@@ -94,6 +98,8 @@ public class CheckLeak {
 
    /**
     * returns the first class found with a given name
+    * @param className The name of the class
+    * @return the first class found on the heap matching className
     */
    public Class<?> getClassByName(final String className) {
       Class<?> classes[] = getLoadedClasses();
@@ -115,14 +121,24 @@ public class CheckLeak {
    public native void releaseTags();
 
    /**
-    * This method will keep every object tagged for later usage. This method is
-    * going to tag objects.
+    *
+    * Internal method. used by notifyOnReferences.
+    * @param notifyOnClasses should call the callback on classes.
+    * @param temporaryFileReferences obvious
+    * @param temporaryFileObjects obvious
+    * @param callback the callback to be used
+    *
     */
    protected native void notifyInventory(boolean notifyOnClasses,
                                          String temporaryFileReferences,
                                          String temporaryFileObjects,
                                          JVMTICallBack callback);
 
+   /** internal method. It will callback for everything on the heap.
+    * A temporary file is required as we can't use Java Objects from the native side. while we are inspecting things. We will execute the callback for everything in the heap before this executions.
+    * @param temporaryFile a temporary file that will be used in the process.
+    * @param callback The native implementation will call this callback for everything used in the heap.
+    * */
    public void notifyOnReferences(final String temporaryFile, final JVMTICallBack callback) {
       notifyInventory(true, temporaryFile, null, callback);
    }
@@ -131,6 +147,10 @@ public class CheckLeak {
     * Will get all the objects holding references to these objects passed by
     * parameter. This method is going to release tags, be careful if you are on
     * the middle of navigations.
+    *
+    * @param objects a list of objects you are looking for referencers
+    *
+    * @return a lit of objects that are referencing all the objects sent as parameters
     */
    public native Object[] getReferenceHolders(Object... objects);
 
@@ -139,6 +159,10 @@ public class CheckLeak {
    /**
     * Will return all methods of a give class. This will change tags, be
     * careful if you are on the middle of navigations.
+    *
+    * @param clazz The class we want object instances.
+    *
+    * @return All the objects that are instances of clazz.
     */
    public native Object[] getAllObjects(Class<?> clazz);
 
@@ -161,10 +185,6 @@ public class CheckLeak {
    private Field getObjectField(Class<?> clazz, int fieldId) {
 
       Field[] fields = metadata.getFields(clazz);
-      // System.out.println("Looking for field " + fieldId + " on " + clazz);
-      // for (int i = 0; i < fields.length; i++) {
-      // System.out.println("[" + i + "]=" + fields[i]);
-      // }
       return metadata.getFields(clazz)[fieldId];
    }
 
@@ -174,14 +194,6 @@ public class CheckLeak {
 
    private native Class getMethodClass(long methodId);
 
-   /**
-    * Return every single object on a give class by its name. This method will
-    * look for every single class with this name, and if more than one
-    * classLoader is loading a class with this name, this method will return
-    * objects for all the respective classes. For example if you look for a
-    * Structs Action Form, this will return every ActionForm defined on the
-    * current JVM.
-    */
    public Object[] getAllObjects(final String clazz) {
       ArrayList list = new ArrayList();
 
@@ -226,7 +238,7 @@ public class CheckLeak {
       }
    }
 
-   /**
+   /*
     * Explore references recursevely
     */
    private void exploreObject(final PrintWriter out,
@@ -289,7 +301,7 @@ public class CheckLeak {
 
    }
 
-   /** Treat a reference sending it tout the PrintWriter output */
+   /* Treat a reference sending it tout the PrintWriter output */
    private Object treatReference(final String level,
                                 final PrintWriter out,
                                 final ReferenceDataPoint point,
@@ -435,7 +447,8 @@ public class CheckLeak {
    }
 
    /**
-    * @return HashMap<Long objectId, ArrayList < ReferenceDataPoint> referencees>
+    * @return a matrix that can be used for navigations through the API.
+    * @throws IOException in case the temporary file generation failed.
     */
    public Map<Long, List<ReferenceDataPoint>> createIndexMatrix() throws IOException {
       releaseTags();
@@ -528,8 +541,17 @@ public class CheckLeak {
    }
 
    /**
-    * This is an overload to reuse the matrix index in case you already have
-    * indexed the JVM
+    * Used to navigate and explore references of className, while using an index.
+    * @param className the className
+    * @param maxLevel how many levels to be recursive for the references
+    * @param solveReferencesOnClasses solve class references
+    * @param solveReferencesOnClassLoaders  solve classLoaders references
+    * @param useToString print toSring
+    * @param weakAndSoft should explore weak and soft references as well
+    * @param referencesMap the index created from navigation
+    *
+    * @return the report generated
+    *
     */
    public String exploreClassReferences(final String className,
                                         final int maxLevel,
@@ -576,6 +598,13 @@ public class CheckLeak {
    /**
     * Show the reference holders tree of an object. This method is also exposed
     * through MBean.
+    *
+    * @param className the class being explored
+    * @param maxLevel max recursion on the report
+    * @param maxObjects the max many of objects to reach from the class
+    * @param useToString print toString
+    * @return the report generated
+    * @throws Exception any exception that happened on this process
     */
    public String exploreObjectReferences(final String className,
                                          final int maxLevel,
@@ -849,6 +878,9 @@ public class CheckLeak {
    /**
     * Show the reference holders tree of an object. This returns a report you
     * can visualize through MBean.
+    *
+    * @param referencesMap the map generated from the HEAP
+    * @param thatObject it will explore references on this
     */
    public String exploreObjectReferences(final Map referencesMap,
                                          final Object thatObject,
@@ -869,8 +901,7 @@ public class CheckLeak {
    }
 
    /**
-    * Returns a WeakHashMap<Class,InventoryDataPoint> summarizing the current
-    * JVM's inventory.
+    * it will return a WeakHashMap summarizing everything in the memory.
     */
    public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
       forceGC();

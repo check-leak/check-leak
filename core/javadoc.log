@@ -1,0 +1,208 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for io.github.check-leak:core:jar:0.5-SNAPSHOT
+[WARNING] 'build.pluginManagement.plugins.plugin.(groupId:artifactId)' must be unique but found duplicate declaration of plugin org.apache.maven.plugins:maven-compiler-plugin @ line 130, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] Inspecting build with total of 1 modules...
+[INFO] Installing Nexus Staging features:
+[INFO]   ... total of 1 executions of maven-deploy-plugin replaced with nexus-staging-maven-plugin
+[INFO] 
+[INFO] ---------------------< io.github.check-leak:core >----------------------
+[INFO] Building core 0.5-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ core ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ core ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 9 source files to /Users/clebertsuconic/work/apache/check-leak/core/target/classes
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java: /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java uses or overrides a deprecated API.
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java: Recompile with -Xlint:deprecation for details.
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/util/JVMTIReport.java: Some input files use unchecked or unsafe operations.
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/util/JVMTIReport.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ core ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /Users/clebertsuconic/work/apache/check-leak/core/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ core ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 22 source files to /Users/clebertsuconic/work/apache/check-leak/core/target/test-classes
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/test/java/io/github/checkleak/core/ReportTest.java: /Users/clebertsuconic/work/apache/check-leak/core/src/test/java/io/github/checkleak/core/ReportTest.java uses unchecked or unsafe operations.
+[INFO] /Users/clebertsuconic/work/apache/check-leak/core/src/test/java/io/github/checkleak/core/ReportTest.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.18.1:test (default-test) @ core ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ core ---
+[INFO] Building jar: /Users/clebertsuconic/work/apache/check-leak/core/target/core-0.5-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-source-plugin:2.2.1:jar-no-fork (attach-sources) @ core ---
+[INFO] Building jar: /Users/clebertsuconic/work/apache/check-leak/core/target/core-0.5-SNAPSHOT-sources.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:2.9.1:jar (attach-javadocs) @ core ---
+[WARNING] Source files encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] 
+Loading source files for package io.github.checkleak.core...
+Loading source files for package io.github.checkleak.core.util...
+Constructing Javadoc information...
+Standard Doclet version 11.0.8
+Building tree for all the packages and classes...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/CheckLeak.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/Installer.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/InventoryDataPoint.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/JVMTICallBack.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/JVMTICapture.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/JVMTIFieldsMetadata.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/JVMTITypes.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/ReferenceDataPoint.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/util/JVMTIReport.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/package-summary.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/package-tree.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/util/package-summary.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/util/package-tree.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/constant-values.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/JVMTICallBack.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/Installer.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/ReferenceDataPoint.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/JVMTICapture.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/JVMTIFieldsMetadata.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/CheckLeak.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/InventoryDataPoint.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/class-use/JVMTITypes.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/util/class-use/JVMTIReport.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/package-use.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/io/github/checkleak/core/util/package-use.html...
+Building index for all the packages and classes...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/overview-tree.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/index-all.html...
+Building index for all classes...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/allclasses-index.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/allpackages-index.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/deprecated-list.html...
+Building index for all classes...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/allclasses.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/allclasses.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/index.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/overview-summary.html...
+Generating /Users/clebertsuconic/work/apache/check-leak/core/target/apidocs/help-doc.html...
+1 error
+30 warnings
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.404 s
+[INFO] Finished at: 2023-02-10T16:55:14-05:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin:2.9.1:jar (attach-javadocs) on project core: MavenReportException: Error while creating archive: 
+[ERROR] Exit code: 1 - javadoc: error - The code being documented uses modules but the packages defined in http://docs.oracle.com/javase/7/docs/api/ are in the unnamed module.
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:131: warning: no @param for callback
+[ERROR]    protected native void notifyInventory(boolean notifyOnClasses,
+[ERROR]                          ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for className
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for maxLevel
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for solveReferencesOnClasses
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for solveReferencesOnClassLoaders
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for useToString
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for weakAndSoft
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @param for referencesMap
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:546: warning: no @return
+[ERROR]    public String exploreClassReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @param for className
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @param for maxLevel
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @param for maxObjects
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @param for useToString
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @return
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:592: warning: no @throws for java.lang.Exception
+[ERROR]    public String exploreObjectReferences(final String className,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:865: warning: no @param for referencesMap
+[ERROR]    public String exploreObjectReferences(final Map referencesMap,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:865: warning: no @param for thatObject
+[ERROR]    public String exploreObjectReferences(final Map referencesMap,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:865: warning: no @param for maxLevel
+[ERROR]    public String exploreObjectReferences(final Map referencesMap,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:865: warning: no @param for useToString
+[ERROR]    public String exploreObjectReferences(final Map referencesMap,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:865: warning: no @return
+[ERROR]    public String exploreObjectReferences(final Map referencesMap,
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:886: warning: no @return
+[ERROR]    public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
+[ERROR]                                                          ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:886: warning: no @throws for java.io.IOException
+[ERROR]    public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
+[ERROR]                                                          ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:908: warning: no @param for className
+[ERROR]    public String printObjects(final String className) throws Exception {
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:908: warning: no @return
+[ERROR]    public String printObjects(final String className) throws Exception {
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/CheckLeak.java:908: warning: no @throws for java.lang.Exception
+[ERROR]    public String printObjects(final String className) throws Exception {
+[ERROR]                  ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/Installer.java:30: warning: no @param for target
+[ERROR]    public static void install(File target) throws IOException {
+[ERROR]                       ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/Installer.java:30: warning: no @throws for java.io.IOException
+[ERROR]    public static void install(File target) throws IOException {
+[ERROR]                       ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/util/JVMTIReport.java:62: warning: no @param for html
+[ERROR]    public static synchronized String inventoryReport(final boolean html) throws Exception {
+[ERROR]                                      ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/util/JVMTIReport.java:62: warning: no @return
+[ERROR]    public static synchronized String inventoryReport(final boolean html) throws Exception {
+[ERROR]                                      ^
+[ERROR] /Users/clebertsuconic/work/apache/check-leak/core/src/main/java/io/github/checkleak/core/util/JVMTIReport.java:62: warning: no @throws for java.lang.Exception
+[ERROR]    public static synchronized String inventoryReport(final boolean html) throws Exception {
+[ERROR]                                      ^
+[ERROR] 
+[ERROR] Command line was: /Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/bin/javadoc @options @packages
+[ERROR] 
+[ERROR] Refer to the generated Javadoc files in '/Users/clebertsuconic/work/apache/check-leak/core/target/apidocs' dir.
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

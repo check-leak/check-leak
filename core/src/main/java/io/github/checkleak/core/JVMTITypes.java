@@ -25,7 +25,7 @@ package io.github.checkleak.core;
 /**
  * A JVMTITypes
  *
- * @author <mailto:clebert.suconic@jboss.org">Clebert Suconic</a>
+ * @author Clebert Suconic
  *
  *
  */

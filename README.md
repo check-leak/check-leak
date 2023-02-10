@@ -3,7 +3,7 @@ Check-Leak is a powerful and efficient library for detecting memory leaks in Jav
 
 # Basic API
 
-Everything will need is part of org.checkleak.core.CheckLeak.
+Everything will need is part of io.github.checkleak.core.CheckLeak.
 
 The most commonly used method is checkLeak.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
 
@@ -11,8 +11,8 @@ The following example is also available as part of the [source code](https://git
 
 ```java
 
-import org.checkleak.core.CheckLeak;
-import org.checkleak.sample.SomeClass;
+import io.github.checkleak.core.CheckLeak;
+import io.github.checkleak.sample.SomeClass;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,7 +60,7 @@ Notice the maven install plugin will copy the appropriate file for your environm
 <build>
    <plugins>
       <plugin>
-         <groupId>org.check-leak</groupId>
+         <groupId>io.github.check-leak</groupId>
          <artifactId>checkleak-maven-plugin</artifactId>
          <version>${check-leak-version}</version>
          <executions>

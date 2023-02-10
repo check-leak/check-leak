@@ -22,7 +22,7 @@ under the License.
    <modelVersion>4.0.0</modelVersion>
 
    <parent>
-      <groupId>org.check-leak</groupId>
+      <groupId>io.github.check-leak</groupId>
       <artifactId>check-leak-parent</artifactId>
       <version>0.5-SNAPSHOT</version>
    </parent>

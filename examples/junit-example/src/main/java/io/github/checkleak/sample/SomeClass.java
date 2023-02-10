@@ -15,20 +15,9 @@
  * limitations under the License.
  */
 
-package io.github.checkleak.maven;
+package io.github.checkleak.sample;
 
-import java.io.InputStream;
+// This is a dumb class that will be used by AvoidLeaksTest
+public class SomeClass {
 
-import io.github.checkleak.core.CheckLeak;
-import org.junit.Assert;
-import org.junit.Test;
-
-public class ValidateResourcesTest {
-
-   @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
-   }
 }

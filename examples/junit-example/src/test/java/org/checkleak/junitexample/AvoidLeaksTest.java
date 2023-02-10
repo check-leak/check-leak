@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.checkleak.junitexample;
+package io.github.checkleak.junitexample;
 
-import org.checkleak.core.CheckLeak;
-import org.checkleak.sample.SomeClass;
+import io.github.checkleak.core.CheckLeak;
+import io.github.checkleak.sample.SomeClass;
 import org.junit.Assert;
 import org.junit.Test;
 

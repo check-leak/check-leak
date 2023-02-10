@@ -62,7 +62,7 @@ find_library(LIBAIO_LIB NAMES aio)
 
 INCLUDE_DIRECTORIES(. ${JNI_INCLUDE_DIRS})
 
-ADD_LIBRARY(check-leak-native SHARED agent.c org_checkleak_core_CheckLeak.h)
+ADD_LIBRARY(check-leak-native SHARED agent.c io_github_checkleak_core_CheckLeak.h)
 
 set_target_properties(check-leak-native PROPERTIES
               LIBRARY_OUTPUT_DIRECTORY ../resources/${CHECKLEAK_LIB_DIR}

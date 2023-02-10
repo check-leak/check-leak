@@ -26,7 +26,27 @@ import java.io.OutputStream;
 
 public class Installer {
 
-   /** copy the binary library as this targetFile */
+   public static void main(String arg[]) {
+      try {
+         if (arg.length != 1) {
+            printUsage();
+         }
+         File file =  new File(arg[0]);
+         install(file);
+      } catch (Throwable e) {
+         e.printStackTrace();
+         printUsage();
+      }
+   }
+
+   private static final void printUsage() {
+      System.err.println("Please pass in the target file as the argument");
+      System.exit(-1);
+   }
+
+   /** copy the binary library as this targetFile
+    * @param target The file that should be generated with the proper binar for the current system.
+    * @throws IOException if an issue happened during the reading and write of the binary. */
    public static void install(File target) throws IOException {
       String osName = System.getProperty("os.name");
       String libraryName;

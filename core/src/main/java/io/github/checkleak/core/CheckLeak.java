@@ -881,6 +881,10 @@ public class CheckLeak {
     *
     * @param referencesMap the map generated from the HEAP
     * @param thatObject it will explore references on this
+    * @param maxLevel max recursion used for the report
+    * @param useToString object.toString will be used on the report
+    * @return a generated report
+    *
     */
    public String exploreObjectReferences(final Map referencesMap,
                                          final Object thatObject,
@@ -902,6 +906,8 @@ public class CheckLeak {
 
    /**
     * it will return a WeakHashMap summarizing everything in the memory.
+    * @return a produced inventory that can be used for navigations.
+    * @throws IOException while generating the tmp file used on the navigation
     */
    public synchronized Map<Class<?>, InventoryDataPoint> produceInventory() throws IOException {
       forceGC();
@@ -920,31 +926,4 @@ public class CheckLeak {
 
       return callBack.maps;
    }
-
-   /**
-    * Will print a report of every instance of the class passed by parameter.
-    * Exposed through JMX .
-    */
-   public String printObjects(final String className) throws Exception {
-      CharArrayWriter charArray = new CharArrayWriter();
-      PrintWriter out = new PrintWriter(charArray);
-
-      Object objects[] = this.getAllObjects(className);
-
-      out.println("<table>");
-      for (Object object : objects) {
-         out.println("<tr><td>");
-         out.println(object);
-         if (object instanceof Object[]) {
-            out.println("</td><td>");
-            out.println("array of " + ((Object[]) object).length);
-            out.println("</td></tr>");
-         }
-      }
-
-      out.println("</table>");
-
-      return charArray.toString();
-   }
-
 }

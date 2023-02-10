@@ -58,6 +58,9 @@ public class JVMTIReport {
 
    /**
     * Will list the current memory inventory.
+    * @param html should the output be an html table
+    * @return the report
+    * @throws Exception in case any issues happened.
     */
    public static synchronized String inventoryReport(final boolean html) throws Exception {
       CheckLeak checkLeak = new CheckLeak();

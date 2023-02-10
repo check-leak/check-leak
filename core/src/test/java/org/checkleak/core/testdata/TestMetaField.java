@@ -15,20 +15,27 @@
  * limitations under the License.
  */
 
-package org.checkleak.maven;
+package org.checkleak.core.testdata;
 
-import java.io.InputStream;
+import java.lang.reflect.Field;
 
-import org.checkleak.core.CheckLeak;
+import org.checkleak.core.JVMTIFieldsMetadata;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ValidateResourcesTest {
+/**
+ * This is accordingly to the specification from https://docs.oracle.com/en/java/javase/11/docs/specs/jvmti.html,
+ * look for jvmtiHeapReferenceInfoField on the doc ^^
+ */
+
+public class TestMetaField {
 
    @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
+   public void testMeta() {
+      JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
+      Field[] fields = metadata.getFields(C1.class);
+      Assert.assertTrue(fields[2].getName().equals("a"));
+      fields = metadata.getFields(C2.class);
+      Assert.assertTrue(fields[4].getName().equals("a"));
    }
 }

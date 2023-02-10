@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package org.checkleak.maven;
+package org.checkleak.core.fieldOnInterface;
 
-import java.io.InputStream;
+import org.checkleak.core.TestClass;
 
-import org.checkleak.core.CheckLeak;
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * @author Clebert Suconic
+ */
 
-public class ValidateResourcesTest {
+public class SuperClassing implements InterfaceOnSuperClass,SecondInterfaceOnSuperClass {
 
-   @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
-   }
+   int a;
+   int b;
+   int c;
+   int d;
+   TestClass onSuper = new TestClass("onSuper");
+
 }

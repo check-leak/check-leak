@@ -15,20 +15,8 @@
  * limitations under the License.
  */
 
-package org.checkleak.maven;
+package org.checkleak.core.testdata;
 
-import java.io.InputStream;
-
-import org.checkleak.core.CheckLeak;
-import org.junit.Assert;
-import org.junit.Test;
-
-public class ValidateResourcesTest {
-
-   @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
-   }
+public interface I0 {
+   int p = 0;
 }

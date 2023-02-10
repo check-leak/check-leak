@@ -15,20 +15,33 @@
  * limitations under the License.
  */
 
-package org.checkleak.maven;
+package org.checkleak.core;
 
-import java.io.InputStream;
+import java.util.ArrayList;
 
-import org.checkleak.core.CheckLeak;
+import org.checkleak.core.util.JVMTIReport;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ValidateResourcesTest {
+
+public class ExampleTest {
+
+   static ArrayList<TestClass> elements = new ArrayList<>();
 
    @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
+   public void itWillLeak() throws Exception {
+      for (int i = 0; i < 10; i++) {
+         elements.add(new TestClass(null));
+      }
+
+      Assert.assertTrue(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
+
+
+   @Test
+   public void testNoLeak() throws Exception {
+      elements.clear();
+      Assert.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
+   }
+
 }

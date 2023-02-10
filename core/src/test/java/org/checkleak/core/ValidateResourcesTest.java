@@ -15,20 +15,25 @@
  * limitations under the License.
  */
 
-package org.checkleak.maven;
+package org.checkleak.core;
 
-import java.io.InputStream;
-
-import org.checkleak.core.CheckLeak;
+import java.io.File;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class ValidateResourcesTest {
 
+   @Rule
+   public TemporaryFolder folder = new TemporaryFolder(new File("./target/"));
+
    @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assert.assertNotNull(inputStream);
-      inputStream.close();
+   public void testInstall() throws Exception {
+      File target = new File(folder.getRoot(), "target-test.txt");
+
+      Installer.install(target);
+      Assert.assertTrue(target.exists());
    }
+
 }

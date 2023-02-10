@@ -19,7 +19,7 @@ package org.checkleak.maven;
 import java.io.File;
 import java.util.Properties;
 
-import org.checkleak.jvmti.Installer;
+import org.checkleak.core.Installer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;

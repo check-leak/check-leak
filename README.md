@@ -3,16 +3,15 @@ Check-Leak is a powerful and efficient library for detecting memory leaks in Jav
 
 # Basic API
 
-The Basic API is defined as part of JVMTIInterface. You simply instantiate org.checkleak.jvmti.JVMTIInterface and work with it.
+The Basic API is defined as part of JVMTIInterface. You simply instantiate org.checkleak.core.CheckLeak and work with it.
 
 The most commonly used method is jvmti.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
 
 The following example is also available as part of the [source code](https://github.com/check-leak/check-leak/tree/main/examples/junit-example).
 
-
 ```java
 
-import org.checkleak.jvmti.JVMTIInterface;
+import org.checkleak.core.CheckLeak;
 import org.checkleak.sample.SomeClass;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,19 +24,19 @@ public class AvoidLeaksTest
       SomeClass someObject = new SomeClass();
       
       // I am starting the JVMTIInterface API
-      JVMTIInterface jvmtiInterface = new JVMTIInterface();
+      JVMTIInterface checkLeak = new JVMTIInterface();
       
       // I'm checking if there are references. On this case I know I should have one object live, so I'm checking for 1
-      Assert.assertEquals(1, jvmtiInterface.getAllObjects(SomeClass.class).length);
+      Assert.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
       
       // You can use the exploreObjectReferences to find where the references are (in case they are not expected)
-      System.out.println("references to object:" + jvmtiInterface.exploreObjectReferences(10, 10, true, someObject));
+      System.out.println("references to object:" + checkLeak.exploreObjectReferences(10, 10, true, someObject));
       
       // Now I am clearing the reference
       someObject = null;
       
       // I'm checking again from JVMTIInterface, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
-      Assert.assertEquals(0, jvmtiInterface.getAllObjects(SomeClass.class).length);
+      Assert.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
    }
 }
 

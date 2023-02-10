@@ -5,7 +5,7 @@
    <parent>
       <groupId>io.github.check-leak</groupId>
       <artifactId>check-leak-parent</artifactId>
-      <version>0.5</version>
+      <version>0.6-SNAPSHOT</version>
    </parent>
 
    <artifactId>core</artifactId>

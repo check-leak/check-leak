@@ -24,11 +24,11 @@ under the License.
    <parent>
       <groupId>org.check-leak</groupId>
       <artifactId>check-leak-parent</artifactId>
-      <version>0.4</version>
+      <version>0.5-SNAPSHOT</version>
    </parent>
 
    <artifactId>examples</artifactId>
-   <version>0.4</version>
+   <version>0.5-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>check-leak Examples</name>
 

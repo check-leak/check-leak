@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/** This is the main point of use on the API. It is the class reponsible to interface with JVMTI.
+ *  The most common methods are getAllObjects and exploreObjectReferences */
 public class CheckLeak {
 
    private static boolean isLoaded = true;

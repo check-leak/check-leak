@@ -23,7 +23,7 @@
 package io.github.checkleak.core;
 
 /**
- * A JVMTITypes
+ * This class will hold definitions for the types of notifications produced by CheckLeak.
  *
  * @author Clebert Suconic
  *

@@ -19,10 +19,10 @@ package io.github.checkleak.core;
 
 import java.util.ArrayList;
 
+import io.github.checkleak.core.testdata.TestClass;
 import io.github.checkleak.core.util.JVMTIReport;
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ExampleTest {
 
@@ -34,14 +34,14 @@ public class ExampleTest {
          elements.add(new TestClass(null));
       }
 
-      Assert.assertTrue(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
+      Assertions.assertTrue(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 
 
    @Test
    public void testNoLeak() throws Exception {
       elements.clear();
-      Assert.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
+      Assertions.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 
 }

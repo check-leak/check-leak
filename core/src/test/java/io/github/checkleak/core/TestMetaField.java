@@ -17,20 +17,26 @@
 
 package io.github.checkleak.core;
 
-import io.github.checkleak.core.util.JVMTIReport;
-import org.junit.Assert;
-import org.junit.Test;
+import java.lang.reflect.Field;
 
-public class SubClassTest extends SuperClassTest {
+import io.github.checkleak.core.testdata.C1;
+import io.github.checkleak.core.testdata.C2;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-   TestQueue testQueue;
+/**
+ * This is accordingly to the specification from https://docs.oracle.com/en/java/javase/11/docs/specs/jvmti.html,
+ * look for jvmtiHeapReferenceInfoField on the doc ^^
+ */
+
+public class TestMetaField {
 
    @Test
-   public void testNoLeak() throws Exception {
-
-      testQueue = new TestQueue(new TestClass(null));
-      boolean leaked = JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10);
-
-      Assert.assertTrue(leaked);
+   public void testMeta() {
+      JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
+      Field[] fields = metadata.getFields(C1.class);
+      Assertions.assertTrue(fields[2].getName().equals("a"));
+      fields = metadata.getFields(C2.class);
+      Assertions.assertTrue(fields[4].getName().equals("a"));
    }
 }

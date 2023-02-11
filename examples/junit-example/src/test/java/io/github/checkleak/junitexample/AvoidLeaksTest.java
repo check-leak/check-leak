@@ -19,8 +19,8 @@ package io.github.checkleak.junitexample;
 
 import io.github.checkleak.core.CheckLeak;
 import io.github.checkleak.sample.SomeClass;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AvoidLeaksTest
 {
@@ -33,7 +33,7 @@ public class AvoidLeaksTest
         CheckLeak checkLeak = new CheckLeak();
 
         // I'm checking if there are references. On this case I know I should have one object live, so I'm checking for 1
-        Assert.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
+        Assertions.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
 
         // You can use the exploreObjectReferences to find where the references are (in case they are not expected)
         System.out.println("references to object:" + checkLeak.exploreObjectReferences(10, 10, true, someObject));
@@ -42,6 +42,6 @@ public class AvoidLeaksTest
         someObject = null;
 
         // I'm checking again from JVMTIInterface, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
-        Assert.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
+        Assertions.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
     }
 }

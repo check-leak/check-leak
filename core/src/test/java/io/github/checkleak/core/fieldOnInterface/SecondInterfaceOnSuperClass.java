@@ -17,7 +17,7 @@
 
 package io.github.checkleak.core.fieldOnInterface;
 
-import io.github.checkleak.core.TestClass;
+import io.github.checkleak.core.testdata.TestClass;
 
 /**
  * @author Clebert Suconic

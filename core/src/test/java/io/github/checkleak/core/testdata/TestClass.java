@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package io.github.checkleak.core;
+package io.github.checkleak.core.testdata;
 
 /**
  * A DumbClass

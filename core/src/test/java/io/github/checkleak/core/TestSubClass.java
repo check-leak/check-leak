@@ -17,9 +17,23 @@
 
 package io.github.checkleak.core;
 
-public class SuperClassTest {
+import io.github.checkleak.core.testdata.SuperClassTest;
+import io.github.checkleak.core.testdata.TestClass;
+import io.github.checkleak.core.testdata.TestQueue;
+import io.github.checkleak.core.util.JVMTIReport;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-   Object obj1;
-   Object obj2;
+public class TestSubClass extends SuperClassTest {
 
+   TestQueue testQueue;
+
+   @Test
+   public void testNoLeak() throws Exception {
+
+      testQueue = new TestQueue(new TestClass(null));
+      boolean leaked = JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10);
+
+      Assertions.assertTrue(leaked);
+   }
 }

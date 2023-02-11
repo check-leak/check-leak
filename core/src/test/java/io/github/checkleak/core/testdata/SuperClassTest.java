@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package io.github.checkleak.core.fieldOnInterface;
+package io.github.checkleak.core.testdata;
 
-/**
- * @author Clebert Suconic
- */
+public class SuperClassTest {
 
-public class FieldOnInterfaceTest {
+   Object obj1;
+   Object obj2;
 
 }

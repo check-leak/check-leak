@@ -15,21 +15,20 @@
  * limitations under the License.
  */
 
-package io.github.checkleak.core;
+package io.github.checkleak.maven;
 
-/**
- * @author Clebert Suconic
- */
+import java.io.InputStream;
 
-public interface SomeInterface {
+import io.github.checkleak.core.CheckLeak;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-   /*int MAX_CONSUMERS_UNLIMITED = -1;
-   int MAX_2CONSUMERS_UNLIMITED = -1;
-   int MAX_333NSUMERS_UNLIMITED = -1;
-   int MAX_4CONSUMERS_UNLIMITED = -1; */
+public class ValidateResourcesTest {
 
-   int MAX_2CONSUMERS_UNLIMITED = -1;
-
-
-   public void doSomething();
+   @Test
+   public void testValidateResources() throws Exception {
+      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
+      Assertions.assertNotNull(inputStream);
+      inputStream.close();
+   }
 }

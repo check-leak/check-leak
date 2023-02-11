@@ -24,8 +24,9 @@ package io.github.checkleak.core;
 
 import java.util.ArrayList;
 
+import io.github.checkleak.core.testdata.TestClass;
 import io.github.checkleak.core.util.JVMTIReport;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ReportTest {
 

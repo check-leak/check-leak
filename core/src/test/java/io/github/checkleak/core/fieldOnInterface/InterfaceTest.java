@@ -18,15 +18,15 @@
 package io.github.checkleak.core.fieldOnInterface;
 
 import io.github.checkleak.core.CheckLeak;
-import io.github.checkleak.core.TestClass;
-import org.junit.Assert;
-import org.junit.Test;
+import io.github.checkleak.core.testdata.TestClass;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Clebert Suconic
  */
 
-public class TestOnInterface {
+public class InterfaceTest {
 
    static DeclaringClass declaringClass;
 
@@ -40,7 +40,7 @@ public class TestOnInterface {
 
       final String reportOnSuper = checkLeak.exploreObjectReferences(10, 1, false, declaringClass.onSuper);
       System.out.println("Report = " + reportOnSuper);
-      Assert.assertTrue(reportOnSuper.contains("onSuper"));
+      Assertions.assertTrue(reportOnSuper.contains("onSuper"));
 
       final String reportOnClass = checkLeak.exploreObjectReferences(10, 1, false, declaringClass.declared);
       System.out.println("Report = " + reportOnClass);
@@ -50,10 +50,10 @@ public class TestOnInterface {
       System.out.println("Report = " + reportOnSuperClassInterface);
       final String reportOnSecondSuperClassInterface = checkLeak.exploreObjectReferences(10, 1, false, declaringClass.secondInterfaceOnSuper);
       System.out.println("Report = " + reportOnSecondSuperClassInterface);
-      Assert.assertTrue(reportOnInterface.contains("onInterface"));
-      Assert.assertTrue(reportOnClass.contains("declared"));
-      Assert.assertTrue(reportOnSuperClassInterface.contains("onSuperInterface"));
-      Assert.assertTrue(reportOnSecondSuperClassInterface.contains("secondInterfaceOnSuper"));
+      Assertions.assertTrue(reportOnInterface.contains("onInterface"));
+      Assertions.assertTrue(reportOnClass.contains("declared"));
+      Assertions.assertTrue(reportOnSuperClassInterface.contains("onSuperInterface"));
+      Assertions.assertTrue(reportOnSecondSuperClassInterface.contains("secondInterfaceOnSuper"));
 
    }
 

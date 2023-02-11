@@ -17,25 +17,14 @@
 
 package io.github.checkleak.core.testdata;
 
-import java.lang.reflect.Field;
-
-import io.github.checkleak.core.JVMTIFieldsMetadata;
-import org.junit.Assert;
-import org.junit.Test;
-
 /**
- * This is accordingly to the specification from https://docs.oracle.com/en/java/javase/11/docs/specs/jvmti.html,
- * look for jvmtiHeapReferenceInfoField on the doc ^^
+ * @author Clebert Suconic
  */
 
-public class TestMetaField {
+public interface SomeInterface {
 
-   @Test
-   public void testMeta() {
-      JVMTIFieldsMetadata metadata = new JVMTIFieldsMetadata();
-      Field[] fields = metadata.getFields(C1.class);
-      Assert.assertTrue(fields[2].getName().equals("a"));
-      fields = metadata.getFields(C2.class);
-      Assert.assertTrue(fields[4].getName().equals("a"));
-   }
+   int MAX_2CONSUMERS_UNLIMITED = -1;
+
+
+   void doSomething();
 }

@@ -14,18 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.checkleak.core;
+package io.github.checkleak.core.testdata;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Implementation of a Queue
- * <p>
- * Completely non blocking between adding to queue and delivering to consumers.
- */
 public class TestQueue implements SomeInterface {
 
 

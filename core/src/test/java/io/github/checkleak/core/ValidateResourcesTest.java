@@ -18,22 +18,23 @@
 package io.github.checkleak.core;
 
 import java.io.File;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class ValidateResourcesTest {
 
-   @Rule
-   public TemporaryFolder folder = new TemporaryFolder(new File("./target/"));
+   @TempDir
+   Path tempFolder;
 
    @Test
    public void testInstall() throws Exception {
-      File target = new File(folder.getRoot(), "target-test.txt");
+      File target = new File(tempFolder.toFile(), "target-test.txt");
 
       Installer.install(target);
-      Assert.assertTrue(target.exists());
+      Assertions.assertTrue(target.exists());
    }
 
 }

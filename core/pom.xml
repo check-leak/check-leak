@@ -44,14 +44,10 @@
 
 
    <dependencies>
-      <!-- ## Test Dependencies ## Note: Junit is required in certain module tests.  We should control versions from here. -->
       <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.13.1</version>
+         <groupId>org.junit.jupiter</groupId>
+         <artifactId>junit-jupiter</artifactId>
          <scope>test</scope>
-         <!-- License: CPL 1.0 -->
-         <!-- There are newer versions of the JUnit but they break our tests -->
       </dependency>
    </dependencies>
 
@@ -64,26 +60,6 @@
             </includes>
          </resource>
       </resources>
-      <plugins>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.1</version>
-            <executions>
-               <execution>
-                  <phase>clean</phase>
-                  <goals>
-                     <goal>run</goal>
-                  </goals>
-                  <configuration>
-                     <tasks>
-                        <echo>surefire-argline is : ${native-surefire-argline}</echo>
-                     </tasks>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-      </plugins>
       <pluginManagement>
          <plugins>
             <plugin>
@@ -110,7 +86,7 @@
             <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-surefire-plugin</artifactId>
-               <version>2.18.1</version>
+               <version>${version.surefire}</version>
                <configuration>
                   <forkMode>once</forkMode>
                   <testFailureIgnore>false</testFailureIgnore>

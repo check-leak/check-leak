@@ -17,15 +17,16 @@
 
 package io.github.checkleak.core;
 
+import io.github.checkleak.core.testdata.TestClass;
 import io.github.checkleak.core.util.JVMTIReport;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class FindHolderTest {
 
    @Test
    public void testLoaded() {
-      Assert.assertTrue(CheckLeak.isLoaded());
+      Assertions.assertTrue(CheckLeak.isLoaded());
    }
 
    @Test
@@ -37,12 +38,12 @@ public class FindHolderTest {
       CheckLeak checkLeak = new CheckLeak();
       Object[] objects = checkLeak.getAllObjects(TestClass.class);
 
-      Assert.assertEquals(1, objects.length);
-      Assert.assertTrue(objects[0] instanceof TestClass);
+      Assertions.assertEquals(1, objects.length);
+      Assertions.assertTrue(objects[0] instanceof TestClass);
 
-      Assert.assertSame(testClass, objects[0]);
+      Assertions.assertSame(testClass, objects[0]);
 
-      Assert.assertEquals("Hello Francis!!!", ((TestClass)objects[0]).someString);
+      Assertions.assertEquals("Hello Francis!!!", ((TestClass)objects[0]).someString);
 
       /*{
          for (Object holder : jvmtiInterface.getReferenceHolders(new Object[]{testClass})) {
@@ -55,7 +56,7 @@ public class FindHolderTest {
 
 
       objects = checkLeak.getAllObjects(TestClass.class);
-      Assert.assertEquals(0, objects.length);
+      Assertions.assertEquals(0, objects.length);
    }
 
 
@@ -81,10 +82,10 @@ public class FindHolderTest {
 
       boolean leaked = JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10);
 
-      Assert.assertTrue(leaked);
+      Assertions.assertTrue(leaked);
 
       testClass = null;
 
-      Assert.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
+      Assertions.assertFalse(JVMTIReport.hasLeaks(TestClass.class.getName(), 0, 10));
    }
 }

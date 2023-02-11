@@ -1,7 +1,7 @@
 # check-leak
 Check-Leak is a powerful and efficient library for detecting memory leaks in Java applications. It utilizes the Java Virtual Machine Tool Interface (JVMTI) to interact directly with the JVM, providing precise and detailed information about the memory usage of your program. This makes Check-Leak an ideal tool for identifying and resolving memory leaks in Java applications.
 
-#Installation
+## Installation
 
 Check Leak is available on the Central Repository. All you have to do is to define a package dependency:
 
@@ -21,7 +21,7 @@ implementation 'io.github.check-leak:core:0.6'
 }
 ```
 
-# Basic API
+## Basic API
 
 Everything will need is part of io.github.checkleak.core.CheckLeak.
 
@@ -62,7 +62,7 @@ public class AvoidLeaksTest
 }
 ```
 
-# Installing the native agent
+## Installing the native agent
 Before using CheckLeak you need to have access to the native agent. We have provided a maven-plugin that will copy the required library at your location.
 
 You have to also configure the surefire-plugin to allow the --agentpath to work accordingly.

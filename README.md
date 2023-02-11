@@ -1,4 +1,3 @@
-# check-leak
 Check-Leak is a powerful and efficient library for detecting memory leaks in Java applications. It utilizes the Java Virtual Machine Tool Interface (JVMTI) to interact directly with the JVM, providing precise and detailed information about the memory usage of your program. This makes Check-Leak an ideal tool for identifying and resolving memory leaks in Java applications.
 
 ## Installation

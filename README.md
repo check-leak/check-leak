@@ -14,7 +14,7 @@ For maven:
 </dependency>
 ```
 
-For graddle:
+For Gradle:
 ```shell
 dependencies {
 implementation 'io.github.check-leak:core:0.6'

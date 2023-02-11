@@ -1,6 +1,26 @@
 # check-leak
 Check-Leak is a powerful and efficient library for detecting memory leaks in Java applications. It utilizes the Java Virtual Machine Tool Interface (JVMTI) to interact directly with the JVM, providing precise and detailed information about the memory usage of your program. This makes Check-Leak an ideal tool for identifying and resolving memory leaks in Java applications.
 
+#Installation
+
+Check Leak is available on the Central Repository. All you have to do is to define a package dependency:
+
+For maven:
+```xml
+<dependency>
+  <groupId>io.github.check-leak</groupId>
+  <artifactId>core</artifactId>
+  <version>0.6</version>
+</dependency>
+```
+
+For graddle:
+```shell
+dependencies {
+implementation 'io.github.check-leak:core:0.6'
+}
+```
+
 # Basic API
 
 Everything will need is part of io.github.checkleak.core.CheckLeak.
@@ -10,11 +30,12 @@ The most commonly used method is checkLeak.getAllObjects() where you can use JUn
 The following example is also available as part of the [source code](https://github.com/check-leak/check-leak/tree/main/examples/junit-example).
 
 ```java
+package io.github.checkleak.junitexample;
 
 import io.github.checkleak.core.CheckLeak;
 import io.github.checkleak.sample.SomeClass;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AvoidLeaksTest
 {
@@ -22,26 +43,24 @@ public class AvoidLeaksTest
    public void assertOneObject() throws Exception {
       // I am keeping a reference live
       SomeClass someObject = new SomeClass();
-      
-      // Instantiate CheckLeak
+
+      // I am starting the JVMTIInterface API
       CheckLeak checkLeak = new CheckLeak();
-      
+
       // I'm checking if there are references. On this case I know I should have one object live, so I'm checking for 1
-      Assert.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
-      
+      Assertions.assertEquals(1, checkLeak.getAllObjects(SomeClass.class).length);
+
       // You can use the exploreObjectReferences to find where the references are (in case they are not expected)
       System.out.println("references to object:" + checkLeak.exploreObjectReferences(10, 10, true, someObject));
-      
+
       // Now I am clearing the reference
       someObject = null;
-      
-      // I'm checking again from CheckLeak, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
-      Assert.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
+
+      // I'm checking again from JVMTIInterface, if all references are gone. Notice that getAllObjects will force a garbage collection on every call
+      Assertions.assertEquals(0, checkLeak.getAllObjects(SomeClass.class).length);
    }
 }
-
 ```
-
 
 # Installing the native agent
 Before using CheckLeak you need to have access to the native agent. We have provided a maven-plugin that will copy the required library at your location.

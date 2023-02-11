@@ -1,0 +1,58 @@
+name: Build
+on:
+  push:
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+  pull_request:
+    paths-ignore:
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
+      - '*.md'
+      - '*.adoc'
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    build:
+        name: Build on ${{ matrix.os }}
+        strategy:
+          fail-fast: false
+          matrix:
+  #            os: [windows-latest, macos-latest, ubuntu-latest]
+              os: [ubuntu-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+          - name: Prepare git
+            run: git config --global core.autocrlf false
+            if: startsWith(matrix.os, 'windows')
+
+          - uses: actions/checkout@v3
+
+          - name: Set up JDK 11
+            uses: actions/setup-java@v3
+            with:
+              distribution: 'temurin'
+              java-version: 11
+              cache: 'maven'
+
+          - name: Setup cmake
+            uses: jwlawson/actions-setup-cmake@v1.13
+            with:
+              cmake-version: '3.16.x'
+
+          - name: Use cmake
+            run: cmake --version
+
+          - name: Build with Maven
+            run: mvn -B clean verify

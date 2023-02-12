@@ -20,18 +20,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    build:
-        name: Build on ${{ matrix.os }}
+    build_linux:
+      name: Build on Ubuntu
+      strategy:
+        fail-fast: false
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Set up JDK 11
+          uses: actions/setup-java@v3
+          with:
+            distribution: 'temurin'
+            java-version: 11
+            cache: 'maven'
+
+        - name: Build with Maven
+          run: mvn -B clean verify
+
+    build_windows:
+        name: Build on Windows
         strategy:
           fail-fast: false
-          matrix:
-  #            os: [windows-latest, macos-latest, ubuntu-latest]
-              os: [ubuntu-latest, windows-latest]
-        runs-on: ${{ matrix.os }}
+        runs-on: windows-latest
         steps:
           - name: Prepare git
             run: git config --global core.autocrlf false
-            if: startsWith(matrix.os, 'windows')
 
           - uses: actions/checkout@v3
 
@@ -42,19 +56,13 @@ jobs:
               java-version: 11
               cache: 'maven'
 
-          - name: Setup cmake
-            uses: jwlawson/actions-setup-cmake@v1.13
-            with:
-              cmake-version: '3.16.x'
+          - uses: ilammy/msvc-dev-cmd@v1
 
-          - name: Use cmake
-            run: cmake --version
-
-          - name: Compile JNI code (${{ matrix.os }})
+          - name: Compile JNI code
             run: |
-              cd ./core/src/main/c
+              cd core\src\main\c
               cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD agent.c
-            if: startsWith(matrix.os, 'windows')
+            shell: cmd
 
           - name: Build with Maven
             run: mvn -B clean verify

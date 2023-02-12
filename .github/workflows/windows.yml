@@ -1,0 +1,27 @@
+name: Compile JNI Code
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 8
+
+    - name: Compile JNI code
+      run: |
+        set JAVA_HOME=%JAVA_HOME%
+        cd ./core/src/main/c
+        cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD agent.c

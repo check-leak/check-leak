@@ -76,10 +76,6 @@ public class CheckLeak {
     */
    public native void forceGC();
 
-   public native void startMeasure(String directory, String prefix, String suffix);
-
-   public native void stopMeasure();
-
    /** There might be more than one class with a matching name (example multiple class loaders)
     * @param className The Classname.
     * @return All The classes matching the classname on every classLoader.

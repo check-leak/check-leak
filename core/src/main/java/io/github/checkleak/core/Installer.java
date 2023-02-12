@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 
 public class Installer {
 
@@ -48,9 +49,12 @@ public class Installer {
     * @param target The file that should be generated with the proper binar for the current system.
     * @throws IOException if an issue happened during the reading and write of the binary. */
    public static void install(File target) throws IOException {
-      String osName = System.getProperty("os.name");
+      String osName = System.getProperty("os.name").toLowerCase();
       String libraryName;
-      if (osName.contains("Mac")) {
+      if (osName.contains("windows")) {
+         osName = "windows";
+         libraryName = "checkleak.dll";
+      } else if (osName.contains("mac")) {
          osName = "darwin";
          libraryName = "libcheckleak.dylib";
       } else {

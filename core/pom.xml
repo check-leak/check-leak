@@ -40,6 +40,19 @@
             </native-surefire-argline>
          </properties>
       </profile>
+      <profile>
+         <id>Windows</id>
+         <activation>
+            <os>
+               <family>Windows</family>
+            </os>
+         </activation>
+         <properties>
+            <native-surefire-argline>
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/windows/checkleak.dll
+            </native-surefire-argline>
+         </properties>
+      </profile>
    </profiles>
 
 

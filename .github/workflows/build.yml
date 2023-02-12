@@ -28,6 +28,16 @@ jobs:
       steps:
         - uses: actions/checkout@v3
 
+        - name: Cache Maven Local Repo
+          if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          uses: actions/cache@v3
+          with:
+            path: |
+              ~/.m2/repository/
+            key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+            restore-keys: |
+              ${{ runner.os }}-mvn-
+
         - name: Set up JDK 11
           uses: actions/setup-java@v3
           with:
@@ -35,7 +45,18 @@ jobs:
             java-version: 11
             cache: 'maven'
 
-        - name: Build with Maven
+        - name: mvn compile to generate source
+          run: mvn clean install -DskipTests=true
+
+        - name: Setup cmake
+          uses: jwlawson/actions-setup-cmake@v1.13
+          with:
+            cmake-version: '3.16.x'
+
+        - name: Use cmake
+          run: cmake .; make
+
+        - name: Run Tests with Maven
           run: mvn -B clean verify
 
     build_windows:
@@ -49,6 +70,16 @@ jobs:
 
           - uses: actions/checkout@v3
 
+          - name: Cache Maven Local Repo
+            if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+            uses: actions/cache@v3
+            with:
+              path: |
+                ~/.m2/repository/
+              key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+              restore-keys: |
+                ${{ runner.os }}-mvn-
+
           - name: Set up JDK 11
             uses: actions/setup-java@v3
             with:
@@ -57,12 +88,18 @@ jobs:
               cache: 'maven'
 
           - uses: ilammy/msvc-dev-cmd@v1
+          - name : Compile with Maven to generate .h file
+            run: mvn install -DskipTests=true
 
           - name: Compile JNI code
             run: |
               cd core\src\main\c
-              cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD agent.c
+              cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
             shell: cmd
-
-          - name: Build with Maven
+          - name: Copy file into place
+            run: |
+              delete core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
+              copy core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
+            shell: cmd
+          - name: Run Tests with Maven
             run: mvn -B clean verify

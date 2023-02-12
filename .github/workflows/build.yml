@@ -15,10 +15,6 @@ on:
       - '*.md'
       - '*.adoc'
 
-defaults:
-  run:
-    shell: bash
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -30,7 +26,7 @@ jobs:
           fail-fast: false
           matrix:
   #            os: [windows-latest, macos-latest, ubuntu-latest]
-              os: [ubuntu-latest]
+              os: [ubuntu-latest, windows-latest]
         runs-on: ${{ matrix.os }}
         steps:
           - name: Prepare git
@@ -53,6 +49,12 @@ jobs:
 
           - name: Use cmake
             run: cmake --version
+
+          - name: Compile JNI code (${{ matrix.os }})
+            run: |
+              cd ./core/src/main/c
+              cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD agent.c
+            if: startsWith(matrix.os, 'windows')
 
           - name: Build with Maven
             run: mvn -B clean verify

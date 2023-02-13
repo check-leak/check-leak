@@ -346,10 +346,10 @@ public class CheckLeak {
                if (field == null) {
                   fieldName = "UndefinedField@" + referenceHolder;
                } else {
-                  fieldName = field.toString();
+                  fieldName = "name='" + field.getName() + "'::=" + field;
                }
             }
-            out.println(level + " FieldReference " + fieldName + "=" + convertToString(referenceHolder, useToString));
+            out.println(level + " FieldReference " + fieldName + " on object " + convertToString(referenceHolder, useToString));
             nextReference = referenceHolder;
             break;
          }

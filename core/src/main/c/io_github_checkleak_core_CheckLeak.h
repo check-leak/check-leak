@@ -25,22 +25,6 @@ JNIEXPORT void JNICALL Java_io_github_checkleak_core_CheckLeak_forceGC
 
 /*
  * Class:     io_github_checkleak_core_CheckLeak
- * Method:    startMeasure
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_io_github_checkleak_core_CheckLeak_startMeasure
-  (JNIEnv *, jobject, jstring, jstring, jstring);
-
-/*
- * Class:     io_github_checkleak_core_CheckLeak
- * Method:    stopMeasure
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_io_github_checkleak_core_CheckLeak_stopMeasure
-  (JNIEnv *, jobject);
-
-/*
- * Class:     io_github_checkleak_core_CheckLeak
  * Method:    releaseTags
  * Signature: ()V
  */

@@ -18,7 +18,7 @@ For maven:
 For Gradle:
 ```shell
 dependencies {
-implementation 'io.github.check-leak:core:0.6'
+implementation 'io.github.check-leak:core:0.7'
 }
 ```
 

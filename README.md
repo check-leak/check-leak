@@ -24,7 +24,7 @@ implementation 'io.github.check-leak:core:0.6'
 
 ## Basic API
 
-Everything will need is part of io.github.checkleak.core.CheckLeak.
+Everything you  need is part of io.github.checkleak.core.CheckLeak.
 
 The most commonly used method is checkLeak.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.
 
@@ -74,7 +74,7 @@ Notice the maven install plugin will copy the appropriate file for your environm
 
 <!-- you can add this to your pom -->
 <properties>
-   <check-leak-version>0.4</check-leak-version>
+   <check-leak-version>0.7</check-leak-version>
 </properties>
 
 <build>
@@ -121,3 +121,8 @@ Notice the maven install plugin will copy the appropriate file for your environm
 </pluginManagement>
 
 ````
+
+
+## Releasing
+
+Look at [RELEASING.md](RELEASING.md) for information on how to cut and deploy a release.

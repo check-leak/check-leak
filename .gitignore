@@ -16,6 +16,7 @@ ratReport.txt
 examples/**/readme.html
 .idea/**
 core/src/main/c/io_github_checkleak_core_CheckLeak.h
+.DS_Store
 
 # for native build
 CMakeCache.txt

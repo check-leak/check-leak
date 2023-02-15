@@ -98,7 +98,6 @@ jobs:
             shell: cmd
           - name: Copy file into place
             run: |
-              del core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
               copy core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
             shell: cmd
           - name: Run Tests with Maven

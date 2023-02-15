@@ -31,4 +31,4 @@ Notice: you need authorization from sonatype to have your user authorized.
 
 # Updating a release in github
 
-Create the release at the  (check-leak releases)[https://github.com/check-leak/check-leak/releases]
+Create the release at the  [check-leak releases](https://github.com/check-leak/check-leak/releases)

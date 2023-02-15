@@ -50,12 +50,13 @@ public class Installer {
     * @throws IOException if an issue happened during the reading and write of the binary. */
    public static void install(File target) throws IOException {
       String osName = System.getProperty("os.name").toLowerCase();
+      String osArch = System.getProperty("os.arch").toLowerCase();
       String libraryName;
       if (osName.contains("windows")) {
          osName = "windows";
          libraryName = "checkleak.dll";
       } else if (osName.contains("mac")) {
-         osName = "darwin";
+         osName = "darwin-" + osArch;
          libraryName = "libcheckleak.dylib";
       } else {
          osName = "linux-amd64";

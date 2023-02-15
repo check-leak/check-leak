@@ -23,7 +23,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin/libcheckleak.dylib
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin-${os.arch}/libcheckleak.dylib
             </native-surefire-argline>
          </properties>
       </profile>

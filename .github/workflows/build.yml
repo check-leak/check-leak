@@ -45,7 +45,7 @@ jobs:
           if: startsWith(matrix.os, 'windows')
 
         - name: mvn compile to generate source
-          run: mvn clean install -DskipTests=true
+          run: mvn enforcer:display-info clean install -DskipTests=true
 
         - name: Setup cmake
           uses: jwlawson/actions-setup-cmake@v1.13

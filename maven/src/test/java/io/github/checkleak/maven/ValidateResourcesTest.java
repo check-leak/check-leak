@@ -17,18 +17,19 @@
 
 package io.github.checkleak.maven;
 
-import java.io.InputStream;
-
 import io.github.checkleak.core.CheckLeak;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+
 public class ValidateResourcesTest {
 
-   @Test
-   public void testValidateResources() throws Exception {
-      InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/darwin/libcheckleak.dylib");
-      Assertions.assertNotNull(inputStream);
-      inputStream.close();
-   }
+    @Test
+    public void testValidateResources() throws Exception {
+        try (InputStream inputStream = CheckLeak.class.getResourceAsStream(
+                "/platforms-lib/darwin-aarch64/libcheckleak.dylib")) {
+            Assertions.assertNotNull(inputStream);
+        }
+    }
 }

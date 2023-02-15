@@ -1,0 +1,64 @@
+name: Build Libraries
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    build_windows_libs:
+        name: Build DLL on Windows
+        strategy:
+          fail-fast: false
+        runs-on: windows-latest
+        steps:
+          - name: Prepare git
+            run: git config --global core.autocrlf false
+
+          - uses: actions/checkout@v3
+
+          - name: Cache Maven Local Repo
+            if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+            uses: actions/cache@v3
+            with:
+              path: |
+                ~/.m2/repository/
+              key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
+              restore-keys: |
+                ${{ runner.os }}-mvn-
+
+          - name: Set up JDK 11
+            uses: actions/setup-java@v3
+            with:
+              distribution: 'temurin'
+              java-version: 11
+              cache: 'maven'
+
+          - uses: ilammy/msvc-dev-cmd@v1
+          - name : Compile with Maven to generate .h file
+            run: mvn install -DskipTests=true
+
+          - name: Compile JNI code
+            run: |
+              cd core\src\main\c
+              cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
+            shell: cmd
+          - name: Copy file into place
+            run: |
+              delete core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
+              copy core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
+            shell: cmd
+            
+          - name: Run Tests with Maven
+            run: mvn -B clean verify
+            
+          - name: Configure Git author
+            run: |
+              git config --local user.email "action@github.com"
+              git config --local user.name "GitHub Action"
+
+          - name: Git commit and push
+            run: |
+              git commit -a -m "Update checkleak.dll"
+              git push

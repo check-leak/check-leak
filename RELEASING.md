@@ -24,7 +24,7 @@ mvn release:perform -Prelease
 ```
 
 
-and go to [repository](https://s01.oss.sonatype.org/) to deploy your component.
+and go to the [repository](https://s01.oss.sonatype.org/) to deploy your component.
 
 
 Notice: you need authorization from sonatype to have your user authorized.

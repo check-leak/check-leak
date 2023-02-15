@@ -20,23 +20,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    build_linux:
-      name: Build on Ubuntu
+    build_libs:
+      name: Build on ${{ matrix.os }}
       strategy:
         fail-fast: false
-      runs-on: ubuntu-latest
+        matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+      runs-on:  ${{ matrix.os }}
       steps:
-        - uses: actions/checkout@v3
+        - name: Prepare git
+          run: git config --global core.autocrlf false
+          if: startsWith(matrix.os, 'windows')
 
-        - name: Cache Maven Local Repo
-          if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-          uses: actions/cache@v3
-          with:
-            path: |
-              ~/.m2/repository/
-            key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
-            restore-keys: |
-              ${{ runner.os }}-mvn-
+        - uses: actions/checkout@v3
 
         - name: Set up JDK 11
           uses: actions/setup-java@v3
@@ -45,6 +41,9 @@ jobs:
             java-version: 11
             cache: 'maven'
 
+        - uses: ilammy/msvc-dev-cmd@v1
+          if: startsWith(matrix.os, 'windows')
+
         - name: mvn compile to generate source
           run: mvn clean install -DskipTests=true
 
@@ -52,53 +51,19 @@ jobs:
           uses: jwlawson/actions-setup-cmake@v1.13
           with:
             cmake-version: '3.16.x'
+          if: ${{ startsWith(matrix.os, 'windows') == false}}
 
         - name: Use cmake
           run: cmake .; make
+          if: ${{ startsWith(matrix.os, 'windows') == false}}
+
+        - name: Compile JNI code in Windows
+          run: |
+            cd core\src\main\c
+            cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
+            copy checkleak.dll ..\resources\platforms-lib\windows\checkleak.dll
+          shell: cmd
+          if: ${{ startsWith(matrix.os, 'windows') }}
 
         - name: Run Tests with Maven
           run: mvn -B clean verify
-
-    build_windows:
-        name: Build on Windows
-        strategy:
-          fail-fast: false
-        runs-on: windows-latest
-        steps:
-          - name: Prepare git
-            run: git config --global core.autocrlf false
-
-          - uses: actions/checkout@v3
-
-          - name: Cache Maven Local Repo
-            if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-            uses: actions/cache@v3
-            with:
-              path: |
-                ~/.m2/repository/
-              key: ${{ runner.os }}-mvn-${{ hashFiles('**/pom.xml') }}
-              restore-keys: |
-                ${{ runner.os }}-mvn-
-
-          - name: Set up JDK 11
-            uses: actions/setup-java@v3
-            with:
-              distribution: 'temurin'
-              java-version: 11
-              cache: 'maven'
-
-          - uses: ilammy/msvc-dev-cmd@v1
-          - name : Compile with Maven to generate .h file
-            run: mvn install -DskipTests=true
-
-          - name: Compile JNI code
-            run: |
-              cd core\src\main\c
-              cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
-            shell: cmd
-          - name: Copy file into place
-            run: |
-              copy core\src\main\c\checkleak.dll core\src\main\resources\platforms-lib\windows\checkleak.dll
-            shell: cmd
-          - name: Run Tests with Maven
-            run: mvn -B clean verify

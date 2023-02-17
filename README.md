@@ -6,7 +6,8 @@ It can be used to detect and diagnose memory leaks.
 
 Check Leak is available on the Central Repository. All you have to do is to define a package dependency:
 
-For maven:
+For Maven:
+
 ```xml
 <dependency>
   <groupId>io.github.check-leak</groupId>
@@ -16,9 +17,10 @@ For maven:
 ```
 
 For Gradle:
-```shell
+
+```gradle
 dependencies {
-implementation 'io.github.check-leak:core:0.7'
+  implementation 'io.github.check-leak:core:0.7'
 }
 ```
 

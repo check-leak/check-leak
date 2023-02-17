@@ -57,6 +57,12 @@
 
 
    <dependencies>
+      <!-- notice for future maintainers:
+           We are trying to keep the core dependency free (no logging, nothing).
+           If we have to add any dependencies here though, we will need to shade the jar as a fat jar,
+           as the core could be used as an javaagent, requiring all the dependencies in the jar for the premain call.
+           So, think twice before adding a dependency: If you have to do it's fine, but it will require maven-shade for a fat jar. -->
+
       <dependency>
          <groupId>org.junit.jupiter</groupId>
          <artifactId>junit-jupiter</artifactId>
@@ -72,7 +78,30 @@
                <include>**/*</include>
             </includes>
          </resource>
+         <resource>
+            <directory>${project.basedir}/src/main/filtered-resources</directory>
+            <filtering>true</filtering>
+            <includes>
+               <include>**/*</include>
+            </includes>
+         </resource>
       </resources>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.1</version>
+            <configuration>
+               <archive>
+                  <manifestEntries>
+                     <Main-Class>io.github.checkleak.core.Installer</Main-Class>
+                     <Premain-Class>io.github.checkleak.core.Agent</Premain-Class>
+                  </manifestEntries>
+               </archive>
+            </configuration>
+         </plugin>
+      </plugins>
+
       <pluginManagement>
          <plugins>
             <plugin>

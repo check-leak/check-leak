@@ -124,6 +124,70 @@ Notice the maven install plugin will copy the appropriate file for your environm
 
 ````
 
+## Monitoring a long runnig process
+
+It is also possible to get results on a long running process. 
+
+We provide check-leak-tick as a Java Agent that will start a thread, capture snapshots of what the VM has allocated and show what's recently allocated.
+
+It currently hard coded the tick on every 10 seconds, logging on System.out.
+
+to use this feature you should do the following:
+
+### Extract the native library
+```shell
+java -jar check-leak-tick.jar check-leak.dll
+```
+
+### Configure your VM
+
+Add the following attributes on the VM settings for your process:
+
+```
+-agentpath:/Users/clebertsuconic/work/kevin/pub-sub/node1/bin/test.dll
+```
+
+### You should see an output on your System.out for what's been recently allocated:
+```
+*******************************************************************************************************************************
+TickAgent tick
+|[B|11977328 bytes | 35243 instances|
+|[Ljava.lang.Object;|7307888 bytes | 15457 instances|
+|[I|3478896 bytes | 1627 instances|
+|java.util.HashMap$Node|1180640 bytes | 36895 instances|
+|java.lang.String|1072656 bytes | 44694 instances|
+|java.util.HashMap|500256 bytes | 10422 instances|
+|[Ljava.util.HashMap$Node;|451616 bytes | 3145 instances|
+|java.lang.Object|225904 bytes | 14119 instances|
+|[J|179120 bytes | 1312 instances|
+|io.netty.buffer.PoolSubpage|158904 bytes | 2207 instances|
+|java.util.concurrent.locks.ReentrantLock$NonfairSync|84960 bytes | 2655 instances|
+|java.util.concurrent.locks.ReentrantLock|42352 bytes | 2647 instances|
+|jdk.internal.ref.CleanerImpl$PhantomCleanableRef|16176 bytes | 337 instances|
+|java.util.concurrent.ConcurrentLinkedQueue$Node|12960 bytes | 540 instances|
+|org.apache.activemq.artemis.core.persistence.impl.journal.OperationContextImpl|12880 bytes | 115 instances|
+|org.apache.activemq.artemis.utils.actors.OrderedExecutor|11920 bytes | 298 instances|
+|org.apache.qpid.proton.amqp.UnsignedInteger|11504 bytes | 719 instances|
+|java.util.concurrent.ConcurrentLinkedQueue|10776 bytes | 449 instances|
+|java.lang.ThreadLocal$ThreadLocalMap$Entry|9856 bytes | 308 instances|
+|[Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;|6320 bytes | 79 instances|
+|java.util.Collections$SetFromMap|4968 bytes | 207 instances| 
+|org.apache.activemq.artemis.utils.actors.ProcessorBase$$Lambda$184/0x000000080035e040|4768 bytes | 298 instances|
+|java.util.IdentityHashMap|2080 bytes | 52 instances|
+|java.lang.ThreadLocal$ThreadLocalMap|1896 bytes | 79 instances| 
+|java.util.IdentityHashMap$KeySet|752 bytes | 47 instances|
+|org.apache.activemq.artemis.utils.actors.HandlerBase$Counter|672 bytes | 42 instances|
+|[Lsun.nio.fs.NativeBuffer;|512 bytes | 16 instances|
+|sun.nio.fs.NativeBuffer|512 bytes | 16 instances|
+|sun.nio.fs.NativeBuffer$Deallocator|384 bytes | 16 instances|
+```
+
+Notice that each time the VM is swiped for the memory the agent is only showing what has increased.
+
+This is an active area of development, and we are looking for ways to improve this. The idea is to swipe the Inventory every few seconds and show the progress of what is leaking.
+
+If you have ideas on how to improve this and make this useful for you, please let us know!
+
 
 ## Releasing
 

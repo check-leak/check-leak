@@ -32,6 +32,10 @@
          <name>Clebert Suconic</name>
          <email>clebert.suconic@gmail.com</email>
       </developer>
+      <developer>
+         <name>George Gastaldi</name>
+         <email>gegastaldi@gmail.com</email>
+      </developer>
    </developers>
 
    <properties>

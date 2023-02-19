@@ -49,7 +49,7 @@
    </properties>
 
    <modules>
-     <module>core</module>
+     <module>check-leak</module>
      <module>maven</module>
      <module>examples</module>
    </modules>

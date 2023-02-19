@@ -8,7 +8,7 @@
       <version>0.8-SNAPSHOT</version>
    </parent>
 
-   <artifactId>core</artifactId>
+   <artifactId>check-leak</artifactId>
 
    <properties>
    </properties>

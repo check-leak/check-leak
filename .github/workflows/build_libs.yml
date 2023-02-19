@@ -47,7 +47,7 @@ jobs:
 
       - name: Compile JNI code in Windows
         run: |
-          cd core\src\main\c
+          cd check-leak\src\main\c
           cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
           copy checkleak.dll ..\resources\platforms-lib\windows\checkleak.dll
         shell: cmd
@@ -60,7 +60,7 @@ jobs:
         run: |
           git config --local user.name "GitHub Action"
           git config --local user.email "action@github.com"
-          git add core/src/main/resources/platforms-lib
+          git add check-leak/src/main/resources/platforms-lib
           git commit -a -m "Update Library for ${{ runner.os }}"
           git pull --rebase
           git push

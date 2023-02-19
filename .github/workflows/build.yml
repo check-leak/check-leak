@@ -59,7 +59,7 @@ jobs:
 
         - name: Compile JNI code in Windows
           run: |
-            cd core\src\main\c
+            cd check-leak\src\main\c
             cl /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" /LD /Fe:checkleak.dll agent.c
             copy checkleak.dll ..\resources\platforms-lib\windows\checkleak.dll
           shell: cmd

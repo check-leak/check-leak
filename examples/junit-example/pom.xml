@@ -23,7 +23,7 @@
   <dependencies>
     <dependency>
       <groupId>io.github.check-leak</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>check-leak</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- this is to guarantee order of compilation -->

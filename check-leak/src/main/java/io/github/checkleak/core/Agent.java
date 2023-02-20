@@ -104,29 +104,29 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
       }
 
       public void check(InventoryDataPoint currentDataPoint) {
-         boolean changed = false;
+         boolean changedBytes = false, changedInstances = false;
          if (currentDataPoint.getBytes() > bytes) {
-            changed = true;
+            changedBytes = true;
          }
          if (currentDataPoint.getInstances() > instances) {
-            changed = true;
+            changedInstances = true;
          }
 
          if (downPercentage >= 0) {
             if (currentDataPoint.getBytes() < bytes && calculatePercentage(currentDataPoint.getBytes(), bytes) <= downPercentage) {
-               changed = true;
+               changedBytes = true;
             }
             if (currentDataPoint.getInstances() < instances && calculatePercentage(currentDataPoint.getBytes(), instances) <= downPercentage) {
-               changed = true;
+               changedInstances = true;
             }
          }
 
-         if (changed) {
-            onChange(false, currentDataPoint);
+         if (changedBytes || changedInstances) {
+            onChange(false, changedBytes, changedInstances, currentDataPoint);
          }
       }
 
-      private void onChange(boolean newItem, InventoryDataPoint dataPoint) {
+      private void onChange(boolean newItem, boolean changeBytes, boolean changeInstances, InventoryDataPoint dataPoint) {
          if (newItem) {
             out.println("|*new* " + clazz + "|" + bytes + " bytes | " + instances + " instances|");
          } else {
@@ -134,8 +134,8 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
             int diffInstances = dataPoint.getInstances() - instances;
             out.println("|" + clazz + "|" + bytes + " bytes (variance=" + diffBytes + ") | " + instances + " instances (variance=" + diffInstances + ")|");
          }
-         this.bytes = dataPoint.getBytes();
-         this.instances = dataPoint.getInstances();
+         if (changeBytes) this.bytes = dataPoint.getBytes();
+         if (changeInstances) this.instances = dataPoint.getInstances();
       }
    }
 
@@ -171,7 +171,7 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
                   if (dataPoint == null) {
                      dataPoint = new DataPoint(b.getClazz(), b);
                      dataPoints.put(b.getClazz().getName(), dataPoint);
-                     dataPoint.onChange(true, b);
+                     dataPoint.onChange(true, true, true, b);
                   } else {
                      dataPoint.check(b);
                   }

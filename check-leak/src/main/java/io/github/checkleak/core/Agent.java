@@ -156,16 +156,20 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
 
       try {
          Thread.currentThread().setName("CheckLeak Tick Agent");
-         long tickNumber = 0;
          while (true) {
             Thread.sleep(sleep);
             try {
                out.println("*******************************************************************************************************************************");
                out.println("Check-Leak Agent");
                out.println(dateFormat.format(new Date()));
+
+               // inventory produced from Check-leak
                Map<Class<?>, InventoryDataPoint> inventoryDataPointMap = checkLeak.produceInventory();
+
                ArrayList<InventoryDataPoint> list = new ArrayList<InventoryDataPoint>(inventoryDataPointMap.values());
+               // sorting it by size
                Collections.sort(list, new CompareDataPoint());
+
                list.forEach(b -> {
                   DataPoint dataPoint = dataPoints.get(b.getClazz().getName());
                   if (dataPoint == null) {
@@ -177,6 +181,7 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
                   }
                });
                list.clear();
+
                inventoryDataPointMap.clear(); // a little help to the GC
                inventoryDataPointMap = null; // I know the VM is supposed to clear this after I leave this loop, but I'm not a believer and my OCD urges me to clear this reference.
                list = null;

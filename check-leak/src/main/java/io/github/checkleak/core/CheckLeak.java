@@ -25,10 +25,12 @@ package io.github.checkleak.core;
 import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -260,7 +262,7 @@ public class CheckLeak {
          out.println(level + "MaxLevel");
          return;
       }
-      Integer index = new Integer(System.identityHashCode(source));
+      Integer index =System.identityHashCode(source);
 
       if (alreadyExplored.contains(index)) {
          if (source instanceof Class) {
@@ -273,7 +275,7 @@ public class CheckLeak {
 
       alreadyExplored.add(index);
 
-      Long sourceTag = new Long(getTagOnObject(source));
+      Long sourceTag = getTagOnObject(source);
       ArrayList listPoints = (ArrayList) mapDataPoints.get(sourceTag);
       if (listPoints == null) {
          return;
@@ -462,7 +464,7 @@ public class CheckLeak {
                                      final long method,
                                      final byte referenceType) {
             ReferenceDataPoint dataPoint = new ReferenceDataPoint(referenceHolder, referencedObject, classTag, index, method, referenceType);
-            Long indexLong = new Long(referencedObject);
+            Long indexLong = referencedObject;
             List<ReferenceDataPoint> arrayList = (ArrayList<ReferenceDataPoint>) referencesMap.get(indexLong);
             if (arrayList == null) {
                arrayList = new ArrayList<ReferenceDataPoint>();
@@ -662,7 +664,7 @@ public class CheckLeak {
       if (maxLevel >= 0 && currentLevel >= maxLevel) {
          return false;
       }
-      Integer index = new Integer(System.identityHashCode(source));
+      Integer index = System.identityHashCode(source);
 
       if (alreadyExplored.contains(index)) {
          return false;
@@ -670,7 +672,7 @@ public class CheckLeak {
 
       alreadyExplored.add(index);
 
-      Long sourceTag = new Long(getTagOnObject(source));
+      Long sourceTag = getTagOnObject(source);
       ArrayList listPoints = (ArrayList) mapDataPoints.get(sourceTag);
       if (listPoints == null) {
          return false;
@@ -924,4 +926,65 @@ public class CheckLeak {
 
       return callBack.maps;
    }
+
+
+
+   /** It will invoke a debug(java.io.PrintStream) on each instance of debugClass */
+   public void invokeDebug(String[] debugList, String debugMethod, int maxDebugObjects, int maxLevel, boolean useToString, PrintStream out) {
+      try {
+         out.println("*******************************************************************************************************************************");
+         out.println("Check-Leak debug output of " + debugList);
+         out.println();
+
+         for (String debugClass : debugList) {
+            Object[] objects = getAllObjects(debugClass);
+            Map<Long, List<ReferenceDataPoint>> matrix = createIndexMatrix();
+            out.println("There are " + objects.length + " objects of " + debugClass + " in the heap");
+            Class clzz = null;
+            Method method = null;
+            int objectsInt = 0;
+            for (Object obj : objects) {
+               objectsInt++;
+               if (maxDebugObjects > 0 && objectsInt > maxDebugObjects) {
+                  break;
+               }
+               if (debugMethod == null) {
+                  out.println("================================================================================");
+                  out.println("references to " + convertToString(obj, useToString));
+                  out.println(exploreObjectReferences(matrix, obj, maxLevel, useToString));
+               } else {
+                  out.println("Invoking " + debugMethod + "(java.io.PrintStream) on " + obj);
+                  out.println("================================================================================");
+
+                  if (clzz != obj.getClass()) {
+                     clzz = obj.getClass();
+                     try {
+                        method = clzz.getMethod(debugMethod, java.io.PrintStream.class);
+                        method.setAccessible(true);
+                     } catch (NoSuchMethodException e) {
+                        out.println("Error getting debugMethod");
+                        e.printStackTrace(out);
+                     }
+                  }
+
+                  if (method != null) {
+                     try {
+                        method.invoke(obj, out);
+                     } catch (Throwable e) {
+                        out.println("Error invoking " + debugClass + "." + debugMethod + "(out)");
+                        e.printStackTrace(out);
+                     }
+                  }
+                  out.println("================================================================================");
+               }
+            }
+         }
+      } catch (Throwable e) {
+         out.println("Error invoking debug method");
+         e.printStackTrace(System.out);
+      } finally {
+         releaseTags();
+      }
+   }
+
 }

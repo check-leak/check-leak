@@ -22,7 +22,7 @@ typedef struct _iteraOverObjectsControl
 
 
 
-inline void verifyError(jvmtiEnv *jvmti, jvmtiError error) {
+void verifyError(jvmtiEnv *jvmti, jvmtiError error) {
    if ( error != JVMTI_ERROR_NONE ) {
       char * errorName;
       (*jvmti)->GetErrorName(jvmti, error, &errorName);

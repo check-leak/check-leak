@@ -68,7 +68,7 @@ public class InstallLib extends AbstractPlugin {
       try {
          Installer.install(targetLib);
       } catch (Exception e) {
-         throw new RuntimeException(e.getMessage(), e);
+         getLog().warn(e.getMessage(), e);
       }
 
    }

@@ -65,6 +65,9 @@ public class Installer {
 
       try (InputStream inputStream = CheckLeak.class.getResourceAsStream("/platforms-lib/" + osName + "/" + libraryName);
            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(target))) {
+         if (inputStream == null) {
+            throw new RuntimeException("Cannot find resource /platforms-lib/" + osName + "/" + libraryName);
+         }
          copy(inputStream, outputStream);
       }
    }

@@ -128,11 +128,11 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
 
       private void onChange(boolean newItem, boolean changeBytes, boolean changeInstances, InventoryDataPoint dataPoint) {
          if (newItem) {
-            out.println("|*new* " + clazz + "|" + bytes + " bytes | " + instances + " instances|");
+            out.println(String.format("|%1$-100s|%2$30s|%3$30s|", "*new* " + clazz, bytes + " bytes", instances + " instances"));
          } else {
             long diffBytes = dataPoint.getBytes() - bytes;
             int diffInstances = dataPoint.getInstances() - instances;
-            out.println("|" + clazz + "|" + bytes + " bytes (variance=" + diffBytes + ") | " + instances + " instances (variance=" + diffInstances + ")|");
+            out.println(String.format("|%1$-100s|%2$30s|%3$30s|", clazz, bytes + " bytes (" + (diffBytes > 0 ? "+" : "") + diffBytes + ")", instances + " instances (" + (diffInstances > 0 ? "+" : "") + diffInstances + ")"));
          }
          if (changeBytes) this.bytes = dataPoint.getBytes();
          if (changeInstances) this.instances = dataPoint.getInstances();

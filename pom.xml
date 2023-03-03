@@ -4,7 +4,7 @@
 
    <groupId>io.github.check-leak</groupId>
    <artifactId>check-leak-parent</artifactId>
-   <version>0.8-SNAPSHOT</version>
+   <version>0.8</version>
    <packaging>pom</packaging>
    <inceptionYear>2023</inceptionYear>
 
@@ -24,7 +24,7 @@
       <connection>scm:git:https://github.com/check-leak/check-leak.git</connection>
       <developerConnection>scm:git:git@github.com:check-leak/check-leak.git</developerConnection>
       <url>https://github.com/check-leak/check-leak/</url>
-      <tag>HEAD</tag>
+      <tag>0.8</tag>
    </scm>
 
    <developers>

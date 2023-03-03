@@ -1,5 +1,10 @@
 # Running a release
 
+## JDK version
+First, make sure you are using JDK 11.
+
+## Running the release
+
 Prepare the release using the following command:
 
 ```sh

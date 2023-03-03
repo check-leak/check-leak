@@ -11,8 +11,8 @@ For Maven:
 ```xml
 <dependency>
   <groupId>io.github.check-leak</groupId>
-  <artifactId>core</artifactId>
-  <version>0.7</version>
+  <artifactId>check-leak</artifactId>
+  <version>0.8</version>
 </dependency>
 ```
 
@@ -20,7 +20,7 @@ For Gradle:
 
 ```gradle
 dependencies {
-  implementation 'io.github.check-leak:core:0.7'
+  implementation 'io.github.check-leak:check-leak:0.8'
 }
 ```
 
@@ -124,19 +124,19 @@ Notice the maven install plugin will copy the appropriate file for your environm
 
 ````
 
-## Monitoring a long runnig process
+## Agent
 
-It is also possible to get results on a long running process. 
+You can also use check-leak as an agent. The agent will execute a lightweight memory dump just to capture the inventory and print how many objects you have on each class type.
 
-We provide check-leak-tick as a Java Agent that will start a thread, capture snapshots of what the VM has allocated and show what's recently allocated.
+You run a repetitive test and monitor the new allocations in your process.
 
-It currently hard coded the tick on every 10 seconds, logging on System.out.
+The agent will keep a max number of Objects and bytes per type, and it prints when that limit reached.
 
-to use this feature you should do the following:
+After some time if you still see allocations chances are you have a leak in your system.
 
 ### Extract the native library
 ```shell
-java -jar check-leak-tick.jar check-leak.dll
+java -jar check-leak.jar check-leak.so
 ```
 
 ### Configure your VM
@@ -144,50 +144,38 @@ java -jar check-leak-tick.jar check-leak.dll
 Add the following attributes on the VM settings for your process:
 
 ```
--agentpath:/Users/clebertsuconic/work/kevin/pub-sub/node1/bin/test.dll
+-agentpath:check-leak.so -javaagent:check-leak.jar=sleep=20000
 ```
 
 ### You should see an output on your System.out for what's been recently allocated:
 ```
 *******************************************************************************************************************************
-TickAgent tick
-|[B|11977328 bytes | 35243 instances|
-|[Ljava.lang.Object;|7307888 bytes | 15457 instances|
-|[I|3478896 bytes | 1627 instances|
-|java.util.HashMap$Node|1180640 bytes | 36895 instances|
-|java.lang.String|1072656 bytes | 44694 instances|
-|java.util.HashMap|500256 bytes | 10422 instances|
-|[Ljava.util.HashMap$Node;|451616 bytes | 3145 instances|
-|java.lang.Object|225904 bytes | 14119 instances|
-|[J|179120 bytes | 1312 instances|
-|io.netty.buffer.PoolSubpage|158904 bytes | 2207 instances|
-|java.util.concurrent.locks.ReentrantLock$NonfairSync|84960 bytes | 2655 instances|
-|java.util.concurrent.locks.ReentrantLock|42352 bytes | 2647 instances|
-|jdk.internal.ref.CleanerImpl$PhantomCleanableRef|16176 bytes | 337 instances|
-|java.util.concurrent.ConcurrentLinkedQueue$Node|12960 bytes | 540 instances|
-|org.apache.activemq.artemis.core.persistence.impl.journal.OperationContextImpl|12880 bytes | 115 instances|
-|org.apache.activemq.artemis.utils.actors.OrderedExecutor|11920 bytes | 298 instances|
-|org.apache.qpid.proton.amqp.UnsignedInteger|11504 bytes | 719 instances|
-|java.util.concurrent.ConcurrentLinkedQueue|10776 bytes | 449 instances|
-|java.lang.ThreadLocal$ThreadLocalMap$Entry|9856 bytes | 308 instances|
-|[Ljava.lang.ThreadLocal$ThreadLocalMap$Entry;|6320 bytes | 79 instances|
-|java.util.Collections$SetFromMap|4968 bytes | 207 instances| 
-|org.apache.activemq.artemis.utils.actors.ProcessorBase$$Lambda$184/0x000000080035e040|4768 bytes | 298 instances|
-|java.util.IdentityHashMap|2080 bytes | 52 instances|
-|java.lang.ThreadLocal$ThreadLocalMap|1896 bytes | 79 instances| 
-|java.util.IdentityHashMap$KeySet|752 bytes | 47 instances|
-|org.apache.activemq.artemis.utils.actors.HandlerBase$Counter|672 bytes | 42 instances|
-|[Lsun.nio.fs.NativeBuffer;|512 bytes | 16 instances|
-|sun.nio.fs.NativeBuffer|512 bytes | 16 instances|
-|sun.nio.fs.NativeBuffer$Deallocator|384 bytes | 16 instances|
+Check-Leak Agent
+2023-03-02 at 21:33:37 EST
+|[Ljava.lang.Object;                                                                                 |        6415680 bytes (+39280)|         6479 instances (+762)|
+|[B                                                                                                  |       4617536 bytes (+226664)|       36085 instances (-3123)|
+|[I                                                                                                  |        4368960 bytes (+64360)|          1234 instances (+72)|
+|java.lang.String                                                                                    |         924552 bytes (+81840)|       38523 instances (+3410)|
+|[C                                                                                                  |          971496 bytes (-7560)|           801 instances (+14)|
+|java.util.concurrent.ConcurrentHashMap$Node                                                         |         626464 bytes (+24928)|        19577 instances (+779)|
+|java.util.HashMap$Node                                                                              |         335232 bytes (+52256)|       10476 instances (+1633)|
+|[Lorg.eclipse.jetty.util.TreeTrie$Node;                                                             |          271440 bytes (+9072)|          1885 instances (+63)|
+|[Ljava.util.HashMap$Node;                                                                           |         207344 bytes (+15808)|          1961 instances (+61)|
+|java.util.LinkedHashMap$Entry                                                                       |          197000 bytes (+3520)|          4925 instances (+88)|
+|java.lang.Object                                                                                    |          188832 bytes (+9888)|        11802 instances (+618)|
+|[Ljava.util.concurrent.ConcurrentHashMap$Node;                                                      |          185488 bytes (+5776)|           285 instances (+17)|
+|java.lang.reflect.Method                                                                            |          183920 bytes (+7040)|          2090 instances (+80)|
+|java.util.ArrayList                                                                                 |          80688 bytes (+11016)|         3362 instances (+459)|
+|java.util.LinkedHashMap                                                                             |            84448 bytes (+504)|           1508 instances (+9)|
 ```
 
-Notice that each time the VM is swiped for the memory the agent is only showing what has increased.
+### Agent parameters
 
-This is an active area of development, and we are looking for ways to improve this. The idea is to swipe the Inventory every few seconds and show the progress of what is leaking.
-
-If you have ideas on how to improve this and make this useful for you, please let us know!
-
+|Parameter| Default | Description |
+|---------|---------|-------------|
+|sleep    |60000 | The interval in which we take snapshots.|
+|output   | null (meaning System.out) | The name of the file where the inventory is printed |
+|down     | -1 (disable) |We update the metrics down once it reaches a bellow this percentage. This is in %. Example if set this to 10, it will update the metric when the new value is bellow 10% of the max it achieved (or previous value) |
 
 ## Releasing
 

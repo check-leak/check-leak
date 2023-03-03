@@ -15,7 +15,7 @@ ratReport.txt
 **/derby.log
 examples/**/readme.html
 .idea/**
-core/src/main/c/io_github_checkleak_core_CheckLeak.h
+check-leak/src/main/c/io_github_checkleak_core_CheckLeak.h
 .DS_Store
 
 # for native build

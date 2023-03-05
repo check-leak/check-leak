@@ -1,0 +1,13 @@
+<html>
+<head>
+   <link type="text/css" charset="utf8" rel="stylesheet" href="styles/jquery.dataTables.min.css">
+   <script type="text/javascript" charset="utf8" src="../../../js/jquery-3.6.1.slim.min.js"></script>
+   <script type="text/javascript" charset="utf8" src="../../../js/jquery.dataTables.min.js"></script>
+   <script type="text/javascript" class="init">
+
+    $(document).ready( function () {
+        $("#gitreport").DataTable();
+    } );
+   </script>
+
+</head>

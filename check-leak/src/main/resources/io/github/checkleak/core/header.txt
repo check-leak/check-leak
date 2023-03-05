@@ -1,0 +1,20 @@
+<html>
+<head>
+
+    <!-- taken from https://code.jquery.com/jquery-3.6.1.min.js -->
+    <script src="styles/jquery.min.js"></script>
+
+    <!-- taken from http://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css -->
+    <link rel="stylesheet" charset="utf8" type="text/css" href="styles/jquery.dataTables.min.css">
+
+    <!-- taken from http://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js -->
+    <script type="text/javascript" charset="utf8" src="styles/jquery.dataTables.min.js"></script>
+
+   <script type="text/javascript" class="init">
+
+    $(document).ready( function () {
+        $("#gitreport").DataTable();
+    } );
+   </script>
+
+</head>

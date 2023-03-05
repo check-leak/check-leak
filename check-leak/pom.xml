@@ -23,7 +23,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin-${os.arch}/libcheckleak.dylib
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/darwin-${os.arch}/libcheckleak.dylib --add-exports jdk.attach/sun.tools.attach=ALL-UNNAMED
             </native-surefire-argline>
          </properties>
       </profile>
@@ -36,7 +36,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/linux-amd64/libcheckleak.so
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/linux-amd64/libcheckleak.so --add-exports jdk.attach/sun.tools.attach=ALL-UNNAMED
             </native-surefire-argline>
          </properties>
       </profile>
@@ -49,7 +49,7 @@
          </activation>
          <properties>
             <native-surefire-argline>
-               -agentpath:${project.basedir}/src/main/resources/platforms-lib/windows/checkleak.dll
+               -agentpath:${project.basedir}/src/main/resources/platforms-lib/windows/checkleak.dll --add-exports jdk.attach/sun.tools.attach=ALL-UNNAMED
             </native-surefire-argline>
          </properties>
       </profile>
@@ -94,8 +94,9 @@
             <configuration>
                <archive>
                   <manifestEntries>
-                     <Main-Class>io.github.checkleak.core.Installer</Main-Class>
+                     <Main-Class>io.github.checkleak.core.RemoteCheckLeak</Main-Class>
                      <Premain-Class>io.github.checkleak.core.Agent</Premain-Class>
+                     <Add-Exports>jdk.attach/sun.tools.attach</Add-Exports>
                   </manifestEntries>
                </archive>
             </configuration>
@@ -118,6 +119,8 @@
                      </goals>
                      <configuration>
                         <compilerArgs>
+                           <arg>--add-exports</arg>
+                           <arg>jdk.attach/sun.tools.attach=ALL-UNNAMED</arg>
                            <arg>-h</arg>
                            <arg>${project.basedir}/src/main/c</arg>
                         </compilerArgs>

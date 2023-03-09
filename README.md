@@ -1,8 +1,24 @@
-Check-Leak is a library for detecting memory leaks in Java applications. It utilizes the Java Virtual Machine Tool Interface (JVMTI) to interact directly with the JVM, providing detailed information objects usage.
+Check-Leak is a project you can use to detect memory leaks. 
 
-It can be used to detect and diagnose memory leaks.
+It can be used as a library encapsulating JVMTI and providing you way to inspect the existance of objects and their references (why they are still in the heap and not garbage collected).
 
-## Installation
+Or you can use it to inpsect the VM on a remote process, in a lite weight way, by just looking at the GC Histograms of your VM and providing you a nice visualization tool.
+
+
+## Running as a tool
+
+You can download check-leak-0.9.jar and run:
+
+```shell
+java -jar check-leak-0.9.jar --pid <PID> --report <reportoutput> --sleep <interval in milliseconds>
+```
+
+Here is an example report, extract from a run over [ActiveMQ Artemis](https://clebertsuconic.github.io).
+
+This will provide you nice [chart views](https://clebertsuconic.github.io/charts/2960.html) about memory consumption for your objects.
+
+
+## Library Installation
 
 Check Leak is available on the Central Repository. All you have to do is to define a package dependency:
 
@@ -123,59 +139,10 @@ Notice the maven install plugin will copy the appropriate file for your environm
 </pluginManagement>
 
 ````
-
-## Agent
-
-You can also use check-leak as an agent. The agent will execute a lightweight memory dump just to capture the inventory and print how many objects you have on each class type.
-
-You run a repetitive test and monitor the new allocations in your process.
-
-The agent will keep a max number of Objects and bytes per type, and it prints when that limit reached.
-
-After some time if you still see allocations chances are you have a leak in your system.
-
 ### Extract the native library
 ```shell
-java -jar check-leak.jar check-leak.so
+java -jar check-leak.jar install check-leak.so
 ```
-
-### Configure your VM
-
-Add the following attributes on the VM settings for your process:
-
-```
--agentpath:check-leak.so -javaagent:check-leak.jar=sleep=20000
-```
-
-### You should see an output on your System.out for what's been recently allocated:
-```
-*******************************************************************************************************************************
-Check-Leak Agent
-2023-03-02 at 21:33:37 EST
-|[Ljava.lang.Object;                                                                                 |        6415680 bytes (+39280)|         6479 instances (+762)|
-|[B                                                                                                  |       4617536 bytes (+226664)|       36085 instances (-3123)|
-|[I                                                                                                  |        4368960 bytes (+64360)|          1234 instances (+72)|
-|java.lang.String                                                                                    |         924552 bytes (+81840)|       38523 instances (+3410)|
-|[C                                                                                                  |          971496 bytes (-7560)|           801 instances (+14)|
-|java.util.concurrent.ConcurrentHashMap$Node                                                         |         626464 bytes (+24928)|        19577 instances (+779)|
-|java.util.HashMap$Node                                                                              |         335232 bytes (+52256)|       10476 instances (+1633)|
-|[Lorg.eclipse.jetty.util.TreeTrie$Node;                                                             |          271440 bytes (+9072)|          1885 instances (+63)|
-|[Ljava.util.HashMap$Node;                                                                           |         207344 bytes (+15808)|          1961 instances (+61)|
-|java.util.LinkedHashMap$Entry                                                                       |          197000 bytes (+3520)|          4925 instances (+88)|
-|java.lang.Object                                                                                    |          188832 bytes (+9888)|        11802 instances (+618)|
-|[Ljava.util.concurrent.ConcurrentHashMap$Node;                                                      |          185488 bytes (+5776)|           285 instances (+17)|
-|java.lang.reflect.Method                                                                            |          183920 bytes (+7040)|          2090 instances (+80)|
-|java.util.ArrayList                                                                                 |          80688 bytes (+11016)|         3362 instances (+459)|
-|java.util.LinkedHashMap                                                                             |            84448 bytes (+504)|           1508 instances (+9)|
-```
-
-### Agent parameters
-
-|Parameter| Default | Description |
-|---------|---------|-------------|
-|sleep    |60000 | The interval in which we take snapshots.|
-|output   | null (meaning System.out) | The name of the file where the inventory is printed |
-|down     | -1 (disable) |We update the metrics down once it reaches a bellow this percentage. This is in %. Example if set this to 10, it will update the metric when the new value is bellow 10% of the max it achieved (or previous value) |
 
 ## Releasing
 

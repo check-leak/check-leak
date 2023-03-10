@@ -110,7 +110,7 @@ public class RemoteAgentTest {
 
       RemoteCheckLeak remoteCheckLeak = new RemoteCheckLeak();
       remoteCheckLeak.connect("" + process.pid());
-      remoteCheckLeak.getHistogram(System.currentTimeMillis(), (line, histogram) -> {
+      remoteCheckLeak.getHistogram(System.currentTimeMillis(), null, (line, histogram) -> {
          if (histogram.name == null || histogram.name.trim().equals("")) {
             System.out.println("Line " + line + " is generating " + histogram);
             errors.incrementAndGet();
@@ -120,6 +120,7 @@ public class RemoteAgentTest {
       Assertions.assertEquals(0, errors.get());
    }
 
+   // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output
    @Test
    public void testRemoteRun() throws Exception {
       process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});

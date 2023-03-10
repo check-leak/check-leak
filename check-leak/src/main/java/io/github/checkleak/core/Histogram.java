@@ -26,6 +26,8 @@ import java.util.Calendar;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.github.checkleak.core.util.DateOps;
+
 public class Histogram {
 
    static AtomicInteger sequenceGenerator = new AtomicInteger(1);
@@ -175,10 +177,13 @@ public class Histogram {
       history.add(dataPoint);
    }
 
+   private String logLinks(long time) {
+      return "  <a href='../logs/" + DateOps.getHistogramFileName(time) + "'>Histogram</a>" +
+         "  <a href='../logs/" + DateOps.getTDumpFileName(time) + "'>Tdump</a>";
+   }
+
    public void generateChart(File output) throws Exception {
       output.getParentFile().mkdirs();
-
-      Calendar calendar = Calendar.getInstance();
 
       PrintStream stream = new PrintStream(new FileOutputStream(output));
       stream.println("<!DOCTYPE html>");
@@ -193,10 +198,10 @@ public class Histogram {
       TableGenerator.tableBegin(stream, "histogram");
       TableGenerator.tableHeader(stream, "Time", "Bytes", "Instances");
       if (history.isEmpty()) {
-         TableGenerator.tableLine(stream, convertTime(this.time, calendar), "" + this.getBytes(), "" + this.getInstances());
+         TableGenerator.tableLine(stream, DateOps.getHour(this.time) + logLinks(this.time), "" + this.getBytes(), "" + this.getInstances());
       } else {
          history.forEach((histogram -> {
-            TableGenerator.tableLine(stream, convertTime(histogram.time, calendar), "" + histogram.getBytes(), "" + histogram.getInstances());
+            TableGenerator.tableLine(stream, DateOps.getHour(histogram.time) + logLinks(histogram.time), "" + histogram.getBytes(), "" + histogram.getInstances());
          }));
       }
       TableGenerator.tableFooter(stream);
@@ -211,10 +216,10 @@ public class Histogram {
       stream.println("var dataBytes = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'Bytes']");
       if (history.isEmpty()) {
-         stream.println(",[" + convertTime(this.time, calendar) + "," + this.bytes + "]");
+         stream.println(",[" + DateOps.getHour(this.time) + "," + this.bytes + "]");
       } else {
          history.forEach(histogram -> {
-            stream.println(",[" + convertTime(histogram.time, calendar) + "," + histogram.bytes + "]");
+            stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.bytes + "]");
          });
       }
       stream.println("]);");
@@ -222,11 +227,11 @@ public class Histogram {
       stream.println("var dataInstances = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'Instances']");
       if (history.isEmpty()) {
-         stream.println(",[" + convertTime(this.time, calendar) + "," + this.instances + "]");
+         stream.println(",[" + DateOps.getHour(this.time) + "," + this.instances + "]");
 
       } else {
          history.forEach(histogram -> {
-            stream.println(",[" + convertTime(histogram.time, calendar) + "," + histogram.instances + "]");
+            stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.instances + "]");
          });
       }
       stream.println("]);");
@@ -257,12 +262,6 @@ public class Histogram {
       stream.println("</html>");
 
       stream.close();
-   }
-
-   String convertTime(long date, Calendar calendar) {
-      calendar.setTimeInMillis(date);
-
-      return String.format("'%02d:%02d:%02d:%02d'", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
    }
 
    public void onOver(boolean newItem, Histogram dataPoint, File report, Executor executor) throws Exception {

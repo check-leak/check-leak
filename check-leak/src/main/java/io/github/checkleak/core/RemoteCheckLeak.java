@@ -43,7 +43,11 @@ import java.util.function.Consumer;
 
 import com.sun.tools.attach.VirtualMachine;
 import io.github.checkleak.core.util.DateOps;
+import io.github.checkleak.core.util.TDumpAnalyzer;
+import io.github.checkleak.core.util.TableGenerator;
 import sun.tools.attach.HotSpotVirtualMachine;
+
+import static io.github.checkleak.core.util.HTMLHelper.makeLink;
 
 public class RemoteCheckLeak implements Runnable {
 
@@ -52,6 +56,9 @@ public class RemoteCheckLeak implements Runnable {
    private File logs;
    private long sleep = 60_000;
    volatile boolean active = true;
+
+   // This is used to generate the logs view
+   ArrayList<Long> processedTmes = new ArrayList<Long>();
 
    public void stop() {
       active = false;
@@ -79,12 +86,18 @@ public class RemoteCheckLeak implements Runnable {
       this.logs = new File(report, "logs");
       this.logs.mkdirs();
 
-      executorService = Executors.newSingleThreadExecutor();
       try {
          TableGenerator.installStuff(report);
+         TDumpAnalyzer.installStuff(logs);
       } catch(Exception e) {
          e.printStackTrace();
       }
+
+      return startExecutor();
+   }
+
+   public RemoteCheckLeak startExecutor() {
+      executorService = Executors.newSingleThreadExecutor();
       return this;
    }
 
@@ -195,6 +208,8 @@ public class RemoteCheckLeak implements Runnable {
          if (parameters.report != null) {
             System.out.println("Setting report at " + parameters.report);
             remoteCheckLeak.setReport(new File(parameters.report));
+         } else {
+            remoteCheckLeak.startExecutor();
          }
          remoteCheckLeak.connect(parameters.pid);
          remoteCheckLeak.setSleep(parameters.sleep);
@@ -230,8 +245,19 @@ public class RemoteCheckLeak implements Runnable {
       final Set<String> zeroNames = new HashSet<>();
       zeroNames.addAll(maxValues.keySet());
       long time = System.currentTimeMillis();
-      File histogramFile = new File(logs, DateOps.getHistogramFileName(time));
-      File threadDumpFile = new File(logs, DateOps.getTDumpFileName(time));
+      processedTmes.add(time);
+      File histogramFile;
+      File threadDumpFile;
+      File threadDumpAnalyzerFile;
+
+      if (report == null) {
+         histogramFile = threadDumpFile = threadDumpAnalyzerFile = null;
+      } else {
+         histogramFile = new File(logs, DateOps.getHistogramFileName(time));
+         threadDumpFile = new File(logs, DateOps.getTDumpFileName(time));
+         threadDumpAnalyzerFile = new File(logs, DateOps.getTDumpAnalyzerFileName(time));
+      }
+
       try (PrintStream histogramOutputStream = new PrintStream(new BufferedOutputStream(new FileOutputStream(histogramFile)))) {
          getHistogram(time, histogramOutputStream, (line, histogram) -> {
             zeroNames.remove(histogram.name);
@@ -239,8 +265,9 @@ public class RemoteCheckLeak implements Runnable {
 
             if (currentMaxValue == null) {
                maxValues.put(histogram.name, histogram);
+               histogram.addHistory(histogram.copy());
                try {
-                  histogram.onOver(true, histogram.copy(), report, executorService);
+                  histogram.onOver(true, histogram, report, executorService);
                } catch (Exception e) {
                   e.printStackTrace();
                }
@@ -254,8 +281,12 @@ public class RemoteCheckLeak implements Runnable {
          });
       }
 
-      try (PrintStream outDump = new PrintStream(new BufferedOutputStream(new FileOutputStream(threadDumpFile)))) {
-         getThreadDump(outDump);
+       if (report != null) {
+
+         {
+            String tdump = getThreadDump();
+            TDumpAnalyzer.installDump(threadDumpFile, threadDumpAnalyzerFile, tdump);
+         }
       }
 
       // the GC Histogram will simply ignore any class that now has 0 instances.
@@ -283,8 +314,10 @@ public class RemoteCheckLeak implements Runnable {
       }
    }
 
-   public void getThreadDump(PrintStream output) throws Exception {
-      execute("Thread.print", output::println);
+   public String getThreadDump() throws Exception {
+      StringBuffer buffer = new StringBuffer();
+      execute("Thread.print", line -> buffer.append(line + "\n"));
+      return buffer.toString();
    }
 
    public Map<String, Histogram> parseHistogram() throws Exception {
@@ -326,24 +359,28 @@ public class RemoteCheckLeak implements Runnable {
    public void run() {
       try {
          while (active) {
+            //System.out.print("\033[H\033[2J");
             System.out.println("*******************************************************************************************************************************");
-            if (report != null) {
-               CountDownLatch latch = new CountDownLatch(1);
-               ExecutorService service = executorService;
-               if (service != null) {
-                  service.execute(() -> {
-                     try {
-                        processHistogram();
+            CountDownLatch latch = new CountDownLatch(1);
+            ExecutorService service = executorService;
+            if (service != null) {
+               System.out.println("Executing...");
+               service.execute(() -> {
+                  try {
+                     System.out.println("Processing histogram");
+                     processHistogram();
+                     if (report != null) {
                         generateIndex(report, maxValues.values());
-                     } catch (Throwable e) {
-                        e.printStackTrace();
-                     } finally {
-                        latch.countDown();
+                        generateLogsView(report, processedTmes);
                      }
-                  });
-               }
-               latch.await(1, TimeUnit.MINUTES);
+                  } catch (Throwable e) {
+                     e.printStackTrace();
+                  } finally {
+                     latch.countDown();
+                  }
+               });
             }
+            latch.await(1, TimeUnit.MINUTES);
             Thread.sleep(sleep);
          }
       } catch (Throwable e) {
@@ -352,31 +389,65 @@ public class RemoteCheckLeak implements Runnable {
    }
 
    public static void generateIndex(File report, Collection<Histogram> values) throws Exception {
-      FileOutputStream fileOutputStream = new FileOutputStream(new File(report, "index.html"));
-      PrintStream out = new PrintStream(new BufferedOutputStream(fileOutputStream));
+      try (PrintStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(report, "index.html"))))) {
 
-      out.println("<!DOCTYPE html>");
-      out.println("<html>");
+         out.println("<!DOCTYPE html>");
+         out.println("<html>");
 
-      TableGenerator.addScriptHeader(out, "mainTable");
+         TableGenerator.addScriptHeader(out, "mainTable");
 
-      out.println("<body>");
+         out.println("<body>");
 
-      TableGenerator.tableBegin(out, "mainTable");
-      TableGenerator.tableHeader(out, "bytes", "peak bytes", "instances", "peak instances", "peak increases", "className");
+         TableGenerator.tableBegin(out, "mainTable");
+         TableGenerator.tableHeader(out, "bytes", "peak bytes", "instances", "peak instances", "peak increases", "className");
 
-      ArrayList<Histogram> histogram = new ArrayList<>(values.size());
-      histogram.addAll(values);
+         ArrayList<Histogram> histogram = new ArrayList<>(values.size());
+         histogram.addAll(values);
 
-      Collections.sort(histogram, new CompareOver());
+         Collections.sort(histogram, new CompareOver());
 
-      histogram.forEach(h -> {
-         TableGenerator.tableLine(out,  "" + h.getBytes(), "" + h.getMaxBytes(), "" + h.getInstances(), "" + h.getMaxInstances(), "" + h.getTimesOver(), "" + "<a href='" + h.getFileName() + "'>" + h.getName() + "</a>");
-      });
-      TableGenerator.tableFooter(out);
 
-      out.println("</body>");
-      out.close();
+         histogram.forEach(h -> {
+            String fileName = h.fileName;
+            TableGenerator.tableLine(out, makeLink("" + h.getBytes(), fileName), makeLink("" + h.getMaxBytes(), fileName), makeLink("" + h.getInstances(), fileName), makeLink("" + h.getMaxInstances(), fileName), makeLink("" + h.getTimesOver(), fileName), makeLink(h.name, fileName));
+         });
+         TableGenerator.tableFooter(out);
+
+         out.println("<a href='logs.html'>Click here to view available logs</a>");
+         out.println("</body>");
+      }
+   }
+
+   public static void generateLogsView(File report, Collection<Long> processedTmes) throws Exception {
+
+      try (PrintStream out = new PrintStream(new BufferedOutputStream(new FileOutputStream(new File(report, "logs.html"))))) {
+
+         out.println("<!DOCTYPE html>");
+         out.println("<html>");
+
+         TableGenerator.addScriptHeader(out, "logsTable");
+
+         out.println("<body>");
+
+         out.println("<h4>histogram</hr4>");
+         TableGenerator.tableBegin(out, "logsTable");
+         TableGenerator.tableHeader(out, "date", "Class Histogram", "Thread Dump", "ThreadDump analyzer");
+
+         processedTmes.forEach(time -> {
+                                  String printTime = DateOps.completeDateHumanReadable(time);
+                                  String histogram = DateOps.getHistogramFileName(time);
+                                  String tdump = DateOps.getTDumpFileName(time);
+                                  String analyzer = DateOps.getTDumpAnalyzerFileName(time);
+                                  TableGenerator.tableLine(out, printTime,
+                                                           "<a href='./logs/" + histogram + "'>" + histogram + "</a>",
+                                                           "<a href='./logs/" + tdump + "'>" + tdump + "</a>",
+                                                           "<a href='./logs/" + analyzer + "'>" + analyzer + "</a>");
+                               });
+         TableGenerator.tableFooter(out);
+
+         out.println("<a href='index.html'>Histogram</a>");
+         out.println("</body>");
+      }
 
    }
 

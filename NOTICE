@@ -1,0 +1,7 @@
+Apache ActiveMQ Artemis
+Copyright [2014-2023] The Apache Software Foundation
+
+
+This code includes Thread Dump Analyzer from https://github.com/spotify/threaddump-analyzer
+
+The Thread dump generation is using a modified version of the threaddump-analyzer to allow reading the thread dumps in a static HTML page.

@@ -1,0 +1,51 @@
+<html>
+
+<head>
+    <title>Online Java Thread Dump Analyzer</title>
+    <link rel="stylesheet" type="text/css" href="code-stylesheet.css"/>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+</head>
+
+<body>
+<script src="analyze.js" type="text/javascript"></script>
+
+<h1 id="titleH1">Thread Dump Analyzer</h1>
+<pre id="theDump" style="display: none;">REPLACE_DUMP</pre>
+
+<div id="RUNNING_DIV" style="display: none;">
+    <hr/>
+    <h2 id="RUNNING_HEADER">Top Running Methods</h2>
+    <table id="RUNNING"
+           summary="Top methods from all threads that are running">
+    </table>
+</div>
+
+<div id="OUTPUT_DIV" style="display: none;">
+    <hr/>
+    <div id="OUTPUT"></div>
+</div>
+
+<div id="SYNCHRONIZERS_DIV" style="display: none;">
+    <hr/>
+    <h2 id="SYNCHRONIZERS_HEADER">Synchronizers</h2>
+    <table id="SYNCHRONIZERS"
+           summary="A list of all synchronizers in the thread dump">
+    </table>
+</div>
+
+<div id="IGNORED_DIV" style="display: none;">
+    <hr/>
+    <h2>Ignored Input Lines</h2>
+    <table id="IGNORED" class="ignored"
+           summary="Lines that were ignored while parsing the thread dump">
+    </table>
+</div>
+<script type="text/javascript" class="init">
+    const urlParams = new URLSearchParams(window.location.search);
+    var dump = document.getElementById('theDump');
+    analyze(dump.textContent);
+</script>
+
+<p><a href="https://github.com/spotify/threaddump-analyzer">Powered by</a></p>
+</body>
+</html>

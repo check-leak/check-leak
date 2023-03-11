@@ -20,6 +20,7 @@ package io.github.checkleak.core;
 import java.io.File;
 import java.util.ArrayList;
 
+import io.github.checkleak.core.util.TableGenerator;
 import org.junit.jupiter.api.Test;
 
 public class HistogramTest {
@@ -77,6 +78,11 @@ public class HistogramTest {
       histogram.setFileName("1.html");
 
       RemoteCheckLeak.generateIndex(new File("./target/output/"), list);
+      ArrayList<Long> logsView = new ArrayList<>();
+      for (int i = 0; i < 10; i++) {
+         logsView.add(System.currentTimeMillis() + (i * 1000));
+      }
+      RemoteCheckLeak.generateLogsView(new File("./target/output/"), logsView);
    }
 
 

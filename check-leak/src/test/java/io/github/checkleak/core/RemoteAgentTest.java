@@ -149,6 +149,32 @@ public class RemoteAgentTest {
       System.out.println("Manually inspect ./target/RemoteAgentTest");
    }
 
+   // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output
+   /*@Test
+   public void testRemoteRunNoReport() throws Exception {
+      process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});
+      Assertions.assertFalse(process.waitFor(100, TimeUnit.MILLISECONDS));
+
+      RemoteCheckLeak remoteCheckLeak = new RemoteCheckLeak();
+      remoteCheckLeak.setActive(true);
+      remoteCheckLeak.startExecutor();
+      remoteCheckLeak.connect("" + process.pid());
+
+      Map<String, Histogram> histogramMap = remoteCheckLeak.parseHistogram();
+      Assertions.assertFalse(histogramMap.isEmpty());
+
+      remoteCheckLeak.setSleep(100);
+      Thread t = new Thread(remoteCheckLeak);
+      t.start();
+      Thread.sleep(5000);
+      remoteCheckLeak.stop();
+      t.join(5000);
+      Assertions.assertFalse(t.isAlive());
+      remoteCheckLeak.disconnect();
+
+      System.out.println("Manually inspect ./target/RemoteAgentTest");
+   }*/
+
    @Test
    public void testParameter() throws Exception {
       RemoteCheckLeak.Parameters x = new RemoteCheckLeak.Parameters();

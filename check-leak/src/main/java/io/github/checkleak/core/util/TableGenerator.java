@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-package io.github.checkleak.core;
+package io.github.checkleak.core.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
+
+import static io.github.checkleak.core.util.HTMLHelper.copy;
 
 public class TableGenerator {
 
@@ -86,23 +84,5 @@ public class TableGenerator {
    public static void tableFooter(PrintStream output) {
       output.println("</tbody></table>");
    }
-
-   private static void copy(String name, File directory) throws Exception {
-      directory.mkdirs();
-      InputStream stream = TableGenerator.class.getResourceAsStream(name);
-      File file = new File(directory, name);
-      copy(stream, new FileOutputStream(file));
-   }
-
-
-   private static void copy(InputStream is, OutputStream os) throws IOException {
-      byte[] buffer = new byte[1024 * 4];
-      int c = is.read(buffer);
-      while (c >= 0) {
-         os.write(buffer, 0, c);
-         c = is.read(buffer);
-      }
-   }
-
 
 }

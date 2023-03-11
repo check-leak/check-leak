@@ -22,11 +22,11 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.github.checkleak.core.util.DateOps;
+import io.github.checkleak.core.util.TableGenerator;
 
 public class Histogram {
 
@@ -179,7 +179,8 @@ public class Histogram {
 
    private String logLinks(long time) {
       return "  <a href='../logs/" + DateOps.getHistogramFileName(time) + "'>Histogram</a>" +
-         "  <a href='../logs/" + DateOps.getTDumpFileName(time) + "'>Tdump</a>";
+         "  <a href='../logs/" + DateOps.getTDumpFileName(time) + "'>Tdump</a>" +
+         "  <a href='../logs/" + DateOps.getTDumpAnalyzerFileName(time) + "'>Analyzer</a>";
    }
 
    public void generateChart(File output) throws Exception {
@@ -196,14 +197,10 @@ public class Histogram {
       stream.println("<div id=\"instancesChart\" style=\"width:100%; max-width:1600px; height:500px;\"></div> ");
 
       TableGenerator.tableBegin(stream, "histogram");
-      TableGenerator.tableHeader(stream, "Time", "Bytes", "Instances");
-      if (history.isEmpty()) {
-         TableGenerator.tableLine(stream, DateOps.getHour(this.time) + logLinks(this.time), "" + this.getBytes(), "" + this.getInstances());
-      } else {
-         history.forEach((histogram -> {
-            TableGenerator.tableLine(stream, DateOps.getHour(histogram.time) + logLinks(histogram.time), "" + histogram.getBytes(), "" + histogram.getInstances());
-         }));
-      }
+      TableGenerator.tableHeader(stream, "Time", "Bytes", "Instances", "links");
+      history.forEach((histogram -> {
+         TableGenerator.tableLine(stream, DateOps.completeDateHumanReadable(histogram.time), "" + histogram.getBytes(), "" + histogram.getInstances(), logLinks(histogram.time));
+      }));
       TableGenerator.tableFooter(stream);
 
 
@@ -215,25 +212,16 @@ public class Histogram {
 
       stream.println("var dataBytes = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'Bytes']");
-      if (history.isEmpty()) {
-         stream.println(",[" + DateOps.getHour(this.time) + "," + this.bytes + "]");
-      } else {
-         history.forEach(histogram -> {
-            stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.bytes + "]");
-         });
-      }
+      history.forEach(histogram -> {
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.bytes + "]");
+      });
       stream.println("]);");
 
       stream.println("var dataInstances = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'Instances']");
-      if (history.isEmpty()) {
-         stream.println(",[" + DateOps.getHour(this.time) + "," + this.instances + "]");
-
-      } else {
-         history.forEach(histogram -> {
-            stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.instances + "]");
-         });
-      }
+      history.forEach(histogram -> {
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.instances + "]");
+      });
       stream.println("]);");
 
       stream.println("var optionsBytes = {");

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -286,6 +287,15 @@ public class RemoteCheckLeak implements Runnable {
       execute("Thread.print", output::println);
    }
 
+   public Map<String, Histogram> parseHistogram() throws Exception {
+      HashMap<String, Histogram> histogramHashMap = new HashMap<>();
+
+      getHistogram(System.currentTimeMillis(), null, (line, histogram) -> {
+         histogramHashMap.put(histogram.name, histogram);
+      });
+
+      return histogramHashMap;
+   }
 
    public void getHistogram(long time, PrintStream output, BiConsumer<String, Histogram> consumer) throws Exception {
       AtomicInteger lineNumber = new AtomicInteger(0);

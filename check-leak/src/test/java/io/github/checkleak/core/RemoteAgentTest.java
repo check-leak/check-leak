@@ -19,6 +19,7 @@ package io.github.checkleak.core;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -132,6 +133,10 @@ public class RemoteAgentTest {
       deleteDirectory(report);
       remoteCheckLeak.setReport(report);
       remoteCheckLeak.connect("" + process.pid());
+
+      Map<String, Histogram> histogramMap = remoteCheckLeak.parseHistogram();
+      Assertions.assertFalse(histogramMap.isEmpty());
+
       remoteCheckLeak.setSleep(100);
       Thread t = new Thread(remoteCheckLeak);
       t.start();

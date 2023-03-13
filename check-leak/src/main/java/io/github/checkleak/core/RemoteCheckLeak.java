@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -52,9 +53,11 @@ import static io.github.checkleak.core.util.HTMLHelper.makeLink;
 public class RemoteCheckLeak implements Runnable {
 
    volatile ExecutorService executorService;
+   volatile Executor executor;
    private File report;
    private File logs;
    private long sleep = 60_000;
+   private final CountDownLatch latch = new CountDownLatch(1);
    volatile boolean active = true;
 
    // This is used to generate the logs view
@@ -62,6 +65,7 @@ public class RemoteCheckLeak implements Runnable {
 
    public void stop() {
       active = false;
+      latch.countDown();
       if (executorService != null) {
          executorService.shutdown();
          executorService = null;
@@ -70,11 +74,6 @@ public class RemoteCheckLeak implements Runnable {
 
    public boolean isActive() {
       return active;
-   }
-
-   public RemoteCheckLeak setActive(boolean active) {
-      this.active = active;
-      return this;
    }
 
    public File getReport() {
@@ -96,8 +95,15 @@ public class RemoteCheckLeak implements Runnable {
       return startExecutor();
    }
 
+   // You have to send a singleThreaded executor, or some equivalent that will guarantee a single thread executed every time
+   public RemoteCheckLeak setExecutor(Executor executor) {
+      this.executor = executor;
+      return this;
+   }
+
    public RemoteCheckLeak startExecutor() {
       executorService = Executors.newSingleThreadExecutor();
+      executor = executorService;
       return this;
    }
 
@@ -267,13 +273,13 @@ public class RemoteCheckLeak implements Runnable {
                maxValues.put(histogram.name, histogram);
                histogram.addHistory(histogram.copy());
                try {
-                  histogram.onOver(true, histogram, report, executorService);
+                  histogram.onOver(true, histogram, report, executor);
                } catch (Exception e) {
                   e.printStackTrace();
                }
             } else {
                try {
-                  currentMaxValue.check(histogram, report, executorService);
+                  currentMaxValue.check(histogram, report, executor);
                } catch (Exception e) {
                   e.printStackTrace();
                }
@@ -296,7 +302,7 @@ public class RemoteCheckLeak implements Runnable {
          Histogram currrentMaxValue = maxValues.get(zero);
          if (currrentMaxValue != null) {
             try {
-               currrentMaxValue.check(zeroed, report, executorService);
+               currrentMaxValue.check(zeroed, report, executor);
             } catch (Exception e) {
                e.printStackTrace();
             }
@@ -362,10 +368,10 @@ public class RemoteCheckLeak implements Runnable {
             //System.out.print("\033[H\033[2J");
             System.out.println("*******************************************************************************************************************************");
             CountDownLatch latch = new CountDownLatch(1);
-            ExecutorService service = executorService;
-            if (service != null) {
+            Executor executor = this.executor;
+            if (executor != null) {
                System.out.println("Executing...");
-               service.execute(() -> {
+               executor.execute(() -> {
                   try {
                      System.out.println("Processing histogram");
                      processHistogram();
@@ -381,7 +387,7 @@ public class RemoteCheckLeak implements Runnable {
                });
             }
             latch.await(1, TimeUnit.MINUTES);
-            Thread.sleep(sleep);
+            latch.await(sleep, TimeUnit.MILLISECONDS);
          }
       } catch (Throwable e) {
          e.printStackTrace();

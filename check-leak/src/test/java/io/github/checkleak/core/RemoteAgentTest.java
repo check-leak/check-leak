@@ -128,7 +128,6 @@ public class RemoteAgentTest {
       Assertions.assertFalse(process.waitFor(100, TimeUnit.MILLISECONDS));
 
       RemoteCheckLeak remoteCheckLeak = new RemoteCheckLeak();
-      remoteCheckLeak.setActive(true);
       File report = new File("./target/RemoteAgentTest");
       deleteDirectory(report);
       remoteCheckLeak.setReport(report);

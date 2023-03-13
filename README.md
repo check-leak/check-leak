@@ -7,15 +7,15 @@ Or you can use it to inpsect the VM on a remote process, in a lite weight way, b
 
 ## Running as a tool
 
-You can download check-leak-0.9.jar and run:
+You can download check-leak-0.10.jar and run:
 
 ```shell
-java -jar check-leak-0.9.jar --pid <PID> --report <reportoutput> --sleep <interval in milliseconds>
+java -jar check-leak-0.10.jar --pid <PID> --report <reportoutput> --sleep <interval in milliseconds>
 ```
 
 Here is an example report, extract from a run over [ActiveMQ Artemis](https://clebertsuconic.github.io).
 
-This will provide you nice [chart views](https://clebertsuconic.github.io/charts/2960.html) about memory consumption for your objects.
+This will provide you nice [chart views](https://clebertsuconic.github.io/charts/2836.html) about memory consumption for your objects.
 
 
 ## Library Installation
@@ -28,7 +28,7 @@ For Maven:
 <dependency>
   <groupId>io.github.check-leak</groupId>
   <artifactId>check-leak</artifactId>
-  <version>0.8</version>
+  <version>0.10</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ For Gradle:
 
 ```gradle
 dependencies {
-  implementation 'io.github.check-leak:check-leak:0.8'
+  implementation 'io.github.check-leak:check-leak:0.10'
 }
 ```
 

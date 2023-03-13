@@ -52,6 +52,12 @@ import static io.github.checkleak.core.util.HTMLHelper.makeLink;
 
 public class RemoteCheckLeak implements Runnable {
 
+   PrintStream out = System.out;
+
+   public void setOut(PrintStream out) {
+      this.out = out;
+   }
+
    volatile ExecutorService executorService;
    volatile Executor executor;
    private File report;
@@ -92,7 +98,16 @@ public class RemoteCheckLeak implements Runnable {
          e.printStackTrace();
       }
 
-      return startExecutor();
+      if (executor == null) {
+         startExecutor();
+      }
+      return this;
+   }
+
+   public Thread startThread() {
+      Thread thread = new Thread(this);
+      thread.start();
+      return thread;
    }
 
    // You have to send a singleThreaded executor, or some equivalent that will guarantee a single thread executed every time
@@ -273,13 +288,13 @@ public class RemoteCheckLeak implements Runnable {
                maxValues.put(histogram.name, histogram);
                histogram.addHistory(histogram.copy());
                try {
-                  histogram.onOver(true, histogram, report, executor);
+                  histogram.onOver(true, histogram, report, executor, out);
                } catch (Exception e) {
                   e.printStackTrace();
                }
             } else {
                try {
-                  currentMaxValue.check(histogram, report, executor);
+                  currentMaxValue.check(histogram, report, executor, out);
                } catch (Exception e) {
                   e.printStackTrace();
                }
@@ -302,7 +317,7 @@ public class RemoteCheckLeak implements Runnable {
          Histogram currrentMaxValue = maxValues.get(zero);
          if (currrentMaxValue != null) {
             try {
-               currrentMaxValue.check(zeroed, report, executor);
+               currrentMaxValue.check(zeroed, report, executor, out);
             } catch (Exception e) {
                e.printStackTrace();
             }
@@ -366,14 +381,14 @@ public class RemoteCheckLeak implements Runnable {
       try {
          while (active) {
             //System.out.print("\033[H\033[2J");
-            System.out.println("*******************************************************************************************************************************");
+            out.println("*******************************************************************************************************************************");
             CountDownLatch latch = new CountDownLatch(1);
             Executor executor = this.executor;
             if (executor != null) {
-               System.out.println("Executing...");
+               out.println("Executing...");
                executor.execute(() -> {
                   try {
-                     System.out.println("Processing histogram");
+                     out.println("Processing histogram");
                      processHistogram();
                      if (report != null) {
                         generateIndex(report, maxValues.values());

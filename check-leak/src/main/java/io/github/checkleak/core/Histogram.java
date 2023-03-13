@@ -127,7 +127,7 @@ public class Histogram {
    }
 
 
-   public void check(Histogram currentDataPoint, File report, Executor executor) throws Exception {
+   public void check(Histogram currentDataPoint, File report, Executor executor, PrintStream out) throws Exception {
       boolean overBytes = false, overInstances = false;
       boolean changeBytes = false, changeInstances = false;
       if (currentDataPoint.getBytes() > getMaxBytes()) {
@@ -146,7 +146,7 @@ public class Histogram {
       }
 
       if (overBytes || overInstances) {
-         onOver(false, currentDataPoint, report, executor);
+         onOver(false, currentDataPoint, report, executor, out);
       }
 
       this.bytes = currentDataPoint.bytes;
@@ -252,16 +252,16 @@ public class Histogram {
       stream.close();
    }
 
-   public void onOver(boolean newItem, Histogram dataPoint, File report, Executor executor) throws Exception {
+   public void onOver(boolean newItem, Histogram dataPoint, File report, Executor executor, PrintStream out) throws Exception {
       timesOver++;
       if (newItem) {
-         System.out.println(String.format("|%30s|%30s|%s", maxBytes + " bytes", maxInstances + " instances", name));
+         out.println(String.format("|%30s|%30s|%s", maxBytes + " bytes", maxInstances + " instances", name));
       } else {
          long diffBytes = dataPoint.getMaxBytes() - bytes;
          long diffInstances = dataPoint.getMaxInstances() - instances;
          String diffBytesStr = " (" + (diffBytes > 0 ? "+" : "") + diffBytes + ")";
          String diffInstancesStr = " (" + (diffInstances > 0 ? "+" : "") + diffInstances + ")";
-         System.out.println(String.format("|%30s|%30s|%s", maxBytes + " bytes" + diffBytesStr, maxInstances + " instances" + diffInstancesStr, name));
+         out.println(String.format("|%30s|%30s|%s", maxBytes + " bytes" + diffBytesStr, maxInstances + " instances" + diffInstancesStr, name));
       }
       if (dataPoint.getBytes() > this.maxBytes) {
          this.maxBytes = dataPoint.getMaxBytes();

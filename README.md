@@ -42,6 +42,10 @@ dependencies {
 
 ## Basic API
 
+Most users will use remove check-leak by simply typing java -jar check-leak.jar. 
+
+However if you require to inspect the objects in the VM, the API might be useful for your.
+
 Everything you  need is part of io.github.checkleak.core.CheckLeak.
 
 The most commonly used method is checkLeak.getAllObjects() where you can use JUnit Assertions to validate if they are still around as expected or not.

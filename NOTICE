@@ -1,7 +1,13 @@
 Apache ActiveMQ Artemis
-Copyright [2014-2023] The Apache Software Foundation
+Copyright [2014-2023] Clebert Suconic
+
+under Apache 2 License terms.
 
 
-This code includes Thread Dump Analyzer from https://github.com/spotify/threaddump-analyzer
+This software includes the following software redistritued:
 
-The Thread dump generation is using a modified version of the threaddump-analyzer to allow reading the thread dumps in a static HTML page.
+The report output will include ThreadDump Analyzer: https://github.com/spotify/threaddump-analyzer
+which is licensed under Apache 2 License
+
+
+The report will also include jquery Datatables which is MIT licensed. From https://datatables.net/license/

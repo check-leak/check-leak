@@ -63,7 +63,7 @@ public class RemoteCheckLeak implements Runnable {
    private File report;
    private File logs;
    private long sleep = 60_000;
-   private final CountDownLatch latch = new CountDownLatch(1);
+   private final CountDownLatch latchRunning = new CountDownLatch(1);
    volatile boolean active = true;
 
    // This is used to generate the logs view
@@ -71,7 +71,7 @@ public class RemoteCheckLeak implements Runnable {
 
    public void stop() {
       active = false;
-      latch.countDown();
+      latchRunning.countDown();
       if (executorService != null) {
          executorService.shutdown();
          executorService = null;
@@ -402,7 +402,7 @@ public class RemoteCheckLeak implements Runnable {
                });
             }
             latch.await(1, TimeUnit.MINUTES);
-            latch.await(sleep, TimeUnit.MILLISECONDS);
+            latchRunning.await(sleep, TimeUnit.MILLISECONDS);
          }
       } catch (Throwable e) {
          e.printStackTrace();

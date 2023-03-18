@@ -62,7 +62,7 @@ public class HistogramTest {
    }
 
    @Test
-   public void testGenerateIndexAndChat() throws Exception {
+   public void testGenerateIndexAndChart() throws Exception {
       TableGenerator.installStuff(new File("./target/output/"));
       String line = "   10:            18          10400  Test";
       Histogram histogram = Histogram.parseLine(line, System.currentTimeMillis());

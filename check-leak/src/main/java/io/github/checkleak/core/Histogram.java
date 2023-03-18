@@ -213,7 +213,7 @@ public class Histogram {
       stream.println("var dataBytesArray = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'link', 'Bytes']");
       history.forEach(histogram -> {
-         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(time) + "',"  + histogram.bytes + "]");
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(histogram.time) + "',"  + histogram.bytes + "]");
       });
       stream.println("]);");
       stream.println("var dataBytes = new google.visualization.DataView(dataBytesArray);dataBytes.setColumns([0, 2]);");
@@ -221,7 +221,7 @@ public class Histogram {
       stream.println("var dataInstancesArray = google.visualization.arrayToDataTable([");
       stream.println("['Date', 'link', 'Instances']");
       history.forEach(histogram -> {
-         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(time) + "',"  + histogram.instances + "]");
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(histogram.time) + "',"  + histogram.instances + "]");
       });
       stream.println("]);");
       stream.println("var dataInstances = new google.visualization.DataView(dataInstancesArray);dataInstances.setColumns([0, 2]);");

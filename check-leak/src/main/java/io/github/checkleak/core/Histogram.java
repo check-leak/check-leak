@@ -248,7 +248,7 @@ public class Histogram {
       stream.println("chart2.draw(dataInstances, optionsInstances);");
 
       stream.println("var selectHandlerBytes = function(e) {window.location = dataBytesArray.getValue(chart.getSelection()[0]['row'], 1 );}");
-      stream.println("var selectHandlerInstances = function(e) {window.location = dataInstancesArray.getValue(chart.getSelection()[0]['row'], 1 );}");
+      stream.println("var selectHandlerInstances = function(e) {window.location = dataInstancesArray.getValue(chart2.getSelection()[0]['row'], 1 );}");
 
       stream.println("google.visualization.events.addListener(chart, 'select', selectHandlerBytes);");
       stream.println("google.visualization.events.addListener(chart2, 'select', selectHandlerInstances);");

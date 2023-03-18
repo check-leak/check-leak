@@ -210,19 +210,21 @@ public class Histogram {
 
       stream.println("function drawChart() {");
 
-      stream.println("var dataBytes = google.visualization.arrayToDataTable([");
-      stream.println("['Date', 'Bytes']");
+      stream.println("var dataBytesArray = google.visualization.arrayToDataTable([");
+      stream.println("['Date', 'link', 'Bytes']");
       history.forEach(histogram -> {
-         stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.bytes + "]");
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(time) + "',"  + histogram.bytes + "]");
       });
       stream.println("]);");
+      stream.println("var dataBytes = new google.visualization.DataView(dataBytesArray);dataBytes.setColumns([0, 2]);");
 
-      stream.println("var dataInstances = google.visualization.arrayToDataTable([");
-      stream.println("['Date', 'Instances']");
+      stream.println("var dataInstancesArray = google.visualization.arrayToDataTable([");
+      stream.println("['Date', 'link', 'Instances']");
       history.forEach(histogram -> {
-         stream.println(",[" + DateOps.getHour(histogram.time) + "," + histogram.instances + "]");
+         stream.println(",[" + DateOps.getHour(histogram.time) + "," + "'../logs/" + DateOps.getTDumpAnalyzerFileName(time) + "',"  + histogram.instances + "]");
       });
       stream.println("]);");
+      stream.println("var dataInstances = new google.visualization.DataView(dataInstancesArray);dataInstances.setColumns([0, 2]);");
 
       stream.println("var optionsBytes = {");
       stream.println(" title: 'Bytes allocated',");
@@ -244,6 +246,13 @@ public class Histogram {
 
       stream.println("var chart2 = new google.visualization.LineChart(document.getElementById('instancesChart'));");
       stream.println("chart2.draw(dataInstances, optionsInstances);");
+
+      stream.println("var selectHandlerBytes = function(e) {window.location = dataBytesArray.getValue(chart.getSelection()[0]['row'], 1 );}");
+      stream.println("var selectHandlerInstances = function(e) {window.location = dataInstancesArray.getValue(chart.getSelection()[0]['row'], 1 );}");
+
+      stream.println("google.visualization.events.addListener(chart, 'select', selectHandlerBytes);");
+      stream.println("google.visualization.events.addListener(chart2, 'select', selectHandlerInstances);");
+
       stream.println("}");
       stream.println("</script>");
       stream.println("</body>");

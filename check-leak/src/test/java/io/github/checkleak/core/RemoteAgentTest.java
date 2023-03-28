@@ -149,6 +149,31 @@ public class RemoteAgentTest {
    }
 
    // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output
+   @Test
+   public void testShouldDieAtTheEnd() throws Exception {
+      process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});
+      Assertions.assertFalse(process.waitFor(100, TimeUnit.MILLISECONDS));
+
+      RemoteCheckLeak remoteCheckLeak = new RemoteCheckLeak();
+      File report = new File("./target/RemoteAgentTest");
+      deleteDirectory(report);
+      remoteCheckLeak.setReport(report);
+      remoteCheckLeak.connect("" + process.pid());
+
+      Map<String, Histogram> histogramMap = remoteCheckLeak.parseHistogram();
+      Assertions.assertFalse(histogramMap.isEmpty());
+
+      remoteCheckLeak.setSleep(100);
+      Thread t = new Thread(remoteCheckLeak);
+      t.start();
+      Thread.sleep(500);
+      process.destroyForcibly();
+      t.join(5000);
+      Assertions.assertFalse(t.isAlive());
+      remoteCheckLeak.disconnect();
+   }
+
+   // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output
    /*@Test
    public void testRemoteRunNoReport() throws Exception {
       process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});

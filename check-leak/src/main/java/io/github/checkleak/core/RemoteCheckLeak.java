@@ -395,6 +395,7 @@ public class RemoteCheckLeak implements Runnable {
                         generateLogsView(report, processedTmes);
                      }
                   } catch (Throwable e) {
+                     active = false;
                      e.printStackTrace();
                   } finally {
                      latch.countDown();

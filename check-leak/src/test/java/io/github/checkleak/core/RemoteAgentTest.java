@@ -78,16 +78,23 @@ public class RemoteAgentTest {
 
    public static void main(String[] arg) {
       ArrayList<Payload> garbage = new ArrayList<>();
-      ArrayList<Payload2> permanent = new ArrayList<>();
+      ArrayList<Payload2> garbage2 = new ArrayList<>();
       int i = 0;
+      int j = 0;
       while (true) {
          try {
             Thread.sleep(1);
             garbage.add(new Payload(new byte[100]));
-            permanent.add(new Payload2(new byte[10]));
+            garbage2.add(new Payload2(new byte[10]));
             if (i++ == 100) {
+               System.out.println("clear garbage");
                garbage.clear();
                i = 0;
+            }
+            if (j++ == 1000) {
+               System.out.println("clear garbage2");
+               j = 0;
+               garbage2.clear();
             }
 
          } catch (Exception e) {
@@ -171,6 +178,22 @@ public class RemoteAgentTest {
       t.join(5000);
       Assertions.assertFalse(t.isAlive());
       remoteCheckLeak.disconnect();
+   }
+
+   // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output
+   @Test
+   public void testShouldDieAtTheEnd2() throws Exception {
+      process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});
+      Assertions.assertFalse(process.waitFor(100, TimeUnit.MILLISECONDS));
+
+      Process checkProcess = SpawnJava.spawn(RemoteCheckLeak.class.getName(), new String[]{"--pid", "" + process.pid(), "--report", "./target/report-check", "--sleep", "1000"});
+      try {
+         Thread.sleep(1000);
+         process.destroyForcibly();
+         Assertions.assertTrue(checkProcess.waitFor(1, TimeUnit.SECONDS));
+      } finally {
+         checkProcess.destroyForcibly();
+      }
    }
 
    // Execute the test, look at the ./target/RemoteAgentTest and inspect the UI output

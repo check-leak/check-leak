@@ -30,6 +30,8 @@ public class SpawnJava {
       command.add(javaPath);
       command.add("-Xmx512m");
       command.add("-Xms512m");
+      command.add("--add-exports");
+      command.add("jdk.attach/sun.tools.attach=ALL-UNNAMED");
       command.add(className);
       if (args != null) {
          for (String arg : args) {

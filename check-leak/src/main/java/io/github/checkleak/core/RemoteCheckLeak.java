@@ -46,10 +46,12 @@ import com.sun.tools.attach.VirtualMachine;
 import io.github.checkleak.core.util.DateOps;
 import io.github.checkleak.core.util.TDumpAnalyzer;
 import io.github.checkleak.core.util.TableGenerator;
+import picocli.CommandLine;
 import sun.tools.attach.HotSpotVirtualMachine;
 
 import static io.github.checkleak.core.util.HTMLHelper.makeLink;
 
+@CommandLine.Command(name = "remote", description = "Remotely connect to a VM to inspect the memory allocations")
 public class RemoteCheckLeak implements Runnable {
 
    PrintStream out = System.out;
@@ -60,9 +62,17 @@ public class RemoteCheckLeak implements Runnable {
 
    volatile ExecutorService executorService;
    volatile Executor executor;
-   private File report;
+
+   @CommandLine.Option(names = {"-report", "--report"}, description = "where the report will be generated")
+   File report;
+
    private File logs;
-   private long sleep = 60_000;
+   @CommandLine.Option(names = {"-sleep", "--sleep"}, description = "Interval in milliseconds")
+   long sleep = 60_000;
+
+   @CommandLine.Option(names = {"-pid", "--pid"}, required = true)
+   String pid;
+
    private final CountDownLatch latchRunning = new CountDownLatch(1);
    volatile boolean active = true;
 
@@ -88,20 +98,22 @@ public class RemoteCheckLeak implements Runnable {
 
    public RemoteCheckLeak setReport(File report) {
       this.report = report;
-      this.logs = new File(report, "logs");
-      this.logs.mkdirs();
-
-      try {
-         TableGenerator.installStuff(report);
-         TDumpAnalyzer.installStuff(logs);
-      } catch(Exception e) {
-         e.printStackTrace();
-      }
-
-      if (executor == null) {
-         startExecutor();
-      }
       return this;
+   }
+
+
+   private void checkReport() {
+      if (report != null) {
+         this.logs = new File(report, "logs");
+         this.logs.mkdirs();
+
+         try {
+            TableGenerator.installStuff(report);
+            TDumpAnalyzer.installStuff(logs);
+         } catch (Exception e) {
+            e.printStackTrace();
+         }
+      }
    }
 
    public Thread startThread() {
@@ -155,89 +167,60 @@ public class RemoteCheckLeak implements Runnable {
       }
    }
 
-   public static class Parameters {
-      long sleep = 30_000;
-      String pid;
-      String report;
+   @CommandLine.Command(name = "java -jar check-leak.jar", description = "use 'help <command>' for more information")
+   public static class Help implements Runnable {
 
-      public void parse(String... arg) {
+      public void setCommandLine(CommandLine commandLine) {
+         this.commandLine = commandLine;
+      }
 
-         try {
-            for (int i = 0; i < arg.length; i++) {
-               String argument = arg[i];
-               if (argument.startsWith("-")) {
-                  switch (argument) {
-                     case "-sleep":
-                     case "--sleep":
-                        sleep = Long.parseLong(arg[i + 1]);
-                        break;
-                     case "-pid":
-                     case "--pid":
-                        pid = arg[i + 1];
-                        break;
-                     case "--report":
-                        report = arg[i + 1];
-                        break;
-                     default:
-                        printUsage("Invalid parameter " + argument);
-                        System.exit(-1);
-                  }
-                  i++;
+      CommandLine commandLine;
+
+      @CommandLine.Parameters
+      String args[];
+
+
+      public Help() {
+      }
+
+      public void run() {
+         if (args != null) {
+            CommandLine theLIn = commandLine;
+            for (String i : args) {
+               Object subCommand = theLIn.getSubcommands().get(i);
+               if (subCommand == null) {
+                  commandLine.usage(System.out);
+               } else
+               if (subCommand instanceof CommandLine) {
+                  theLIn = (CommandLine) subCommand;
+               } else {
+                  commandLine.usage(System.out);
                }
             }
-
-            if (report != null && sleep < 1000) {
-               printUsage("It is dangerous to use report with a very short sleep (less than 1 second). Reports may still being generated in the background while the next scan is being performed.");
-               System.exit(-1);
-            }
-         } catch (Throwable e) {
-            e.printStackTrace();
-            printUsage(e.getMessage());
-            System.exit(-1);
+            theLIn.usage(System.out);
+         } else {
+            commandLine.usage(System.out);
          }
       }
-   }
 
-   public static void printUsage(String message) {
-      System.out.println(message);
-      System.out.println("java -jar check-leak.jar -sleep timeout -pid <PID> -report <report-location>");
-      System.out.println("java -jar check-leak.jar install <dll-output>");
    }
 
    public static void main(String arg[]) {
       printBanner(System.out);
 
-      if (arg.length > 0 && arg[0].equals("install")) {
-         try {
-            Installer.install(new File(arg[1]));
-         } catch (Throwable e) {
-            printUsage(e.getMessage());
-         }
-         return;
-      }
-
-      Parameters parameters = new Parameters();
-      parameters.parse(arg);
-
-      if (parameters.pid == null) {
-         printUsage("you must specify -pid <PID>");
-         System.exit(-1);
-      }
-
       try {
-         RemoteCheckLeak remoteCheckLeak = new RemoteCheckLeak();
-         if (parameters.report != null) {
-            System.out.println("Setting report at " + parameters.report);
-            remoteCheckLeak.setReport(new File(parameters.report));
-         } else {
-            remoteCheckLeak.startExecutor();
-         }
-         remoteCheckLeak.connect(parameters.pid);
-         remoteCheckLeak.setSleep(parameters.sleep);
-         remoteCheckLeak.run();
+         Help help = new Help();
+         CommandLine commandLine = new CommandLine(help);
+         help.setCommandLine(commandLine);
+
+         commandLine.addSubcommand(new Installer());
+         commandLine.addSubcommand(new RemoteCheckLeak());
+         commandLine.addSubcommand("help", help);
+         commandLine.execute(arg);
       } catch (Throwable e) {
          e.printStackTrace();
       }
+      System.exit(-1);
    }
 
    VirtualMachine machine;
@@ -379,6 +362,15 @@ public class RemoteCheckLeak implements Runnable {
    @Override
    public void run() {
       try {
+
+         checkReport();
+         startExecutor();
+         connect(pid);
+
+         System.out.println("pid::" + pid);
+         System.out.println("report::" + report);
+         System.out.println("sleep::" + sleep);
+
          while (active) {
             // System.out.print("\033[H\033[2J");
             out.println("*******************************************************************************************************************************");
@@ -394,6 +386,7 @@ public class RemoteCheckLeak implements Runnable {
                         generateIndex(report, maxValues.values());
                         generateLogsView(report, processedTmes);
                      }
+                     out.println("Done");
                   } catch (Throwable e) {
                      e.printStackTrace();
                      stop();

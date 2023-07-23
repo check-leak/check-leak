@@ -25,24 +25,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
 
-public class Installer {
+import picocli.CommandLine;
 
-   public static void main(String arg[]) {
+@CommandLine.Command (name = "install", description = "install the library at a specified location")
+public class Installer implements Runnable {
+
+   @CommandLine.Parameters(description = "File Name where the .dll should be installed. Example: java -jar check-leak.jar install check-leak.so")
+   File file;
+
+   public void run() {
       try {
-         if (arg.length != 1) {
-            printUsage();
-         }
-         File file =  new File(arg[0]);
          install(file);
       } catch (Throwable e) {
          e.printStackTrace();
-         printUsage();
       }
-   }
-
-   private static final void printUsage() {
-      System.err.println("Please pass in the target file as the argument");
-      System.exit(-1);
    }
 
    /** copy the binary library as this targetFile

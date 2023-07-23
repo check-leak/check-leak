@@ -186,7 +186,7 @@ public class RemoteAgentTest {
       process = SpawnJava.spawn(RemoteAgentTest.class.getName(), new String[]{"test"});
       Assertions.assertFalse(process.waitFor(100, TimeUnit.MILLISECONDS));
 
-      Process checkProcess = SpawnJava.spawn(RemoteCheckLeak.class.getName(), new String[]{"--pid", "" + process.pid(), "--report", "./target/report-check", "--sleep", "1000"});
+      Process checkProcess = SpawnJava.spawn(RemoteCheckLeak.class.getName(), new String[]{"remote", "--pid", "" + process.pid(), "--report", "./target/report-check", "--sleep", "1000"});
       try {
          Thread.sleep(1000);
          process.destroyForcibly();
@@ -221,16 +221,5 @@ public class RemoteAgentTest {
 
       System.out.println("Manually inspect ./target/RemoteAgentTest");
    }*/
-
-   @Test
-   public void testParameter() throws Exception {
-      RemoteCheckLeak.Parameters x = new RemoteCheckLeak.Parameters();
-      x.parse("check", "-sleep", "300", "-pid", "333");
-      Assertions.assertEquals("333", x.pid);
-      Assertions.assertEquals(300, x.sleep);
-      x.parse("check", "-pid", "177", "-sleep", "277");
-      Assertions.assertEquals("177", x.pid);
-      Assertions.assertEquals(277, x.sleep);
-   }
 
 }

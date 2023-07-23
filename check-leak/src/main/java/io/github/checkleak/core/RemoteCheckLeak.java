@@ -215,6 +215,7 @@ public class RemoteCheckLeak implements Runnable {
 
          commandLine.addSubcommand(new Installer());
          commandLine.addSubcommand(new RemoteCheckLeak());
+         commandLine.addSubcommand(new AutoCompletion(commandLine));
          commandLine.addSubcommand("help", help);
          commandLine.execute(arg);
       } catch (Throwable e) {

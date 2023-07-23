@@ -10,7 +10,7 @@ Or you can use it to inpsect the VM on a remote process, in a lite weight way, b
 You can download check-leak-0.10.jar and run:
 
 ```shell
-java -jar check-leak-0.10.jar --pid <PID> --report <reportoutput> --sleep <interval in milliseconds>
+java -jar check-leak-0.10.jar remote --pid <PID> --report <reportoutput> --sleep <interval in milliseconds>
 ```
 
 Here is an example report, extract from a run over [ActiveMQ Artemis](https://clebertsuconic.github.io).

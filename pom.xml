@@ -43,6 +43,7 @@
       <maven.compiler.source>11</maven.compiler.source>
       <maven.compiler.target>11</maven.compiler.target>
       <version.junit>5.9.2</version.junit>
+      <version.assertj>3.24.2</version.assertj>
       <version.surefire>3.0.0-M6</version.surefire>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -52,6 +53,7 @@
      <module>check-leak</module>
      <module>maven</module>
      <module>examples</module>
+     <module>assertj</module>
    </modules>
 
    <dependencyManagement>
@@ -62,6 +64,11 @@
             <version>${version.junit}</version>
             <type>pom</type>
             <scope>import</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${version.assertj}</version>
          </dependency>
       </dependencies>
    </dependencyManagement>

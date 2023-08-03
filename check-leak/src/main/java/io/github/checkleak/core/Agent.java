@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,11 +36,23 @@ import java.util.regex.Pattern;
 public class Agent implements java.lang.instrument.ClassFileTransformer, Runnable {
    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 
+   private static boolean running = true;
+
+   public static void stop() {
+      running = false;
+   }
+
    final PrintStream out;
    final int downPercentage;
    final int sleep;
+   private String[] debugList;
+   private String debugMethod;
+   int maxDebugObjects;
+   int maxLevel;
+   boolean useToString;
 
-   public Agent(int sleep, String fileOutput, int downPercentage) throws Exception {
+
+   public Agent(int sleep, String fileOutput, int downPercentage, String[] debugList, String debugMethod, int maxDebugObjects, int maxLevel, boolean useToString) throws Exception {
       this.sleep = sleep;
       if (fileOutput == null) {
          out = System.out;
@@ -49,6 +62,11 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
       }
 
       this.downPercentage = downPercentage;
+      this.debugList = debugList;
+      this.debugMethod = debugMethod;
+      this.maxDebugObjects = maxDebugObjects;
+      this.maxLevel = maxLevel;
+      this.useToString = useToString;
    }
 
    private static void logError(String logging) {
@@ -90,6 +108,11 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
       validProperties.put("sleep", new DefaultValue("60000", "Time to sleep in milliseconds"));
       validProperties.put("output", new DefaultValue(null, "The file output. default=null which means System.out"));
       validProperties.put("down", new DefaultValue("-1", "How much percentage to consider a retracted value. We only consider retracted at a certain percentage of the max value. Default is -1 (disabled)"));
+      validProperties.put("debugList", new DefaultValue(null, "A list of classes, comma separated that we will pay more attention and debug."));
+      validProperties.put("debugMethod", new DefaultValue(null, "used together with debugClass. The method to be called for every class still alive. The signature expected of the method should receive a PrintStream"));
+      validProperties.put("maxDebugObjects", new DefaultValue("10", "When debugging references, how many objects should we detail"));
+      validProperties.put("maxLevel", new DefaultValue("5", "When debuggin references, what level of detail should we print"));
+      validProperties.put("useToString", new DefaultValue("true", "Should it print toString() when debugging objects"));
    }
 
    class DataPoint {
@@ -156,7 +179,7 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
 
       try {
          Thread.currentThread().setName("CheckLeak Tick Agent");
-         while (true) {
+         while (running) {
             Thread.sleep(sleep);
             try {
                out.println("*******************************************************************************************************************************");
@@ -184,6 +207,11 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
 
                inventoryDataPointMap.clear(); // a little help to the GC
                inventoryDataPointMap = null; // I know the VM is supposed to clear this after I leave this loop, but I'm not a believer and my OCD urges me to clear this reference.
+
+
+               if (debugList != null) {
+                  checkLeak.invokeDebug(debugList, debugMethod, maxDebugObjects, maxLevel, useToString, out);
+               }
                list = null;
             } catch (Throwable e) {
                e.printStackTrace();
@@ -193,7 +221,6 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
          e.printStackTrace();
       }
    }
-
 
    private static long copy(InputStream in, OutputStream out) throws Exception {
       try {
@@ -272,7 +299,13 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
 
 
    public static void premain(String agentArgs, Instrumentation inst) {
+      startAgent(agentArgs);
+   }
+
+   public static Thread startAgent(String agentArgs) {
       printBanner(System.out);
+
+      Agent.running = true;
 
       HashMap<String, String> args = parseParameters(agentArgs);
       printValues(args);
@@ -281,17 +314,27 @@ public class Agent implements java.lang.instrument.ClassFileTransformer, Runnabl
       int sleep = Integer.parseInt(args.get("sleep"));
       String fileOutput = args.get("output");
       int downPercentage = Integer.parseInt(args.get("down"));
+      String debugList = args.get("debugList");
+      String debugMethod = args.get("debugMethod");
+
+      int maxDebugObjects = Integer.parseInt(args.get("maxDebugObjects"));
+      int maxLevel = Integer.parseInt(args.get("maxLevel"));
+      boolean useToString  = Boolean.parseBoolean(args.get("useToString"));
+
+      String[] debugListArray = debugList != null ? debugList.split(",") : null;
 
       logInfo("sleep=" + sleep + ", downPercentage=" + downPercentage + ", fileOutput=" + fileOutput);
 
       try {
-         Agent agent = new Agent(sleep, fileOutput, downPercentage);
+         Agent agent = new Agent(sleep, fileOutput, downPercentage, debugListArray, debugMethod, maxDebugObjects, maxLevel, useToString);
          Thread t = new Thread(agent);
          t.setDaemon(true);
          t.start();
+         return t;
       } catch (Exception e) {
          e.printStackTrace();
          logError("Invalid initializational " + e);
       }
+      return null;
    }
 }

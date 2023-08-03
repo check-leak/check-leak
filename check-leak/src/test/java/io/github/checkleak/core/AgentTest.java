@@ -19,6 +19,7 @@ package io.github.checkleak.core;
 
 import java.util.Map;
 
+import io.github.checkleak.core.testdata.DebugCall;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -48,11 +49,38 @@ public class AgentTest {
       args = Agent.parseParameters("invalidArg=3333");
       Assertions.assertEquals("60000", args.get("sleep"));
       Assertions.assertEquals(null, args.get("invalidArg"));
+
+      args = Agent.parseParameters("debugList=Test$DEBUG,TEST3");
+      Assertions.assertEquals("60000", args.get("sleep"));
+      Assertions.assertEquals("Test$DEBUG,TEST3", args.get("debugList"));
    }
 
    @Test
    public void calculatePercentage() {
       int percentage = Agent.calculatePercentage(3000, 5000);
       Assertions.assertEquals(60, percentage);
+   }
+
+   @Test
+   public void debugCall() throws Exception {
+      DebugCall obj1 = new DebugCall();
+      DebugCall obj2 = new DebugCall();
+
+      Thread t = Agent.startAgent("sleep=100;debugList=" + DebugCall.class.getName() + "$Internal" + ";debugMethod=debug;output=./target/test.log");
+
+      for (int i = 0; i < 100; i++) {
+         if (obj1.invocations > 0 && obj2.invocations > 0) {
+            break;
+         }
+         Thread.sleep(100);
+      }
+
+      Agent.stop();
+      t.join(1000);
+
+      Assertions.assertTrue(obj1.invocations > 0);
+      Assertions.assertTrue(obj2.invocations > 0);
+
+
    }
 }

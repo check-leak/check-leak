@@ -43,7 +43,7 @@
       <maven.compiler.source>11</maven.compiler.source>
       <maven.compiler.target>11</maven.compiler.target>
       <version.junit>5.9.2</version.junit>
-      <version.surefire>3.0.0-M6</version.surefire>
+      <version.surefire>3.2.5</version.surefire>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
    </properties>

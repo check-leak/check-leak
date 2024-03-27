@@ -137,7 +137,7 @@
                   <testFailureIgnore>false</testFailureIgnore>
                   <runOrder>alphabetical</runOrder>
                   <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                  <argLine>${native-surefire-argline}</argLine>
+                  <argLine>${native-surefire-argline} -Xcheck:jni</argLine>
                </configuration>
             </plugin>
             <plugin>
